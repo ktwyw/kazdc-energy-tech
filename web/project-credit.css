@@ -1,0 +1,45 @@
+.project-credit {
+  scroll-margin-top: 1rem;
+  border-block: 1px solid #cbd8cc;
+  background: #e9efe7;
+  color: #203b32;
+}
+.credit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.35rem clamp(2rem, 5vw, 5rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+}
+.credit-grid h2 {
+  margin: 0 0 .45rem;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: normal;
+  color: #476054;
+}
+.credit-grid p {margin: .13rem 0 0; font-size: .93rem; line-height: 1.5; overflow-wrap: anywhere}
+.credit-grid address {font-style: normal}
+.credit-grid .credit-institute {margin: 0 0 .35rem; font-size: clamp(1.5rem, 2.1vw, 1.9rem); line-height: 1.12; font-weight: 700}
+.credit-grid .credit-name {font-size: 1.05rem; line-height: 1.4; font-weight: 600; margin-bottom: .25rem}
+.credit-grid a {color: #15594a; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .17em}
+.credit-grid a:hover {text-decoration-thickness: 2px}
+@media (max-width: 670px) {
+  .credit-grid {grid-template-columns: minmax(0, 1fr)}
+}
+@media print {
+  .project-credit {background: transparent; break-inside: avoid}
+  .credit-grid {padding-block: .8rem}
+}
+
+.credit-grid .credit-feedback {margin-top: .7rem; max-width: 49ch; color: #405b4f}
+.case-share {display: flex; align-items: center; flex-wrap: wrap; gap: 4px 9px; max-width: 100%; margin: .35rem 0}
+.case-share button {padding: 5px 10px; border: 1px solid #92ab9d; border-radius: 4px; background: transparent; color: #164e40; font: inherit; font-size: .82rem; font-weight: 630; line-height: 1.4; cursor: pointer}
+.case-share button:hover {background: #e2ece3}
+.case-share button:disabled {cursor: default; opacity: .56}
+.case-share output,.case-version-note {font-size: .81rem; line-height: 1.35; color: #3c594c}
+.case-version-note {margin: 0}
+.case-share textarea {display: block; flex: 1 0 100%; width: 100%; max-width: 100%; min-height: 6rem; box-sizing: border-box; font: inherit; font-size: .86rem}
+.case-share[hidden],.case-share [hidden],.case-share.private-readings {display: none}
+@media print {.case-share {display: none}}

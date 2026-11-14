@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123c3a"><title>Источники · KazDC Энерготехнологии</title>
+<meta name="description" content="Откуда взяты метеоданные для городов Казахстана? По каким формулам рассчитывается энергопотребление дата-центра? Какие параметры можно менять?">
+<meta property="og:site_name" content="KazDC Энерготехнологии">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Источники · KazDC Энерготехнологии">
+<meta property="og:description" content="Откуда взяты метеоданные для городов Казахстана? По каким формулам рассчитывается энергопотребление дата-центра? Какие параметры можно менять?">
+<link rel="alternate" hreflang="en" href="references.html">
+<link rel="alternate" hreflang="kk" href="references-kk.html">
+<link rel="alternate" hreflang="ru" href="references-ru.html">
+<link rel="alternate" hreflang="zh-Hans" href="references-zh.html">
+<script>"use strict";
+
+window.SiteI18n = (() => {
+  const data = {"lang":"ru","locale":"ru","months":["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"],"shortMonths":["янв.","февр.","март","апр.","май","июнь","июль","авг.","сент.","окт.","нояб.","дек."],"cities":{"aktau":"Актау","aktobe":"Актобе","almaty":"Алматы","astana":"Астана","atyrau":"Атырау","ekibastuz":"Экибастуз","karaganda":"Караганда","kokshetau":"Кокшетау","kostanay":"Костанай","kyzylorda":"Кызылорда","oral":"Уральск","oskemen":"Усть-Каменогорск","pavlodar":"Павлодар","petropavl":"Петропавловск","qonaev":"Конаев","semey":"Семей","shymkent":"Шымкент","taldykorgan":"Талдыкорган","taraz":"Тараз","turkistan":"Туркестан","zhezkazgan":"Жезказган"},"station":{"station":"Метеостанция · {city}","airport":"Метеостанция аэропорта · {city}","internationalAirport":"Станция международного аэропорта · {city}","era":"Реанализ ERA5 · {city}","qonaev":"Реанализ ERA5 для Конаева (в файле указан Капчагай)","origin":"{location} · число исходных лет за период {period}: {years}","quality":"В отдельные представительные месяцы погода в файле прохладнее, чем по наблюдениям в аэропорту. Средняя температура июня 2024 года — 21,2 °C в файле и 24,3 °C по наблюдениям. Расход электроэнергии может быть занижен."}};
+  const cityName = (slug, fallback) => data.cities[slug] || fallback || slug;
+  function formatNumber(value, options) {
+    if (data.lang !== "kk") return value.toLocaleString(data.locale, options);
+    // Some browsers ship a partial Kazakh locale and silently use English punctuation.
+    return value.toLocaleString("en-US", options).replaceAll(",", "\u00a0").replace(".", ",");
+  }
+  function stationNote(station) {
+    const location = station.location_note || "";
+    let kind = "station";
+    if (location.includes("ERA5")) kind = station.slug === "qonaev" ? "qonaev" : "era";
+    else if (location.includes("International Airport")) kind = "internationalAirport";
+    else if (location.includes("Airport")) kind = "airport";
+    const place = data.lang === "en" && location ? location :
+      data.station[kind].replace("{city}", cityName(station.slug, station.name));
+    const origin = data.station.origin.replace("{location}", place)
+      .replace("{years}", station.source_years).replace("{period}", station.period);
+    const quality = station.slug === "almaty" && station.quality_note ? ". " + data.station.quality : "";
+    return origin + quality;
+  }
+  return {lang: data.lang, locale: data.locale, months: data.months, shortMonths: data.shortMonths, cityName, stationNote, formatNumber};
+})();
+</script>
+<style>:root{--paper:#f6f5ef;--panel:#fffefa;--ink:#203630;--secondary:#4b6158;--rule:#d0d8cb;--forest:#143f3a;--teal:#087b69;--light:#d7e6d9;--mint:#a9dfbf;--ochre:#986026;font-family:"Inter","Arial",sans-serif;color:var(--ink);background:var(--paper);font-variant-numeric:tabular-nums}
+*{box-sizing:border-box}body{margin:0;line-height:1.52}a{color:#126452;text-underline-offset:.18em}a:hover{text-decoration:underline}button,input,select{font:inherit}button,a,input,select,summary{touch-action:manipulation}button{cursor:pointer}h1,h2,h3,h4,p,figure{margin:0}h1,h2,.brand,.chart-head h2{letter-spacing:-.045em}h1,h2{font-family:"DM Sans","Inter","Arial",sans-serif}h3{letter-spacing:-.025em}b,strong{font-weight:700}a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #bd7b36;outline-offset:3px}
+.inner{width:min(1190px,calc(100% - 80px));margin-inline:auto}.mast{border-bottom:1px solid var(--rule);background:var(--panel)}.mast-row{display:flex;align-items:center;justify-content:space-between;min-height:74px;gap:28px}.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-size:22px;font-weight:750;white-space:nowrap}.brand b{font-weight:480}.coil{position:relative;display:grid;gap:3px;padding:6px 5px;background:var(--forest);border-radius:4px;width:28px}.coil i{display:block;height:3px;background:#a8debc;transform:skew(-22deg)}.mast nav,.foot nav{display:flex;align-items:center;gap:23px}.mast nav a,.foot nav a{font-size:.86rem;font-weight:600;text-decoration:none;color:var(--secondary);white-space:nowrap}.mast nav a:hover,.foot nav a:hover{text-decoration:underline}.mast nav a[aria-current]{color:var(--teal);box-shadow:0 2px var(--teal)}.skip{position:absolute;left:-300px;top:0;background:white;padding:.8em;z-index:10}.skip:focus{left:6px}
+.hero{display:grid;grid-template-columns:.93fr 1.07fr;gap:5vw;align-items:center;padding:56px 0 50px;border-bottom:1px solid var(--rule)}.kicker{color:var(--teal);font-size:.7rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}.hero h1{font-size:clamp(54px,5.6vw,82px);line-height:.96;font-weight:660}.hero h1 span,.page-intro h1 span{color:var(--teal)}.deck{font-size:clamp(1rem,1.35vw,1.22rem);line-height:1.48;color:var(--secondary);margin:20px 0 0;max-width:43rem}.text-links,.tools{display:flex;gap:18px;flex-wrap:wrap;align-items:center}.text-links{margin-top:23px}.text-links a,.details-body>a,.sources a{font-weight:650;font-size:.91rem}.climate-card{background:var(--forest);color:#fcfff9;padding:25px 27px 17px;border-radius:8px;min-width:0}.chart-head,.result-title,.heading,.range-line,.cities-head,.ends,.foot,.legend{display:flex;align-items:center;justify-content:space-between;gap:12px}.chart-head h2,.chart-head h3{font-family:inherit;font-size:1.05rem;font-weight:680;letter-spacing:-.02em}.chart-head>span,.result-title>span,.cities-head>span,.fine,.details-body,.climate-card figcaption,.control-note,.ends{font-size:.84rem}.chart-head>span,.result-title>span,.cities-head>span,.fine,.control-note,.ends{color:var(--secondary)}.climate-card .chart-head span,.climate-card figcaption{color:#d4e6d7}.graphic{width:100%;min-width:0;line-height:1}.graphic svg{display:block;width:100%;height:auto;overflow:visible}.climate-card figcaption{line-height:1.4;margin-top:4px}.climate-card figcaption span{display:inline-flex;align-items:center;margin:3px 14px 2px 0;gap:5px;font-weight:600}.chart-head{margin-bottom:10px}
+.workspace,.studies,.reading{padding:39px 0 43px;border-bottom:1px solid var(--rule);scroll-margin-top:14px}.heading{margin-bottom:23px;flex-wrap:wrap}.heading h2,.reading h2{font-size:clamp(27px,3vw,40px);line-height:1.1;font-weight:635}.heading .kicker{margin-bottom:7px}.quiet,.action{border:1px solid #a6bcac;border-radius:5px;padding:.54em .86em;font-weight:620;font-size:.88rem;line-height:1.4;display:inline-flex;align-items:center;justify-content:center}.quiet{background:transparent;color:var(--forest)}.quiet:hover{background:#e1e9de}.action{background:var(--forest);color:white;border-color:var(--forest)}.action:hover{background:#20584d}.action:disabled{opacity:.42;cursor:default}.compare-grid{display:grid;grid-template-columns:minmax(220px,.79fr) minmax(0,1.9fr);gap:20px;align-items:stretch}.controls,.result-panel{border:1px solid var(--rule);border-radius:7px;padding:23px 26px;min-width:0}.controls{background:#e8eee4;align-self:start}.result-panel{background:var(--panel)}.controls h3,.result-title h3{font-size:1.2rem;line-height:1.35}.controls h3{margin-bottom:17px}.controls label{display:block;margin:12px 0 4px;font-size:.86rem;font-weight:640}.controls select,.controls input:not([type=range]){width:100%;min-width:0;border:1px solid #9aafa0;border-radius:4px;background:#fffffa;color:var(--ink);padding:7px 9px;min-height:39px}.range-line{margin-top:18px;align-items:baseline}.range-line label{margin:0}.range-line output{font-size:1.24rem;color:var(--forest);font-weight:700}.controls input[type=range]{display:block;width:100%;accent-color:var(--teal);margin:10px 0 0}.ends{font-size:.72rem}.control-note,.controls .fine{margin-top:13px;line-height:1.45}.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:18px 0 24px}.metrics>div+div{border-left:1px solid var(--rule);padding-left:16px}.metrics span,.metrics small{display:block;color:var(--secondary);font-size:.79rem;line-height:1.3}.metrics strong{display:block;color:var(--forest);font-size:clamp(24px,3vw,43px);letter-spacing:-.05em;line-height:1.22;font-weight:650}.cities-head{font-size:.89rem;margin:0 0 8px}.city-bars{display:grid;gap:7px}.bar-row{display:grid;grid-template-columns:minmax(65px,.7fr) 2fr minmax(65px,.4fr);gap:12px;align-items:center;font-size:.87rem}.bar-row>span:first-child{color:var(--secondary)}.bar-row.active>span:first-child{font-weight:750;color:var(--ink)}.bar-track{height:9px;background:#edf1e9;border-radius:1px;overflow:hidden}.bar-track i{display:block;height:100%;background:#8ba89a}.active .bar-track i{background:var(--teal)}.bar-row>strong{text-align:right;font-weight:650}.fine{line-height:1.46}.result-panel>.fine{margin-top:14px}
+.details{border-top:1px solid var(--rule);margin-top:13px}.details+.details{margin-top:0}.details summary{padding:12px 1px;font-weight:650;font-size:.92rem;cursor:pointer;color:var(--forest)}.details-body{padding:4px 0 13px;font-size:.95rem;line-height:1.55}.details-body p+p,.reading p+p{margin-top:12px}.details-body button{margin:10px 9px 0 0}.table-wrap{min-width:0;overflow-x:auto}.table-wrap table{border-collapse:collapse;width:100%;margin:12px 0 7px;font-size:.82rem;line-height:1.35}.table-wrap th,.table-wrap td{text-align:right;border-bottom:1px solid var(--rule);padding:8px 9px}.table-wrap th:first-child,.table-wrap td:first-child{text-align:left}.table-wrap thead th{color:var(--secondary);background:#ecf0e8;font-weight:650}.table-wrap tfoot{font-weight:700}.study-rows{border-top:1px solid var(--rule)}.study-rows a{display:grid;grid-template-columns:minmax(110px,.55fr) 2fr 30px;gap:20px;align-items:center;padding:16px 6px;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none}.study-rows a:hover{background:#ebefe6}.study-rows b,.study-rows small{display:block}.study-rows b{font-size:1.13rem}.study-rows small{font-size:.88rem;color:var(--secondary);margin-top:2px}.study-tag{color:var(--teal);font-weight:650;font-size:.78rem}.study-rows i{color:var(--teal);font-size:1.45rem;font-style:normal;text-align:center}
+.page-intro{padding:47px 0 32px;border-bottom:1px solid var(--rule)}.page-intro h1{overflow-wrap:anywhere;hyphens:auto;font-size:clamp(42px,5.4vw,74px);line-height:1.02;font-weight:650}.page-intro .deck{max-width:56rem;margin-top:14px}.reading{display:grid;grid-template-columns:.78fr 1.7fr;gap:45px}.reading h3{font-size:1.16rem;margin:20px 0 7px}.reading h3:first-child{margin-top:0}.reading p{color:#364b42;font-size:.97rem}.reading .sources{margin:18px 0 3px}.equation,.interpretation{background:#eaf1e8;border-left:3px solid var(--teal);padding:12px 15px;color:var(--forest);font-size:.95rem;line-height:1.5}.interpretation{margin:18px 0}.equation{font-weight:620;margin:15px 0}.legend{justify-content:flex-start;color:var(--secondary);gap:6px;font-size:.8rem}.dot{width:9px;height:9px;border-radius:50%;display:inline-block}.dot.teal{background:var(--teal)}.dot.muted{background:#b0c0b6;margin-left:12px}.error,.notice{padding:11px 13px;margin:12px 0;background:#fcf1e4;border-left:3px solid var(--ochre);color:#693f1f}.foot{padding:28px 0 33px;flex-wrap:wrap}.foot>div{display:flex;gap:15px;align-items:baseline}.foot>div span{font-size:.85rem;color:var(--secondary)}.foot strong{letter-spacing:-.02em}.foot nav{gap:19px}.error[hidden]{display:none}button:disabled,.controls input:disabled{opacity:.54}
+@media(max-width:900px){.inner{width:calc(100% - 42px)}.mast-row{align-items:flex-start;justify-content:flex-start;gap:13px;flex-wrap:wrap;padding:11px 0}.mast nav{flex-wrap:wrap;gap:6px 19px}.hero{gap:28px;padding:38px 0}.climate-card{padding:16px 19px}.controls,.result-panel{padding:18px}.compare-grid{grid-template-columns:minmax(200px,.8fr) minmax(0,1.7fr)}.metrics{gap:10px}.metrics>div+div{padding-left:11px}.mast nav a{font-size:.8rem}.range-line{gap:5px}}
+@media(max-width:670px){.inner{width:calc(100% - 32px)}.mast-row{display:block}.mast nav{padding-top:7px;gap:4px 14px}.hero{grid-template-columns:1fr;padding:32px 0 27px;gap:24px}.hero h1 br{display:none}.hero h1{font-size:clamp(44px,10vw,63px)}.deck{margin-top:13px}.text-links{gap:8px 16px;margin-top:14px}.climate-card{padding:15px 19px}.compare-grid,.reading{grid-template-columns:1fr;gap:14px}.workspace,.studies,.reading{padding:25px 0}.heading{margin-bottom:14px}.controls h3{margin-bottom:8px}.range-line{margin-top:12px}.metrics span,.metrics small{font-size:.73rem}.metrics strong{font-size:clamp(23px,6.8vw,34px)}.metrics{gap:6px}.metrics>div+div{padding-left:8px}.page-intro{padding:31px 0 25px}.study-rows a{grid-template-columns:1fr 28px;gap:2px 10px;padding:12px 1px}.study-tag{grid-row:1;grid-column:1}.study-rows a>span:nth-child(2){grid-row:2;grid-column:1}.study-rows i{grid-column:2;grid-row:1/3}.foot>div{flex-wrap:wrap;gap:2px 12px}.foot nav{gap:6px 15px;flex-wrap:wrap}.foot{gap:10px}.table-wrap th,.table-wrap td{padding:7px 5px}.reading h2{max-width:25ch}.tools{gap:7px}}
+@media print{.mast nav,.foot,.tools,button,.text-links{display:none}.inner{width:100%}.controls,.result-panel,.climate-card{break-inside:avoid}.hero{padding:10px 0}.workspace,.reading{padding:15px 0}}
+
+.climate-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;padding-top:8px;border-top:1px solid #507168}
+.climate-pair label{min-width:0}
+.climate-card .climate-pair span{display:flex;gap:7px;margin:0 0 4px;font-size:.78rem}
+.climate-pair i{width:19px;border-top:3px solid #a5e5bd}
+.climate-pair .peer-line{border-top:2px dashed #ebc888}
+.climate-pair select{display:block;width:100%;min-height:34px;padding:4px 7px;border:1px solid #75958b;border-radius:4px;color:#f6fff8;background:#234d44;font-weight:600}
+.city-export{margin-top:12px}
+#city-bars{display:block}
+#city-bars .bar-row{break-inside:avoid;grid-template-columns:minmax(5.7rem,.92fr) 1.3fr 3.8rem;gap:8px;padding:3px 0}
+@media(min-width:950px){
+  #city-bars{column-count:2;column-gap:24px;column-rule:1px solid var(--rule)}
+  #city-bars .bar-row{font-size:.80rem}
+}
+@media(max-width:370px){.climate-pair{gap:9px}.climate-card .climate-pair span{gap:4px;font-size:.71rem}}
+
+
+@media (max-width: 500px) {
+  .result-panel .metrics {grid-template-columns: 1fr; gap: 0}
+  .result-panel .metrics > div {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center; column-gap: 12px; padding-block: 8px;
+  }
+  .result-panel .metrics > div + div {border-left: 0; border-top: 1px solid var(--rule); padding-left: 0}
+  .result-panel .metrics span {grid-row: 1 / 3; font-size: .85rem}
+  .result-panel .metrics strong, .result-panel .metrics small {grid-column: 2; text-align: right}
+  .result-panel .metrics small {max-width: 15ch; overflow-wrap: anywhere}
+  .bar-row > span:first-child {overflow-wrap: anywhere; hyphens: auto}
+  #power-bars .bar-row {grid-template-columns: minmax(8rem, 1.6fr) minmax(0, 1fr) auto}
+}
+
+.ref-hero {display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:clamp(24px,6vw,90px);padding:50px 0 40px;border-bottom:1px solid var(--rule)}
+.ref-hero h1 {font-size:clamp(3.1rem,6.8vw,6.15rem);line-height:1;font-weight:650;letter-spacing:-.055em}
+.ref-hero .deck {max-width:35rem;margin-top:16px}
+.ref-feature {background:var(--forest);color:#f5f8ee;border-radius:7px;padding:23px 28px}
+.ref-feature-label {color:#b9dfc8;font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.ref-feature h2 {font-size:clamp(1.3rem,2.15vw,1.9rem);line-height:1.14;letter-spacing:-.03em;margin:8px 0}
+.ref-feature p:not(.ref-feature-label) {color:#dbeade;font-size:.91rem;line-height:1.48}
+.ref-feature a {display:inline-block;margin-top:12px;color:#e0f7dc;font-size:.87rem;font-weight:650}
+.ref-layout {display:grid;grid-template-columns:minmax(180px,.45fr) minmax(0,1.55fr);gap:clamp(30px,6vw,82px);align-items:start}
+.ref-index {position:sticky;top:18px;margin-top:35px;padding:0 16px 4px 0}
+.ref-index h2 {font-family:inherit;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--secondary);margin:0 0 11px}
+.ref-index a {display:block;padding:5px 0;text-decoration:none;font-size:.92rem;font-weight:560}
+.ref-index a:hover,.ref-index a:focus-visible {text-decoration:underline}
+.ref-content {min-width:0}
+.ref-section {padding:32px 0;border-bottom:1px solid var(--rule);scroll-margin-top:18px}
+.ref-section:last-child {border:0}
+.ref-section h2 {font-size:clamp(1.6rem,2.8vw,2.45rem);line-height:1.12;letter-spacing:-.035em;font-weight:650;margin-bottom:14px}
+.ref-section>p,.ref-list dd {max-width:79ch;color:#334a40;font-size:.96rem;line-height:1.58}
+.ref-list {margin:17px 0 0}
+.ref-list dt {font-size:1.05rem;font-weight:690;color:var(--ink);margin:20px 0 4px;line-height:1.35}
+.ref-list dt:first-child {margin-top:0}
+.ref-list dd {margin:0 0 9px}
+.ref-list dd:last-child {margin-bottom:0}
+.ref-list dd span {display:block;margin:6px 0 0;color:#6b7a6f;font-size:.86rem}
+.ref-list a,.ref-action a,.ref-files a {font-weight:560}
+.ref-directory {margin:17px 0 9px;background:var(--panel);border:1px solid var(--rule);border-radius:5px}
+.ref-directory summary {padding:12px 15px;color:var(--forest);font-weight:650;cursor:pointer}
+.ref-directory summary span {font-size:.82rem;font-weight:450;color:var(--secondary);margin-left:10px}
+.ref-table-wrap {overflow-x:auto;padding:0 12px 11px}
+.ref-table-wrap table {width:100%;border-collapse:collapse;font-size:.78rem;line-height:1.4}
+.ref-table-wrap caption {text-align:left;margin:0 0 6px;color:var(--secondary)}
+.ref-table-wrap th,.ref-table-wrap td {text-align:left;padding:6px 7px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.ref-table-wrap thead {background:#eaf0e6}
+.ref-section>p.ref-action,.ref-section>p.ref-date {font-size:.84rem}
+.ref-files {list-style:none;margin:16px 0;padding:0;border-top:1px solid var(--rule)}
+.ref-files li {display:grid;grid-template-columns:9rem 1fr;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:.9rem}
+.ref-section>p.ref-date {color:var(--secondary)}
+@media(max-width:900px) {.ref-hero{gap:26px}.ref-layout{grid-template-columns:175px minmax(0,1fr);gap:24px}}
+@media(max-width:670px) {
+  .ref-hero {grid-template-columns:1fr;gap:18px;padding:30px 0 24px}
+  .ref-feature {padding:17px 20px}.ref-layout {display:block}
+  .ref-index {position:static;display:grid;grid-template-columns:1fr 1fr;gap:0 12px;margin:0;padding:20px 0;border-bottom:1px solid var(--rule)}
+  .ref-index h2 {grid-column:1/-1;margin-bottom:4px}.ref-index a {font-size:.84rem;padding:4px 0}
+  .ref-section {padding:23px 0}.ref-directory summary span {display:block;margin:2px 0 0 16px}
+  .ref-files li {grid-template-columns:1fr;gap:2px}
+}
+@media print {
+  .ref-hero,.ref-layout {display:block}.ref-hero {padding:12px 0}.ref-index,.ref-feature {display:none}
+  .ref-section {padding:14px 0}.ref-section h2,.ref-list dt {break-after:avoid}.ref-list dd {break-inside:avoid}
+  .ref-table-wrap {overflow:visible}.ref-table-wrap table {font-size:8pt}
+}
+
+.ref-heading-row {display:flex;align-items:center;flex-wrap:wrap;gap:8px 20px;margin-bottom:12px}
+.ref-heading-row .kicker {margin:0}
+html:lang(zh-Hans) {font-family:Inter,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",sans-serif}
+html:lang(zh-Hans) h1,html:lang(zh-Hans) h2 {font-family:inherit;letter-spacing:0}
+html:lang(zh-Hans) .ref-hero h1 {line-height:1.16}
+html:lang(zh-Hans) .ref-feature h2,html:lang(zh-Hans) .ref-section h2 {line-height:1.36}
+html:lang(zh-Hans) .ref-list dd,html:lang(zh-Hans) .ref-section>p {line-height:1.83}
+html:lang(zh-Hans) .ref-feature p:not(.ref-feature-label) {line-height:1.65}
+.station-alias {display:block;color:var(--secondary);font-weight:450;font-size:.77rem}
+@media(min-width:901px) and (max-width:1200px) {
+  html:lang(ru) .mast nav {flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}
+}
+@media(min-width:901px) {
+  html:lang(kk) .mast nav {flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}
+}
+@media(max-width:440px) {html:lang(kk) .brand {white-space:normal}}
+@media(max-width:360px) {
+  html:lang(ru) .brand,html:lang(kk) .brand {font-size:1.15rem}
+  html:lang(kk) .ref-hero h1 {font-size:2.55rem}
+}
+@media(max-width:670px) {.ref-heading-row {margin-bottom:8px}}
+
+#weather-comparison {margin: 20px 0 8px; scroll-margin-top: 18px}
+#weather-comparison .chart-head h3 {margin: 0; color: #f7fff8}
+@media print {#weather-comparison {max-width: 40rem; print-color-adjust: exact}}
+.mast .mast-row, .mast .mast-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px clamp(12px, 1.7vw, 25px);
+}
+.mast .mast-row > nav, .mast .mast-inner > nav {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px clamp(10px, 1.35vw, 20px);
+}
+.language-menu {position: relative; justify-self: end; z-index: 3; color: #173f36}
+.language-menu summary {
+  display: flex; align-items: center; gap: 6px; min-height: 38px;
+  padding: 5px 9px; cursor: pointer; list-style: none;
+  border: 1px solid #9bb6a8; border-radius: 5px;
+  background: #fffefa; font-family: inherit; line-height: 1.35;
+  font-size: .86rem; font-weight: 600; white-space: nowrap;
+}
+.language-menu summary::-webkit-details-marker {display: none}
+.language-menu summary::after {
+  content: ""; width: 6px; height: 6px; margin: -3px 2px 0;
+  border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg);
+}
+.language-menu[open] summary::after {margin-top: 3px; transform: rotate(225deg)}
+.language-menu summary:hover, .language-menu[open] summary {background: #eaf2e9}
+.language-menu svg {width: 17px; height: 17px; flex: none}
+.language-options {
+  position: absolute; right: 0; top: calc(100% + 5px); min-width: 10rem; width: max-content;
+  max-width: min(19rem, calc(100vw - 36px)); padding: 5px;
+  background: #fffefa; border: 1px solid #aac1b5; border-radius: 6px;
+  box-shadow: 0 5px 14px #143d3429;
+}
+.language-options p {margin: 4px 6px 5px; font: inherit; font-size: .8rem; color: #405a4e}
+.language-options a, .language-options [aria-current] {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  min-height: 40px; padding: 5px 9px; color: #173f36;
+  border-radius: 3px; font-size: .92rem; text-decoration: none;
+}
+.language-options a:hover, .language-options a:focus-visible {background: #e9f2e9; text-decoration: underline}
+.language-options [aria-current] {background: #e9f2e9; font-weight: 650}
+.language-menu :focus-visible {outline: 2px solid #886020; outline-offset: 2px}
+html:lang(zh-Hans) body {font-family: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif}
+html:lang(zh-Hans) :is(h1, h2) {font-family: inherit; letter-spacing: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .hero h1 {font-size: clamp(2.25rem, 4.1vw, 3.9rem); overflow-wrap: anywhere}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line label {min-width: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line output {flex-shrink: 0}
+@media (max-width: 1050px) {
+  .mast .mast-row, .mast .mast-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand language" "nav nav"; gap: 5px 10px; padding: 8px 0;
+  }
+  .mast .brand {grid-area: brand; min-width: 0; width: fit-content; white-space: normal; line-height: 1.2}
+  .mast .brand .coil {flex: none}
+  .mast .language-menu {grid-area: language}
+  .mast .mast-row > nav, .mast .mast-inner > nav {grid-area: nav; justify-content: flex-start; padding: 0}
+}
+@media print {.mast .language-menu {display: none}}
+.project-credit {
+  scroll-margin-top: 1rem;
+  border-block: 1px solid #cbd8cc;
+  background: #e9efe7;
+  color: #203b32;
+}
+.credit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.35rem clamp(2rem, 5vw, 5rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+}
+.credit-grid h2 {
+  margin: 0 0 .45rem;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: normal;
+  color: #476054;
+}
+.credit-grid p {margin: .13rem 0 0; font-size: .93rem; line-height: 1.5; overflow-wrap: anywhere}
+.credit-grid address {font-style: normal}
+.credit-grid .credit-institute {margin: 0 0 .35rem; font-size: clamp(1.5rem, 2.1vw, 1.9rem); line-height: 1.12; font-weight: 700}
+.credit-grid .credit-name {font-size: 1.05rem; line-height: 1.4; font-weight: 600; margin-bottom: .25rem}
+.credit-grid a {color: #15594a; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .17em}
+.credit-grid a:hover {text-decoration-thickness: 2px}
+@media (max-width: 670px) {
+  .credit-grid {grid-template-columns: minmax(0, 1fr)}
+}
+@media print {
+  .project-credit {background: transparent; break-inside: avoid}
+  .credit-grid {padding-block: .8rem}
+}
+
+.credit-grid .credit-feedback {margin-top: .7rem; max-width: 49ch; color: #405b4f}
+.case-share {display: flex; align-items: center; flex-wrap: wrap; gap: 4px 9px; max-width: 100%; margin: .35rem 0}
+.case-share button {padding: 5px 10px; border: 1px solid #92ab9d; border-radius: 4px; background: transparent; color: #164e40; font: inherit; font-size: .82rem; font-weight: 630; line-height: 1.4; cursor: pointer}
+.case-share button:hover {background: #e2ece3}
+.case-share button:disabled {cursor: default; opacity: .56}
+.case-share output,.case-version-note {font-size: .81rem; line-height: 1.35; color: #3c594c}
+.case-version-note {margin: 0}
+.case-share textarea {display: block; flex: 1 0 100%; width: 100%; max-width: 100%; min-height: 6rem; box-sizing: border-box; font: inherit; font-size: .86rem}
+.case-share[hidden],.case-share [hidden],.case-share.private-readings {display: none}
+@media print {.case-share {display: none}}
+</style>
+</head>
+<body data-page="references">
+<a href="#main" class="skip">К основному содержанию</a>
+<header class="mast"><div class="inner mast-row">
+<a class="brand" href="regional-ru.html" data-study-link="regional"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span><span>KazDC <b>Энерготехнологии</b></span></a>
+<nav aria-label="Модели и эксперименты"><a href="regional-ru.html" data-study-link="regional">Города</a><a href="technologies-ru.html" data-study-link="tech">Технологии</a><a href="snow-ru.html" data-study-link="snow">Хранение снега</a><a href="heat-ru.html" data-study-link="heat">Утилизация тепла</a><a href="power-ru.html" data-study-link="power">Электропитание</a><a href="bench-ru.html" data-study-link="bench">Эксперимент</a><a href="references-ru.html" data-study-link="references" aria-current="page">Источники</a><a href="research-priorities-ru.html" data-study-link="research">Приоритеты исследований</a><a href="#project-contact">Контакты</a></nav>
+<details class="language-menu"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>Язык</summary><div class="language-options"><a lang="en" hreflang="en" href="references.html" data-language-section data-reference-language>English</a><a lang="kk" hreflang="kk" href="references-kk.html" data-language-section data-reference-language>Қазақша</a><span lang="ru" aria-current="page">Русский<b aria-hidden="true">✓</b></span><a lang="zh-Hans" hreflang="zh-Hans" href="references-zh.html" data-language-section data-reference-language>简体中文</a></div></details>
+</div></header>
+<main class="inner" id="main">
+<header class="ref-hero">
+  <div>
+    <div class="ref-heading-row"><p class="kicker">KazDC-BIM · Методы и данные</p></div>
+    <h1>Источники</h1>
+    <p class="deck">Откуда взяты метеоданные для городов Казахстана? По каким формулам рассчитывается энергопотребление дата-центра? Какие параметры можно менять?</p>
+  </div>
+  <aside class="ref-feature" aria-labelledby="ref-feature-title">
+    <p class="ref-feature-label">Базовый сценарий для Астаны</p>
+    <h2 id="ref-feature-title">Сколько электроэнергии уйдёт на охлаждение за один час?</h2>
+    <p>Возьмите температуру наружного воздуха, определите, какую часть нагрузки покроют сухой охладитель и чиллер, и сверьте расход электроэнергии с почасовым расчётом.</p>
+    <a href="methods-ru.html#worked-hours">Разобрать один час <span aria-hidden="true">→</span></a>
+  </aside>
+</header>
+
+<div class="ref-layout">
+  <nav class="ref-index" aria-label="Разделы страницы">
+    <h2>Содержание</h2>
+    <a href="#weather">Метеоданные и время</a><a href="#stations">Архивы метеостанций</a>
+    <a href="#cooling">Охлаждение наружным воздухом</a><a href="#liquid">Жидкостные контуры и измерения</a>
+    <a href="#heat">Утилизация тепла</a><a href="#storage">Водяной аккумулятор холода</a>
+    <a href="#snow">Сезонное хранение снега</a><a href="#power">ИБП, солнечные панели и батареи</a>
+    <a href="#reproduce">Как повторить расчёт</a>
+  </nav>
+
+  <div class="ref-content">
+    <section id="weather" class="ref-section"><h2>Метеоданные и время</h2>
+      <p>Для каждого города взят типичный метеорологический год (TMYx) из 8 760 часовых интервалов. Его двенадцать месяцев могут относиться к разным календарным годам. Такие данные позволяют сравнивать сезоны. Для оценки экстремальных условий или прогноза на конкретный год нужны другие метеорологические ряды.</p>
+      <dl class="ref-list">
+        <dt>Climate.OneBuilding · Как составляют типичный метеорологический год</dt>
+        <dd>Метеофайлы TMYx составили Linda K. Lawrie и Drury B. Crawley. Из набора по Казахстану за 2011–2025 годы взяты температура наружного воздуха по сухому термометру, относительная влажность, атмосферное давление на станции и суммарная солнечная радиация на горизонтальную поверхность. Для солнечной радиации составители использовали данные реанализа ERA5. <span><a href="https://climate.onebuilding.org/contact/default.html">Составители и условия использования</a> · <a href="https://climate.onebuilding.org/sources/default.html">Методика TMYx</a> · <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">Каталог по Казахстану</a></span></dd>
+        <dt>EnergyPlus · Поля метеофайла EPW и коды источников</dt>
+        <dd>Для каждого из четырёх входных параметров во всех файлах указан код источника и неопределённости <code>?9</code>. По этому коду нельзя установить, получено ли конкретное значение прямым измерением. Часы пронумерованы от 1 до 24, в поле минут указано 30. Количество солнечной энергии за интервал выражено в Вт·ч/м². Деление на один час даёт среднюю за час плотность потока излучения в Вт/м², которую использует модель солнечных панелей. <span><a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/energyplus-weather-file-epw-data-dictionary.html">Поля и единицы EPW</a> · <a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/data-sources-uncertainty.html">Коды источников и неопределённости</a></span></dd>
+        <dt>NOAA и Казахстан · Сверка температур и учёт времени</dt>
+        <dd>Для Алматы использованы часовые и суточные записи NOAA. Средняя температура за июнь 2024 года, включённый в типичный год, составляет 21,2 °C в метеофайле аэропорта и 24,3 °C по наблюдениям в том же аэропорту. Более низкая температура в файле может занизить расчётное электропотребление системы охлаждения. В 16 файлах EPW указано UTC+6, в пяти — UTC+5. Месячные итоги рассчитаны по календарю каждого файла. Для выбора часов зарядки и разрядки бака модель переводит время в действующий в Казахстане часовой пояс UTC+5. <span><a href="https://www.ncei.noaa.gov/products/land-based-station/integrated-surface-database">Часовые наблюдения NOAA</a> · <a href="https://registry.opendata.aws/noaa-gsod/">Суточные сводки NOAA</a> · <a href="regional-ru.html#almaty-source">Сверка данных по Алматы</a> · <a href="https://www.gov.kz/org/vko-shemonaiha-volchan/press/news/details/720058?lang=en">Переход Казахстана на единое время</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="stations" class="ref-section"><h2>Архивы метеостанций</h2>
+      <p>Исходный файл можно найти по идентификатору EPW. Для Экибастуза, Конаева и Талдыкоргана использованы данные сеточного реанализа ERA5. В остальных 18 файлах указаны данные метеостанций NCEI ISD и реанализа ERA5. Для Актау доступны 14 исходных лет, для Тараза — 10, для каждого из остальных городов — 15. В таблице сохранены обозначения из файлов. Например, архив Конаева можно найти по прежнему названию города — <span lang="en">Kapchagay</span>.</p>
+      <figure id="weather-comparison" class="climate-card" aria-labelledby="weather-figure-title">
+  <div class="chart-head"><h3 id="weather-figure-title">Температура наружного воздуха</h3><span>Средняя за месяц · °C</span></div>
+  <div id="weather-chart" class="graphic"></div>
+  <figcaption class="climate-pair">
+    <label><span><i class="model-line" aria-hidden="true"></i>Город для расчёта</span><select id="climate-city"></select></label>
+    <label><span><i class="peer-line" aria-hidden="true"></i>Город для сравнения</span><select id="climate-peer"></select></label>
+  </figcaption>
+</figure>
+<details id="weather-values" class="ref-directory" hidden>
+  <summary>Таблица среднемесячных температур</summary>
+  <div class="ref-table-wrap" tabindex="0" role="region" aria-labelledby="weather-caption">
+    <table>
+      <caption id="weather-caption"></caption>
+      <thead><tr>
+        <th scope="col">Месяц</th>
+        <th scope="col"><span id="weather-first"></span> (°C)</th>
+        <th scope="col"><span id="weather-second"></span> (°C)</th>
+      </tr></thead>
+      <tbody id="weather-rows"></tbody>
+    </table>
+  </div>
+</details>
+<p class="ref-action"><a data-weather-return href="regional-ru.html#compare">К сравнению охлаждения по городам</a></p>
+
+      <details class="ref-directory"><summary>Метеофайлы городов (21) <span>Название станции, период данных и исходный ZIP</span></summary>
+        <div class="ref-table-wrap" tabindex="0" role="region" aria-label="Таблица метеофайлов с горизонтальной прокруткой">
+          <table><caption>Города Казахстана и соответствующие им названия и идентификаторы в файлах EPW</caption>
+            <thead><tr><th scope="col">Город</th><th scope="col">Название в EPW</th><th scope="col">ID в EPW</th><th scope="col">Источник</th><th scope="col">Число лет (период)</th><th scope="col">Время в файле</th><th scope="col">Архив</th></tr></thead>
+            <tbody><tr><th scope="row">Актау<small lang="en" class="station-alias">Aktau</small></th><td>Aktau</td><td>381110</td><td>NCEI ISD / ERA5</td><td>14 (2011–2025)</td><td>UTC+5</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/MAN_Mangystau/KAZ_MAN_Aktau.381110_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Актау">ZIP</a></td></tr>
+<tr><th scope="row">Актобе<small lang="en" class="station-alias">Aktobe</small></th><td>Aktobe.Intl.AP</td><td>352290</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+5</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/AKT_Aktobe/KAZ_AKT_Aktobe.Intl.AP.352290_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Актобе">ZIP</a></td></tr>
+<tr><th scope="row">Алматы<small lang="en" class="station-alias">Almaty</small></th><td>Almaty.Intl.AP</td><td>368720</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ALM_Almaty/KAZ_ALM_Almaty.Intl.AP.368720_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Алматы">ZIP</a></td></tr>
+<tr><th scope="row">Астана<small lang="en" class="station-alias">Astana</small></th><td>Astana</td><td>351880</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/AKM_Akmola/KAZ_AKM_Astana.351880_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Астана">ZIP</a></td></tr>
+<tr><th scope="row">Атырау<small lang="en" class="station-alias">Atyrau</small></th><td>Atyrau</td><td>357000</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+5</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ATY_Atyrau/KAZ_ATY_Atyrau.357000_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Атырау">ZIP</a></td></tr>
+<tr><th scope="row">Экибастуз<small lang="en" class="station-alias">Ekibastuz</small></th><td>Ekibastuz</td><td>360010</td><td>Реанализ ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/PAV_Pavlodar/KAZ_PAV_Ekibastuz.360010_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Экибастуз">ZIP</a></td></tr>
+<tr><th scope="row">Караганда<small lang="en" class="station-alias">Karaganda</small></th><td>Karagandy.Intl.AP</td><td>353940</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/KAR_Karaganda/KAZ_KAR_Karagandy.Intl.AP.353940_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Караганда">ZIP</a></td></tr>
+<tr><th scope="row">Кокшетау<small lang="en" class="station-alias">Kokshetau</small></th><td>Kokshetau</td><td>288790</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/AKM_Akmola/KAZ_AKM_Kokshetau.288790_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Кокшетау">ZIP</a></td></tr>
+<tr><th scope="row">Костанай<small lang="en" class="station-alias">Kostanay</small></th><td>Kostanay</td><td>289520</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/KUS_Kostanay/KAZ_KUS_Kostanay.289520_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Костанай">ZIP</a></td></tr>
+<tr><th scope="row">Кызылорда<small lang="en" class="station-alias">Kyzylorda</small></th><td>Kyzylorda</td><td>380620</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+5</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/KZY_Kyzylorda/KAZ_KZY_Kyzylorda.380620_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Кызылорда">ZIP</a></td></tr>
+<tr><th scope="row">Уральск<small lang="en" class="station-alias">Oral</small></th><td>Uralsk.AP</td><td>351080</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+5</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ZAP_West_Kazakhstan/KAZ_ZAP_Uralsk.AP.351080_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Уральск">ZIP</a></td></tr>
+<tr><th scope="row">Усть-Каменогорск<small lang="en" class="station-alias">Oskemen</small></th><td>Ust.Kamenogorsk.AP</td><td>350675</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/VOS_East_Kazakhstan/KAZ_VOS_Ust.Kamenogorsk.AP.350675_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Усть-Каменогорск">ZIP</a></td></tr>
+<tr><th scope="row">Павлодар<small lang="en" class="station-alias">Pavlodar</small></th><td>Pavlodar.AP</td><td>360030</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/PAV_Pavlodar/KAZ_PAV_Pavlodar.AP.360030_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Павлодар">ZIP</a></td></tr>
+<tr><th scope="row">Петропавловск<small lang="en" class="station-alias">Petropavl</small></th><td>Petropavl</td><td>286760</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/SEV_North_Kazakhstan/KAZ_SEV_Petropavl.286760_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Петропавловск">ZIP</a></td></tr>
+<tr><th scope="row">Конаев<small lang="en" class="station-alias">Qonaev</small></th><td>Kapchagay</td><td>368810</td><td>Реанализ ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ALM_Almaty/KAZ_ALM_Kapchagay.368810_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Конаев">ZIP</a></td></tr>
+<tr><th scope="row">Семей<small lang="en" class="station-alias">Semey</small></th><td>Semey</td><td>361770</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/VOS_East_Kazakhstan/KAZ_VOS_Semey.361770_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Семей">ZIP</a></td></tr>
+<tr><th scope="row">Шымкент<small lang="en" class="station-alias">Shymkent</small></th><td>Shymkent</td><td>383280</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/SYM_Shymkent/KAZ_SYM_Shymkent.383280_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Шымкент">ZIP</a></td></tr>
+<tr><th scope="row">Талдыкорган<small lang="en" class="station-alias">Taldykorgan</small></th><td>Taldykorgan</td><td>367780</td><td>Реанализ ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ALM_Almaty/KAZ_ALM_Taldykorgan.367780_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Талдыкорган">ZIP</a></td></tr>
+<tr><th scope="row">Тараз<small lang="en" class="station-alias">Taraz</small></th><td>Taraz.AP</td><td>383410</td><td>NCEI ISD / ERA5</td><td>10 (2011–2021)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ZHA_Jambyl/KAZ_ZHA_Taraz.AP.383410_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Тараз">ZIP</a></td></tr>
+<tr><th scope="row">Туркестан<small lang="en" class="station-alias">Turkistan</small></th><td>Turkistan</td><td>381980</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/SYM_Shymkent/KAZ_SYM_Turkistan.381980_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Туркестан">ZIP</a></td></tr>
+<tr><th scope="row">Жезказган<small lang="en" class="station-alias">Zhezkazgan</small></th><td>Zhezkazgan</td><td>356710</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/KAR_Karaganda/KAZ_KAR_Zhezkazgan.356710_TMYx.2011-2025.zip" aria-label="Исходный метеофайл (ZIP) — Жезказган">ZIP</a></td></tr></tbody>
+          </table>
+        </div>
+      </details>
+      <p class="ref-action"><a href="data/regions/stations.json" download>Скачать сведения о станциях и контрольные суммы SHA-256 (JSON)</a></p>
+    </section>
+
+    <section id="cooling" class="ref-section"><h2>Охлаждение наружным воздухом</h2>
+      <dl class="ref-list">
+        <dt>Сухой охладитель (драйкулер) и холодильная машина (чиллер) для покрытия остаточной нагрузки</dt>
+        <dd>Справочник <cite lang="en">EnergyPlus Engineering Reference</cite> Министерства энергетики США (версия 24.2) описывает отвод тепла наружным воздухом без испарения воды в одно- и двухскоростных охладителях жидкости. В KazDC характеристика охладителя построена по одной заданной расчётной точке. В базовом сценарии ИТ-оборудование выделяет 1 МВт тепла. Теплоноситель нагревается в контуре на 6 К. В расчётной точке его температура на выходе из охладителя выше температуры воздуха на входе на 5 К. Холодильный коэффициент чиллера (COP) равен 4, мощность вентилятора при полной частоте вращения — 25 кВт, насоса — 15 кВт. Час засчитывается как час без чиллера, если сухой охладитель покрывает всю нагрузку в течение этого часа. Вентилятор и насос при этом могут потреблять электричество. <span><a href="https://bigladdersoftware.com/epx/docs/24-2/engineering-reference/cooling-towers-and-evaporative-fluid-coolers.html#one-and-two-speed-fluid-coolers">Охладители жидкости в EnergyPlus</a> · <a href="methods-ru.html#dispatch">Распределение нагрузки в KazDC</a> · <a href="case.json" download>Параметры установки (JSON)</a></span></dd>
+        <dt>Испарительная насадка и температура мокрого термометра</dt>
+        <dd>Психрометрические зависимости взяты из справочника ASHRAE <cite lang="en">Fundamentals</cite> (2017, гл. 1). Расчётные температуры мокрого термометра после округления сверены с библиотекой PsychroLib (Meyer и Thevenard, 2019). В EnergyPlus 26.2 (§ 16.3) эффективность насадки показывает, какую долю разности температур сухого и мокрого термометров удаётся использовать для предохлаждения воздуха. В сценарии KazDC заданы массовый расход воздуха, мощность насоса орошения 2 кВт, летний порог включения и лимит расхода воды. Расход подпиточной воды принят на 10 % выше расчётного расхода на испарение. <span><a href="https://handbook.ashrae.org/Handbooks/F17/SI/f17_ch01/f17_ch01_si.aspx">Психрометрия ASHRAE</a> · <a href="https://joss.theoj.org/papers/10.21105/joss.01137">Статья о PsychroLib</a> · <a href="https://energyplus.readthedocs.io/en/v26.2.0/guides/engineering-reference/16.3-evaporative-coolers.html">Уравнение для насадки в EnergyPlus</a> · <a href="technologies-ru.html?study=pad">Модель предохлаждения</a></span></dd>
+        <dt>Косвенное охлаждение в теплообменнике «воздух — воздух»</dt>
+        <dd>В EnergyPlus 26.2 (§ 16.8) передаваемая тепловая мощность без фазового перехода определяется эффективностью теплообменника, меньшей из двух расходных теплоёмкостей потоков и разностью температур на входе. Расходная теплоёмкость равна произведению массового расхода на удельную теплоёмкость. Справочник ASHRAE <cite lang="en">HVAC Applications</cite> (2015, гл. 19) рассматривает использование наружного воздуха для охлаждения дата-центров. В KazDC расходные теплоёмкости потоков равны, пользователь задаёт дополнительную мощность вентилятора, а при низкой наружной температуре действует блокировка. <span><a href="https://energyplus.readthedocs.io/en/v26.2.0/guides/engineering-reference/16.8-heat-exchangers.html">Теплообменники в EnergyPlus</a> · <a href="https://handbook.ashrae.org/Handbooks/A15/IP/A15_CH19/a15_ch19_ip.aspx">Дата-центры в справочнике ASHRAE</a> · <a href="technologies-ru.html?study=air">Модель воздушного теплообменника</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="liquid" class="ref-section"><h2>Жидкостные контуры и измерения</h2>
+      <dl class="ref-list">
+        <dt>Сколько теплоты уносит вода?</dt>
+        <dd>В главе 12 справочника ASHRAE <cite lang="en">HVAC Systems and Equipment</cite> (2024) описаны измерения расхода и температуры, необходимые для определения количества теплоты. Пример измерений на серверной стойке приводят Sickinger, Van Geet и Ravenscroft (2014) в отчёте NREL/TP-2C00-62905 (§ 2.4). В расчёте принята удельная теплоёмкость воды 4,18 кДж/(кг·К). Предполагается, что показания стабильны в течение заданного интервала. Невязку баланса определяют с учётом знака, вычитая из энергии, подведённой к нагревателю, теплоту, унесённую водой. <span><a href="https://handbook.ashrae.org/Handbooks/S24/IP/s24_ch12/s24_ch12_ip.aspx">Методы измерения ASHRAE</a> · <a href="https://www.nlr.gov/docs/fy15osti/62905.pdf#page=23">Эксперимент NREL с серверной стойкой</a> · <a href="bench-ru.html">Расчёт по измерениям водяного контура</a></span></dd>
+        <dt>Где измерять температуру и перепад давления на охлаждающей пластине?</dt>
+        <dd>Руководство Open Compute Project <cite lang="en">Cold Plate Development and Qualification</cite> (2022, §§ 1.3.2.1–2) определяет тепловое сопротивление между корпусом компонента и жидкостью на входе, а также перепад давления на пластине. В расчёте KazDC используется температура поверхности пластины. Чтобы определить тепловое сопротивление между поверхностью и жидкостью на входе, их разность температур делят на мощность нагревателя. Чтобы получить значение для корпуса компонента, нужно измерить температуру самого корпуса. Расчёт мощности насоса учитывает только перепад давления на пластине. <span><a href="https://www.opencompute.org/documents/ocp-cold-plate-development-and-qualification-with-integrated-comments-pdf">Руководство Open Compute Project</a> · <a href="https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-federal-data-centers">Жидкостное охлаждение в руководстве Минэнерго США</a> · <a href="technologies-ru.html?study=cold">Расчёт охлаждающей пластины</a></span></dd>
+        <dt>Пропиленгликоль, начало кристаллизации и мощность насоса</dt>
+        <dd>Температура начала кристаллизации и свойства жидких растворов взяты из <cite lang="en">DOWFROST Engineering and Operating Guide</cite> (Dow, 2001, табл. 3, 10, 14 и 22). Свойства воды при 0,1 МПа приведены в работе Pátek и соавт. (2009). Руководство Агентства по охране окружающей среды США <cite lang="en">EPANET 2.2 User Manual</cite> (2020, гл. 3 и 12) описывает расчёт потерь напора по формуле Дарси — Вейсбаха. В KazDC заданы шероховатость труб и местные сопротивления. В диапазоне чисел Рейнольдса от 2 300 до 4 000 коэффициент трения интерполируется линейно. Модель подсчитывает часы, когда температура наружного воздуха ниже температуры начала кристаллизации раствора. Фактическая температура жидкости в трубе зависит также от расхода и теплоизоляции. <span><a href="https://ingredi.com/content/pdfs/DOWFROST_Manual.pdf">Таблицы свойств Dow</a> · <a href="https://www.nist.gov/publications/reference-correlations-thermophysical-properties-liquid-water-01-mpa">Расчётные зависимости для воды</a> · <a href="https://nepis.epa.gov/Exe/ZyPURL.cgi?Dockey=P10113EM.TXT">Гидравлика трубопроводов в EPANET</a> · <a href="technologies-ru.html?study=glycol">Модель гликолевого контура</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="heat" class="ref-section"><h2>Утилизация тепла</h2>
+      <dl class="ref-list">
+        <dt>Сколько тепла серверных стоек может использовать здание?</dt>
+        <dd>Van Geet и Sickinger в руководстве <cite lang="en">Best Practices Guide for Energy-Efficient Data Center Design</cite> (Минэнерго США, 2024, §§ 5.6 и 7.1) описывают прямое жидкостное охлаждение и использование отводимого тепла. Для здания в сценарии заданы почасовая потребность в тепле и доля тепла стоек, доступная для утилизации. Для прямого теплообмена принята минимальная разность температур 3 К, для контура потребителя — перепад между подачей и обратной линией 10 К. <span><a href="https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf">Руководство Минэнерго США по проектированию</a> · <a href="heat-ru.html">Модель утилизации тепла</a></span></dd>
+        <dt>Проверка коэффициента преобразования теплового насоса (COP)</dt>
+        <dd>В учебнике OpenStax <cite lang="en">University Physics, Volume 2</cite> (§ 4.5) предельный отопительный COP обратимого цикла выражен через абсолютные температуры. В KazDC для испарения и конденсации принято по одному значению температуры. Вода на стороне источника охлаждается на 6 К. По температуре этой воды на выходе и требуемой температуре горячей воды в подающей линии оценивается оптимистичная верхняя граница COP. Рабочий COP определяют по характеристикам конкретного теплового насоса при заданных условиях. <span><a href="https://openstax.org/books/university-physics-volume-2/pages/4-5-the-carnot-cycle">Обратимый цикл в учебнике OpenStax</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="storage" class="ref-section"><h2>Водяной аккумулятор холода</h2>
+      <dl class="ref-list">
+        <dt>Ёмкость бака, теплоприток и режим работы</dt>
+        <dd>Справочник ASHRAE <cite lang="en">HVAC Systems and Equipment</cite> (2024, гл. 50) описывает аккумулирование энергии за счёт изменения температуры и баки с температурным расслоением охлаждённой воды. Полезный запас холода рассчитывается по объёму, плотности и удельной теплоёмкости воды, а также допустимому повышению её температуры. Для каждого часа модель учитывает зарядку, разрядку и потерю холода при хранении, затем определяет остаток. В сценарии бак заряжается ночью и разряжается после полудня. Потребляемая мощность перекачивающего насоса принята равной 1 % передаваемой тепловой мощности. <span><a href="https://handbook.ashrae.org/handbooks/S24/SI/s24_ch50/s24_ch50_si.aspx">Аккумулирование энергии в справочнике ASHRAE</a> · <a href="technologies-ru.html?study=tank">Модель бака-аккумулятора</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="snow" class="ref-section"><h2>Сезонное хранение снега</h2>
+      <dl class="ref-list">
+        <dt>Теплота плавления льда и три сценария для Астаны</dt>
+        <dd>По данным Feistel (2003, <cite lang="en">Progress in Oceanography</cite>, т. 58, с. 83, формула 60), для плавления 1 кг пресноводного льда при атмосферном давлении вблизи 0 °C требуется около 333,5 кДж. В модели дата-центра это значение вместе с доступным запасом снега определяет, какую часть остаточной часовой нагрузки чиллера может покрыть таяние снега. В отдельном расчёте сравниваются три варианта хранения снега объёмом 55, 60 и 50 м³ с учётом притока тепла через ограждение за 91 день. По умолчанию на 1 м³ запаса приходится 550 кг льда, а мощность теплопритока составляет 200 Вт.</dd>
+        <dd>Самостоятельная модель <cite lang="en">Astana SnowCool</cite> (версия 1.1 от 16 сентября 2026 г.) использует теплоту плавления 334 кДж/кг. После 120 суток хранения к запасу снега в течение 168 часов прикладывают тепловую нагрузку 5 кВт. В файле представлены результаты моделирования при разных условиях контакта воды со льдом. Строка для часа 0 описывает начальное состояние, следующие 168 строк — результаты за каждый час. <span><a href="https://www.teos-10.org/pubs/Feistel_2003.pdf#page=41">Feistel о теплоте плавления льда</a> · <a href="data/snowcool_replay.csv" download>Почасовые результаты SnowCool (CSV)</a> · <a href="snow-ru.html">Сценарии охлаждения снегом в Астане</a></span></dd>
+        <dt>Опыт эксплуатации в Швеции и Японии</dt>
+        <dd>Skogsberg и Nordell (2001) описали снежное хранилище больницы в Сундсвалле в журнале <cite lang="en">Cold Regions Science and Technology</cite> (т. 32, с. 63–70). Результаты первого сезона эксплуатации привёл Skogsberg (2002, т. 34, с. 135–142). Японский город Бибай на острове Хоккайдо опубликовал материалы об испытании системы охлаждения серверов снегом в White Data Center. Для Астаны отдельно заданы условия сбора и хранения снега и характеристики теплообменника. <span><a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=86">Проект хранилища в Сундсвалле</a> · <a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=96">Результаты эксплуатации в Сундсвалле</a> · <a href="https://www.city.bibai.hokkaido.jp/soshiki/13/417.html">Материалы города Бибай (на японском)</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="power" class="ref-section"><h2>ИБП, солнечные панели и батареи</h2>
+      <dl class="ref-list">
+        <dt>КПД источника бесперебойного питания при одинаковой выходной мощности</dt>
+        <dd>В требованиях ENERGY STAR Агентства по охране окружающей среды США (<cite lang="en">Uninterruptible Power Supplies Key Product Criteria</cite>, табл. 1) указаны уровни нагрузки, при которых оценивается КПД источника бесперебойного питания (ИБП). В расчёте КПД в заданной рабочей точке равен отношению выходной электрической мощности к входной. В примерах с КПД 94 % и 97 % оба источника питают одну и ту же постоянную нагрузку в течение всего года. <span><a href="https://www.energystar.gov/products/uninterruptible_power_supplies/key_product_criteria">Критерии ENERGY STAR</a> · <a href="power-ru.html">Сравнение двух ИБП</a></span></dd>
+        <dt>Выработка солнечных панелей и режим работы аккумулятора</dt>
+        <dd>В руководстве Dobos (2014) <cite lang="en">PVWatts Version 5 Manual</cite> (NREL/TP-6A20-62641, § 10, формула 8) мощность модулей на стороне постоянного тока определяется с учётом плотности потока солнечного излучения и температуры. Документация System Advisor Model (SAM) описывает параметры фотоэлектрической системы и управление аккумулятором на стороне потребителя. В KazDC приняты горизонтальные панели без снежного покрова, упрощённая модель температуры ячейки, фиксированные потери и резерв энергии на случай отключения сети. КПД зарядки и КПД разрядки составляют по 95 %. Батарея питает местную нагрузку, а избыточная выработка ограничивается. <span><a href="https://research-hub.nlr.gov/en/publications/pvwatts-version-5-manual/">Руководство PVWatts</a> · <a href="https://samrepo.nlr.gov/help/pvwatts_system_design.html">Параметры солнечных панелей в SAM</a> · <a href="https://samrepo.nlr.gov/help/battery_dispatch_btm.html">Управление батареей в SAM</a> · <a href="technologies-ru.html?study=solar">Модель солнечных панелей и батареи</a></span></dd>
+        <dt>Время поступления солнечной радиации в шести файлах</dt>
+        <dd>Сверка временных меток с положением Солнца по формулам NOAA выявила ненулевую солнечную радиацию вне местного светового дня в файлах для Актау, Атырау, Костаная, Уральска, Туркестана и Жезказгана. Модель сохраняет исходные временные метки и указывает на эту особенность в результатах расчёта и CSV. Для этих городов особенно важно сверяться с местными почасовыми измерениями солнечной радиации при оценке работы батареи и пиковой мощности, потребляемой из сети. <span><a href="https://gml.noaa.gov/grad/solcalc/solareqns.PDF">Формулы NOAA для положения Солнца</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="reproduce" class="ref-section ref-reproduce"><h2>Как повторить расчёт</h2>
+      <p>Для Астаны задайте температуру подачи теплоносителя 18 °C. По метеоданным и параметрам установки рассчитайте каждый час, затем сложите почасовые значения расхода электроэнергии на охлаждение. Число строк с режимом <code>dry_only</code> покажет, сколько часов за год система справлялась без чиллера.</p>
+      <ul class="ref-files">
+        <li><strong>Исходные данные</strong><span><a href="case.json" download>Параметры установки (JSON)</a> · <a href="data/astana_hourly.csv" download>Метеоданные Астаны (CSV)</a></span></li>
+        <li><strong>Методика</strong><span><a href="methods-ru.html#reproduce">Формулы, примеры и команды для повторения расчёта</a></span></li>
+        <li><strong>Контрольные результаты</strong><span><a href="reference/hourly.csv" download>Почасовые (CSV)</a> · <a href="reference/monthly.csv" download>Месячные (CSV)</a> · <a href="reference/annual.csv" download>Годовые (CSV)</a></span></li>
+      </ul>
+      <p class="ref-date">Источники и расчёты проверены 14 ноября 2026 г. В исходных файлах данных сохранены названия столбцов.</p>
+    </section>
+  </div>
+</div>
+
+
+</main>
+<footer><div class="project-credit" id="project-contact" tabindex="-1"><div class="inner"><div class="credit-grid">
+  <div>
+    <h2>Организация проекта</h2>
+    <p class="credit-institute"><a href="https://inmet.nu.edu.kz/ru" aria-label="INMET — Институт новых материалов и энергетических технологий">INMET</a></p>
+    <p>Институт новых материалов и энергетических технологий</p>
+    <p>Назарбаев Университет</p>
+  </div>
+  <div>
+    <h2>Контактное лицо</h2>
+    <address>
+      <p class="credit-name"><a href="https://research.nu.edu.kz/en/persons/yanwei-wang/">Янвей Ванг, PhD</a></p>
+      <p><a href="mailto:yanwei.wang@nu.edu.kz">yanwei.wang@nu.edu.kz</a></p>
+    </address>
+    <p class="credit-feedback"><a href="mailto:yanwei.wang@nu.edu.kz?subject=KazDC%20Energy%20Tech%3A%20%D1%80%D0%B0%D1%81%D1%87%D1%91%D1%82%20%D0%BD%D0%B0%20%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D0%B5%20%D0%BA%D0%BE%D0%BD%D0%BA%D1%80%D0%B5%D1%82%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%D0%B0">Обсудить с INMET расчёт на примере конкретного объекта</a></p>
+  </div>
+</div>
+</div></div>
+<div class="inner foot"><div><strong>KazDC-BIM</strong><span>Энергопотребление дата-центров Казахстана</span></div>
+<nav aria-label="Материалы"><a href="methods-ru.html">Методика расчёта для Астаны</a><a href="references-ru.html" data-reference-link>Источники</a><a href="bench-ru.html">Эксперимент</a><a href="source.zip" data-source-download download>Скачать проект (ZIP)</a></nav></div></footer>
+<script type="application/json" id="weather-data">{"cities": [{"slug": "astana", "name": "Астана", "means": [-14.447446, -12.720387, -4.627419, 6.459306, 14.908065, 20.130278, 20.708602, 19.888038, 12.319722, 4.296909, -6.627222, -12.046371]}, {"slug": "almaty", "name": "Алматы", "means": [-6.479167, -3.925149, 2.518011, 9.704583, 15.457258, 21.220833, 24.767742, 22.558871, 16.841111, 7.754839, -0.351528, -3.699866]}, {"slug": "shymkent", "name": "Шымкент", "means": [-0.406452, 1.748661, 8.591398, 15.5, 21.02836, 25.757778, 29.816398, 27.430914, 20.737222, 13.403226, 7.35875, 1.741129]}, {"slug": "atyrau", "name": "Атырау", "means": [-5.21371, -3.102232, 3.414785, 12.138056, 21.102823, 25.674722, 28.125672, 25.876478, 18.643472, 11.409543, 2.258611, -3.408737]}, {"slug": "ekibastuz", "name": "Экибастуз", "means": [-13.754704, -13.719643, -3.584812, 7.771806, 15.123522, 21.210833, 21.964382, 20.295833, 12.577639, 4.867339, -4.977639, -11.677016]}, {"slug": "oskemen", "name": "Усть-Каменогорск", "means": [-15.670565, -15.086756, -2.515323, 7.93875, 13.616263, 19.581944, 20.790995, 19.243683, 13.057222, 5.801747, -4.1625, -13.638844]}, {"slug": "aktau", "name": "Актау", "means": [2.8375, 1.297917, 6.631855, 12.626944, 19.420027, 24.851528, 26.845296, 27.046774, 20.497083, 14.581855, 6.891806, 3.261962]}, {"slug": "aktobe", "name": "Актобе", "means": [-12.647581, -12.139583, -2.247715, 7.946944, 16.86586, 22.606944, 24.539651, 22.081586, 14.995, 6.693952, -3.15875, -8.805108]}, {"slug": "karaganda", "name": "Караганда", "means": [-13.686559, -13.389435, -3.618548, 7.892222, 13.893011, 19.426944, 20.219355, 18.692876, 11.766667, 2.754839, -6.121806, -11.076613]}, {"slug": "kokshetau", "name": "Кокшетау", "means": [-13.692473, -14.102381, -5.843011, 5.6625, 13.652957, 18.518472, 20.326613, 18.188306, 10.945139, 4.142473, -4.597778, -10.072177]}, {"slug": "kostanay", "name": "Костанай", "means": [-16.404704, -13.206994, -6.590054, 6.891667, 14.154167, 19.060278, 21.299866, 20.327688, 12.475694, 4.008065, -4.741667, -10.336022]}, {"slug": "kyzylorda", "name": "Кызылорда", "means": [-4.722446, -3.485863, 5.982258, 15.160972, 21.947984, 26.655972, 28.88629, 26.449462, 20.254722, 10.178763, 2.2425, -5.975]}, {"slug": "oral", "name": "Уральск", "means": [-9.710215, -10.349107, -2.316129, 9.747361, 16.463978, 20.900833, 23.799597, 22.81707, 14.559444, 7.122581, 0.412917, -6.428495]}, {"slug": "pavlodar", "name": "Павлодар", "means": [-15.375403, -13.684375, -4.842876, 6.987083, 14.799597, 20.468472, 21.558065, 19.353226, 12.005, 5.152285, -5.448472, -13.51371]}, {"slug": "petropavl", "name": "Петропавловск", "means": [-14.973118, -12.82128, -6.334274, 5.464444, 13.422849, 17.977222, 20.421237, 17.503495, 11.051111, 5.186828, -5.031944, -12.083468]}, {"slug": "qonaev", "name": "Конаев", "means": [-3.83172, -2.662351, 5.784409, 14.505833, 20.043414, 24.702083, 26.545833, 25.628629, 18.950278, 10.849194, 4.910556, -2.850672]}, {"slug": "semey", "name": "Семей", "means": [-13.410887, -13.857292, -2.353629, 8.689444, 14.715726, 21.042361, 21.872177, 19.821102, 12.615833, 5.472984, -2.073889, -12.114382]}, {"slug": "taldykorgan", "name": "Талдыкорган", "means": [-8.976747, -6.548512, 2.934677, 10.645694, 16.70121, 21.147917, 23.47621, 20.93078, 15.718889, 7.745565, -1.321528, -4.026882]}, {"slug": "taraz", "name": "Тараз", "means": [-2.828898, -1.348214, 4.890591, 13.638056, 18.520565, 23.595, 26.474731, 24.054435, 17.8175, 10.339113, 1.544306, -1.872849]}, {"slug": "turkistan", "name": "Туркестан", "means": [-1.038172, 1.593452, 9.711425, 16.92625, 22.996102, 27.406667, 30.680914, 28.139247, 21.965417, 12.673656, 4.981944, -0.732124]}, {"slug": "zhezkazgan", "name": "Жезказган", "means": [-12.903629, -12.73497, -1.910618, 10.566389, 17.045296, 23.576806, 25.538306, 22.61371, 15.617778, 6.62043, -1.128472, -8.448253]}], "months": ["янв.", "февр.", "март", "апр.", "май", "июнь", "июль", "авг.", "сент.", "окт.", "нояб.", "дек."], "chart": "Среднемесячная температура по сухому термометру (°C). Города: {first}, {second}."}</script>
+<script>"use strict";
+
+const MonthlyChart = (() => {
+  function svgNode(tag, attrs, label) {
+    const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+    if (label !== undefined) node.textContent = label;
+    return node;
+  }
+
+  function draw(id, series, months, label, climate = false) {
+    const holder = document.getElementById(id);
+    const width = Math.max(250, Math.round(holder.getBoundingClientRect().width));
+    const height = climate ? Math.min(215, width * .46) : Math.min(208, width * .45);
+    const left = climate ? 32 : 45, right = 15, top = 12, bottom = height - 27;
+    const values = series.flatMap(s => s.values);
+    const low = climate ? Math.min(-20, Math.floor(Math.min(...values) / 10) * 10) : 0;
+    const hiValue = Math.max(1, ...values);
+    const tickStep = climate ? 10 : Math.max(.25, Math.ceil(hiValue / 4 / 10) * 10);
+    const high = climate ? Math.max(30, Math.ceil(hiValue / 10) * 10) : Math.ceil(hiValue / tickStep) * tickStep;
+    const x = i => left + i * (width - left - right) / 11;
+    const y = value => bottom - (value - low) * (bottom - top) / (high - low);
+    const ink = climate ? "#cfe3d4" : "#50655a";
+    const svg = svgNode("svg", {viewBox: "0 0 " + width + " " + height, role:"img", "aria-label":label});
+    for (let v = low; v <= high; v += tickStep) {
+      svg.append(svgNode("line", {x1:left,y1:y(v),x2:width-right,y2:y(v),stroke:climate?"#53766a":"#d9dfd6",
+        "stroke-width": v === 0 ? 1.2 : .7, "stroke-dasharray":v === 0 ? "none":"3 4"}));
+      svg.append(svgNode("text", {x:left-6,y:y(v)+3,"text-anchor":"end",fill:ink,"font-size":10},window.SiteI18n.formatNumber(v)));
+    }
+    for (const [i, month] of months.entries()) {
+      if (width < 425 && i % 2) continue;
+      svg.append(svgNode("text", {x:x(i),y:height-5,"text-anchor":"middle",fill:ink,"font-size":10},month));
+    }
+    for (const s of series) {
+      const points = s.values.map((val, i) => x(i) + "," + y(val)).join(" ");
+      const line = svgNode("polyline", {points,fill:"none",stroke:s.color,"stroke-width":s.weight||2,
+        "stroke-linejoin":"round","stroke-linecap":"round","stroke-dasharray":s.dash||"none"});
+      line.append(svgNode("title", {}, s.name));
+      svg.append(line);
+      if (s.mark) s.values.forEach((v, i) => svg.append(svgNode("circle",
+        {cx:x(i),cy:y(v),r:2.7,fill:s.color})));
+    }
+    holder.replaceChildren(svg);
+  }
+
+  return {draw};
+})();
+
+"use strict";
+
+(() => {
+  const data = JSON.parse(document.getElementById("weather-data").textContent);
+  const city = document.getElementById("climate-city");
+  const peer = document.getElementById("climate-peer");
+  const byId = new Map(data.cities.map(row => [row.slug, row]));
+  const sorted = [...data.cities].sort((a, b) => a.name.localeCompare(b.name, document.documentElement.lang));
+  for (const select of [city, peer]) {
+    for (const row of sorted) select.add(new Option(row.name, row.slug));
+  }
+  const query = new URLSearchParams(location.search);
+  city.value = byId.has(query.get("city")) ? query.get("city") : "astana";
+  peer.value = byId.has(query.get("peer")) ? query.get("peer") : "shymkent";
+  let previousCity = "";
+  function draw(withTable = false) {
+    const first = byId.get(city.value), second = byId.get(peer.value);
+    const label = data.chart.replace("{first}", first.name).replace("{second}", second.name);
+    MonthlyChart.draw("weather-chart", [
+      {name:second.name, values:second.means, color:"#ebc888", weight:2, dash:"5 4"},
+      {name:first.name, values:first.means, color:"#a5e5bd", weight:3, mark:true}
+    ], data.months, label, true);
+    if (withTable) {
+      document.getElementById("weather-caption").textContent = label;
+      document.getElementById("weather-first").textContent = first.name;
+      document.getElementById("weather-second").textContent = second.name;
+      const rows = window.SiteI18n.months.map((month, index) => {
+        const row = document.createElement("tr");
+        const header = document.createElement("th");
+        header.scope = "row";
+        header.textContent = month;
+        row.append(header);
+        for (const city of [first, second]) {
+          row.insertCell().textContent = window.SiteI18n.formatNumber(city.means[index],
+            {minimumFractionDigits:1, maximumFractionDigits:1});
+        }
+        return row;
+      });
+      document.getElementById("weather-rows").replaceChildren(...rows);
+      document.getElementById("weather-values").hidden = false;
+    }
+  }
+  function update(changed = false) {
+    if (city.value === peer.value) {
+      peer.value = previousCity && previousCity !== city.value ? previousCity : (city.value === "astana" ? "shymkent" : "astana");
+    }
+    previousCity = city.value;
+    for (const option of peer.options) option.disabled = option.value === city.value;
+    const address = new URL(location.href);
+    if (changed || query.has("city") || query.has("peer")) {
+      address.searchParams.set("city", city.value);
+      address.searchParams.set("peer", peer.value);
+    }
+    if (changed && /^https?:$/.test(location.protocol)) history.replaceState(null, "", address);
+    for (const link of document.querySelectorAll('[data-reference-language], [data-weather-return], [data-study-link="regional"]')) {
+      const target = new URL(link.href);
+      target.search = address.search;
+      link.href = target.href;
+    }
+    draw(true);
+  }
+  city.addEventListener("change", () => update(true));
+  peer.addEventListener("change", () => update(true));
+  window.addEventListener("resize", () => draw());
+  update();
+})();
+</script>
+<script>// Native disclosure and links also work without JavaScript.
+(() => {
+  const menu = document.querySelector(".language-menu");
+  const summary = menu.querySelector("summary");
+  document.addEventListener("click", event => {
+    if (menu.open && !menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && menu.open) {
+      menu.open = false;
+      summary.focus();
+    }
+  });
+  function syncLanguageLinks() {
+    for (const link of menu.querySelectorAll("a[hreflang]")) {
+      const destination = new URL(link.href);
+      // Offline studies set their target queries directly because file URLs cannot be rewritten with history.
+      if (location.protocol !== "file:") destination.search = location.search;
+      destination.hash = location.hash;
+      link.href = destination.href;
+    }
+  }
+  syncLanguageLinks();
+  menu.addEventListener("toggle", syncLanguageLinks);
+  menu.addEventListener("click", syncLanguageLinks, true);
+  window.addEventListener("hashchange", syncLanguageLinks);
+  window.addEventListener("popstate", syncLanguageLinks);
+})();
+</script>
+</body></html>

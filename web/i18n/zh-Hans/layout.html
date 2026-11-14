@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>阿斯塔纳数据中心制冷 · {{SITE_TITLE}}</title>
+  {{SITE_METADATA}}
+  <style>{{STYLE}}{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body>
+<a class="skip" href="#controls">跳转到供液温度设置</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" data-snow-link href="{{REGIONAL_URL}}" aria-label="{{SITE_TITLE}} 首页"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>{{SITE_TITLE}}</a>
+  <nav aria-label="研究内容"><a href="#charts">方案比较</a><a href="#monthly">月度数据</a><a href="{{METHODS_URL}}">计算方法</a><a href="{{SNOW_URL}}" data-snow-link>储雪供冷</a><a href="{{REFERENCES_URL}}">参考资料</a><a href="{{RESEARCH_URL}}">{{RESEARCH_NAV_LABEL}}</a><a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main class="wrap" id="top">
+  <div class="intro"><div><p class="eyebrow">数据中心参考算例</p>
+    <h1>阿斯塔纳数据中心制冷</h1>
+    <p class="lead">当 IT 设备的负载恒定为 <span data-val="load-mw">1</span> MW 时，室外空气能通过干式冷却器带走多少热量？</p>
+  </div><div class="station"><strong>哈萨克斯坦，阿斯塔纳</strong><span>EPW 气象站编号 351880 · 2011—2025 年 TMYx 典型气象年</span><span>8,760 个逐时室外干球温度值</span></div></div>
+  <noscript><p class="notice">启用 JavaScript 查看交互式结果，也可使用项目压缩包中的参考 CSV 文件。</p></noscript>
+  <section class="scenario" aria-label="供液温度与全年结果">
+    <div class="control-card" id="controls"><div class="label-line"><label for="supply">冷却液供液温度</label><button id="reset" class="reset" type="button">重置</button></div>
+      <div class="value-line"><output id="supply-value" for="supply">18<span> °C</span></output>
+        <div class="steppers"><button id="down" aria-label="将供液温度降低 0.5 °C">−</button><button id="up" aria-label="将供液温度升高 0.5 °C">+</button></div>
+      </div>
+      <input id="supply" type="range" min="8" max="32" step="0.5" value="18" aria-describedby="threshold">
+      <div class="range-ends" aria-hidden="true"><span>8 °C</span><span>20 °C</span><span>32 °C</span></div>
+      <p id="threshold"></p>
+    </div>
+    <div class="results-card"><div class="result-heading"><h2>全年结果</h2><span>干式冷却器＋冷水机组</span></div>
+      <div class="kpi-grid">
+        <div><h3>制冷节电率</h3><p class="big" id="savings"></p><p class="small" id="saved-energy"></p></div>
+        <div><h3>冷水机组停机</h3><p class="big" id="off"></p><p class="small" id="off-share"></p></div>
+        <div><h3>干式冷却器排热占比</h3><p class="big" id="dry-share"></p><p class="small" id="dry-energy"></p></div>
+      </div>
+    </div>
+  </section>
+  {{COPY_CASE@controls}}
+  <section id="charts" class="charts" aria-label="月度对比图">
+    <article class="panel">
+      <h2>制冷用电量</h2><p class="unit">系统月耗电量 · MWh</p>
+      <div class="legend"><span><i class="base"></i>仅冷水机组</span><span><i class="hybrid"></i>干式冷却器＋冷水机组</span></div>
+      <div id="power-chart" class="chart"></div>
+      <p id="power-note" class="chart-note"></p>
+    </article>
+    <article class="panel">
+      <h2>冷水机组各工况时数</h2><p class="unit">干式冷却器与冷水机组联合系统 · 小时/月</p>
+      <div class="legend"><span><i class="dry"></i>冷水机组停机</span><span><i class="assist"></i>联合运行</span><span><i class="mech"></i>仅冷水机组</span></div>
+      <div id="mode-chart" class="chart"></div>
+      <p id="mode-note" class="chart-note"></p>
+    </article>
+  </section>
+  <section id="monthly" class="panel table-panel"><div class="section-heading"><div><h2>月度结果</h2>
+    <p class="unit">用电量包括冷水机组、运行中的干式冷却器风机，以及两种方案共用的循环泵。</p></div>
+    <button class="download" id="download" type="button">下载 CSV <span aria-hidden="true">↓</span></button></div>
+    <div class="scroll" role="region" aria-label="月度结果表，小屏幕可横向滚动" tabindex="0"><table>
+      <caption class="sr-only">两种方案的月度比较及全年合计</caption>
+      <thead><tr><th scope="col">时段</th><th scope="col">仅冷水机组<br><em>MWh（电）</em></th><th scope="col">干式冷却器＋冷水机组<br><em>MWh（电）</em></th><th scope="col">节电率<br><em>%</em></th><th scope="col">冷水机组停机<br><em>小时</em></th><th scope="col">联合运行<br><em>小时</em></th><th scope="col">仅冷水机组<br><em>小时</em></th></tr></thead>
+      <tbody id="table-body"></tbody><tfoot id="table-foot"></tfoot>
+    </table></div>
+  </section>
+  <section id="method" class="panel method"><div class="section-heading"><div><h2>制冷需求与用电量的计算方法</h2>
+    <p class="unit">在相同的 IT 负载与供液温度下，逐小时比较两种方案。</p></div>
+    <a class="guide-link" href="{{METHODS_URL}}">详细计算方法 <span aria-hidden="true">→</span></a></div>
+    <div class="method-grid"><div><h3>系统设定</h3><dl id="assumptions"></dl>
+      <h3 class="method-subhead">气象输入数据</h3><p class="method-copy">模型读取阿斯塔纳典型气象年的 8,760 个逐时室外干球温度。控制策略逐小时判断运行工况，因此能分别计入寒冷的夜间和温暖的午后。</p>
+      <p class="sources"><a href="{{REFERENCES_URL}}#cooling">制冷模型的资料来源与假设</a> · <a href="data/astana_hourly.csv" download>阿斯塔纳逐时气象数据（CSV）</a></p></div>
+      <div class="prose"><h3>室外空气如何带走热量</h3>
+      <p>冷却液在流经 IT 设备时吸热升温。回流的冷却液先进入室外干式冷却器，随后由冷水机组移除剩余热量，再由水泵送回 IT 设备。</p>
+      <h3>供液温度为 <span id="method-supply"></span> 时的运行界限</h3>
+      <p id="method-thresholds"></p>
+      <h3>三个百分比各代表什么</h3><p>停机时数只计入室外空气能独立承担全部冷负荷的完整小时，其占比以全年时数为基准。干式冷却排热占比还包括联合运行时干式冷却器带走的热量。节电率则按两种系统的总用电量计算，包含机组、风机和水泵。</p>
+      <p><a href="{{METHODS_URL}}#worked-hours">逐小时计算示例</a>展示了同一套设备在室外气温较低、温和和较高时的运行情况。</p>
+      <p>在这一供液温度下，冬季储存的有限雪量能替代多少夏季机械制冷？ <a href="{{SNOW_URL}}" data-snow-link>季节性储雪计算器</a></p>
+    </div></div>
+  </section>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap">{{PROJECT_CREDIT}}</div></footer>
+<div id="live" class="sr-only" role="status" aria-live="polite"></div>
+<div id="tip" class="tip" hidden></div>
+<script id="case-data" type="application/json">{{DATA}}</script>
+<script id="dashboard-text" type="application/json">{{DASHBOARD_TEXT}}</script>
+<script>{{SCRIPT}}</script>
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body>
+</html>

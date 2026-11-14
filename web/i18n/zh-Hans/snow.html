@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>阿斯塔纳的季节性储雪供冷 · {{SITE_TITLE}}</title>
+  {{SITE_METADATA}}
+  <style>{{STYLE}}{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body class="snow-page">
+<a class="skip" href="#facility">跳至数据中心供冷计算器</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" data-supply-link href="{{REGIONAL_URL}}" aria-label="{{SITE_TITLE}} 首页"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>{{SITE_TITLE}}</a>
+  <nav aria-label="项目页面"><a data-supply-link href="{{DASHBOARD_URL}}">供冷计算</a><a href="{{METHODS_URL}}">计算方法</a><a href="{{REFERENCES_URL}}">参考资料</a><a href="{{RESEARCH_URL}}">{{RESEARCH_NAV_LABEL}}</a><a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main class="wrap snow-book">
+  <div class="snow-title"><p class="eyebrow">阿斯塔纳 · 季节性蓄冷</p>
+    <h1>冬天储存的雪能在夏天为数据中心供冷吗？</h1>
+    <p>积雪融化时会吸收热量。利用阿斯塔纳的天气数据，估算一个冬季储存的雪在夏季能提供多少冷量，以及冷水机组仍需消耗多少电能。</p>
+  </div>
+  <nav class="view-links" aria-label="储雪研究各部分">
+    <a href="#facility">数据中心供冷计算器</a><a href="#storage-designs">储雪方式与 5 kW 模拟</a><a href="#equipment">设备与测量</a>
+  </nav>
+  <noscript><p class="notice">启用 JavaScript 即可模拟三种供冷方案，并逐小时查看七天的模拟结果。下文的储雪方式、模型假设和测量说明可离线阅读。</p></noscript>
+
+  <section class="snow-section" id="facility" aria-labelledby="facility-title">
+    <div class="block-title"><div><h2 id="facility-title">数据中心供冷计算器</h2>
+      <p>模型采用 <span id="plant-load">1 MW</span> 的 IT 负荷和阿斯塔纳典型年的逐时天气数据。干式冷却器优先散热。6 月至 8 月，融雪水可承担原本需要冷水机组处理的部分热负荷。调整储雪体积，观察储量能维持多久；再调整换热器功率，观察冷水机组能否停机。</p></div>
+      <button type="button" class="plain-button" id="reset-snow">恢复初始设置</button></div>
+    <div class="facility-grid">
+      <form id="facility-form" class="control-surface">
+        <h3>供冷设备与储雪设施</h3>
+        <div class="fields">
+          <label>冷却液供液温度 <span>°C</span><select name="supply" id="snow-supply">{{SUPPLY_OPTIONS}}</select></label>
+          <label>压实后的积雪体积 <span>m³</span><input name="volume" type="number" min="0" max="500000" step="any" value="4000" required></label>
+          <label>冰当量密度 <span>kg 冰/m³</span><input name="density" type="number" min="0" max="917" step="any" value="550" required></label>
+          <label>6 月 1 日可用比例 <span>占初始融冰潜热的 %</span><input name="retained" type="number" min="0" max="100" step="any" value="70" required></label>
+          <label>换热器有效换热功率 <span>kW（热）</span><input name="rating" type="number" min="0" max="10000" step="any" value="500" required></label>
+          <label>融雪水泵额定输入功率 <span>kW（电）</span><input name="pump" type="number" min="0" max="1000" step="any" value="5" required></label>
+          <label class="wide">何时利用储雪供冷<select name="policy" id="snow-policy"><option value="as-needed">需要冷水机组时即投入</option><option value="hot-hours">留到高温时段使用</option></select></label>
+          <label class="wide" id="hot-control" hidden>室外温度启动阈值 <span>°C 及以上</span><input name="threshold" type="number" min="0" max="45" step="any" value="25" required></label>
+        </div>
+        <details class="small-detail"><summary>收集和处理积雪的用电量</summary>
+          <label>每吨初始冰量对应的额外用电 <span>kWh/t</span><input name="handling" type="number" min="0" max="1000" step="any" value="0" required></label>
+          <p>填入本次储雪新增的电动运输或压实用电量，柴油消耗另行记录。</p>
+        </details>
+        <p class="validation" id="invalid-case" role="alert" hidden></p>
+      </form>
+      <div class="facility-results" aria-live="polite" aria-atomic="false">
+        <article class="savings-hero"><p>加入储雪系统后的年节电量</p>
+          <div class="savings-number" id="net-saved">—</div><p id="saving-split"></p>
+        </article>
+        <div class="snow-kpis">
+          <div><h3>夏季由储雪带走的热量</h3><strong id="snow-heat">—</strong><p id="snow-share"></p></div>
+          <div><h3>冷水机组新增停机时数</h3><strong id="added-hours">—</strong><p id="total-hours"></p></div>
+          <div><h3>备用冷水机组峰值负荷</h3><strong id="peak-duty">—</strong><p>典型年中的最大小时冷水机组负荷</p></div>
+        </div>
+        <figure class="stock-figure"><figcaption><h3>可用储雪冷量</h3><span>每日结束时的剩余冷量 · MWh（热）</span></figcaption>
+          <div id="stock-chart" class="snow-chart"></div>
+          <p id="stock-note"></p>
+        </figure>
+      </div>
+    </div>
+    {{COPY_CASE@facility}}
+    <div class="target-panel"><div><h3>根据夏季供冷目标确定储雪体积</h3><p>在所选设备和运行策略下，设定由储雪承担的负荷占比。该占比以干式冷却后仍需冷水机组承担的夏季热负荷为基准。</p></div>
+      <label>目标占比 <span>%</span><input type="number" min="0" max="100" step="any" value="10" required id="size-target" name="target" form="facility-form"></label>
+      <div class="target-answer"><strong id="target-volume">—</strong><p id="target-note"></p><button type="button" id="apply-target" class="plain-button">采用此体积</button></div>
+    </div>
+    <article class="month-card">
+      <div class="block-title"><div><h3>三种供冷方案的全年比较</h3><p id="monthly-boundary">月度供冷系统用电包括冷水机组、风机和水泵。上方的年节电量已计入积雪收集和处理用电。年度记录中的储量为 8 月 31 日停止放冷时的剩余可用冷量。</p></div>
+      <div class="table-actions"><label>选择用电统计范围<select id="monthly-meter"><option value="plant">整个供冷系统</option><option value="chiller">仅冷水机组</option></select></label>
+      <button id="snow-download" type="button" class="plain-button">下载月度 CSV ↓</button></div></div>
+      <div class="scroll" tabindex="0" role="region" aria-label="三种供冷方案逐月对比">
+        <table><thead><tr><th scope="col">月份</th><th scope="col">仅冷水机组<br><em>MWh（电）</em></th><th scope="col">干式冷却器 + 冷水机组<br><em>MWh（电）</em></th><th scope="col">干式冷却器 + 储雪 + 冷水机组<br><em>MWh（电）</em></th><th scope="col">储雪带走的热量<br><em>MWh（热）</em></th><th scope="col">新增停机时数<br><em>小时</em></th><th scope="col">备用机组峰值负荷<br><em>kW（热）</em></th></tr></thead>
+        <tbody id="snow-months"></tbody><tfoot id="snow-year"></tfoot></table></div>
+    </article>
+    <details class="math-note"><summary>逐时计算方法</summary>
+      <p>系统先按原有控制策略运行干式冷却器。夏季每小时，储雪回路的供冷功率取以下三项的最小值：冷水机组剩余热负荷、换热器额定有效功率，以及剩余可用冷量除以一小时。其余负荷由备用冷水机组承担。仅当该小时的热平衡完全不需要机械制冷时，才计为一个停机小时。 <a href="{{METHODS_URL}}#dispatch">干式冷却器运行方程</a></p>
+      <p><strong>储雪。</strong> 初始融冰潜热（kWh）等于压实后的积雪体积 × 冰当量密度 × 333.5 / 3,600。可用比例同时考虑储存期后保留下来的冰，以及扣除预留量后实际可利用的冰。6 月 1 日的可用冷量决定整个夏季的供冷上限。设定比例时应计入预计储存损失和无法利用的冰。模型假设在储量耗尽前换热器的有效功率恒定。现场测量可以逐小时跟踪外界漏热和水冰接触状况的变化。</p>
+      <p><strong>用电。</strong> 带缓冲的回路通过启停融雪水泵，在额定工况下供冷。每提供 1 kWh 冷量所需的泵耗电量等于泵额定输入功率除以换热器额定有效功率。仅当该比值小于 1/COP 时才利用储雪供冷。年净节电量等于“干式冷却器 + 冷水机组”的年用电量减去加入储雪后的年用电量，再减去填入的积雪收集和处理用电量。结果可能为负。</p>
+      <p><strong>储量设计。</strong> 所需储雪体积等于目标供冷量除以每立方米的可用冷量。只有满足运行条件的时数和换热器有效功率足以传递这些热量时，目标才可实现。高温时段策略按逐时室外温度决定是否启用储雪，未使用的储量继续保留。换热器功率采用所选供液温度下可达到的有效额定值。IT 热负荷保持恒定。天气决定干式冷却后仍需冷水机组承担的冷量。压实后的体积和冰当量密度是两个独立的现场输入量。</p>
+      <p>物性与气象资料。 <a href="https://www.teos-10.org/pubs/Feistel_2003.pdf">Feistel，0 °C 时冰的熔化潜热</a> · <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">阿斯塔纳 TMYx 气象数据</a></p>
+    </details>
+  </section>
+
+  <section class="snow-section" id="storage-designs" aria-labelledby="campus-title">
+    <div class="block-title" id="campus"><div><h2 id="campus-title">冬季积雪的三种储存方式</h2>
+      <p>保温容器、用保温板围成的储雪仓和覆盖木屑的雪堆，都可以将冬季积雪保存到夏季。根据示例容积和假设的得热功率，可以估算到 7 月 1 日每种方式还能保留多少冰。另一项独立的七天模拟采用恒定的 5 kW 冷负荷，考察融雪水与冰的接触状况如何影响供冷功率。</p></div></div>
+    <div class="campus-card">
+      <h3>到 7 月 1 日还能剩下多少冰？</h3>
+      <p>模型从 4 月 1 日到 7 月 1 日储雪 91 天，随后才启动水循环。三种设施的初始假设密度和平均得热功率相同，以便比较体积的影响。改变某种设施的得热功率，即可观察改善保温对 7 月剩余冰量的影响。</p>
+      <label class="campus-density">三种方案共用的冰当量密度 <span>kg 冰/m³</span><input type="number" required step="any" min="0" max="917" id="campus-density" value="550" form="campus-form"></label>
+      <form id="campus-form"><div class="store-grid">
+        <article><h4>保温储雪箱</h4><p>55 m³ · 主动供冷方案</p><p>保温层保护储雪。放冷时，融雪水带走独立冷却液回路中的热量。</p><label>假设的得热功率 <span>W</span><input name="container" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-container">—</strong></article>
+        <article><h4>板式储雪仓</h4><p>60 m³ · 被动储雪对照方案</p><p>用聚异氰脲酸酯保温夹芯板围护储雪。</p><label>假设的得热功率 <span>W</span><input name="panels" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-panels">—</strong></article>
+        <article><h4>覆盖式雪堆</h4><p>50 m³ · 被动储雪对照方案</p><p>雪堆置于衬垫上，以木屑覆盖保温。</p><label>假设的得热功率 <span>W</span><input name="pile" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-pile">—</strong></article>
+      </div></form>
+      {{COPY_CASE@storage-designs}}
+      <p class="fine" id="campus-note" aria-live="polite"></p>
+    </div>
+    <article class="replay-card" id="replay">
+      <div class="block-title"><div><h3>储雪能连续七天提供 5 kW 的冷量吗？</h3>
+        <p>SnowCool 模拟从 20 吨冰开始，储存在体积为 50 m³、保温层厚 300 mm 的立方体中。储存 120 天后，连续 168 小时施加 5 kW 热负荷，总需冷量为 840 kWh。切换水冰接触条件，观察何时需要备用制冷，以及当时还剩多少冰。</p></div>
+        <label>水冰接触条件<select id="contact"><option value="degraded">接触变差</option><option value="reference">参考接触条件</option></select></label></div>
+      <div class="replay-metrics"><div><h4>储雪提供的冷量</h4><strong id="replay-snow">—</strong></div><div><h4>所需备用冷量</h4><strong id="replay-backup">—</strong></div><div><h4>最终剩余的融冰潜热</h4><strong id="replay-end">—</strong></div></div>
+      <div class="replay-plots"><figure><figcaption>剩余融冰潜热 <span>kWh（热）</span></figcaption><div class="snow-chart" id="ice-chart"></div></figure>
+      <figure><figcaption>储雪实际提供的供冷功率 <span>小时平均功率 · kW（热）</span></figcaption><div class="snow-chart" id="duty-chart"></div></figure></div>
+      <label class="replay-slider" for="replay-hour">查看该小时结束时的状态 <output id="replay-hour-value" for="replay-hour">168</output><input type="range" id="replay-hour" min="1" max="168" value="168" step="1"></label>
+      {{COPY_CASE@replay}}
+      <p class="replay-readout" id="replay-readout" aria-live="polite"></p>
+      <p class="fine">温热的回水可能在雪中形成优先流动通道。即使仍有冰，水能接触到的冰面减少也会限制传热速率。七天放冷期间，围护结构得热（228 W）和泵散热（40 W）又消耗了相当于 45.03 kWh 的融冰潜热。在参考接触条件下，初始的 1,198.88 kWh 冷量提供 840.00 kWh 有效冷量后，还剩 313.86 kWh。本回放把已核查的 A 工况数据汇总为逐小时结果，并沿用原研究中 334 kJ/kg 的熔化潜热和 10% 的期末预留比例。</p>
+    </article>
+  </section>
+
+  <section class="snow-section" id="equipment" aria-labelledby="equipment-title">
+    <div class="block-title"><div><h2 id="equipment-title">设备与现场测量</h2><p>哪些测量可以检验储雪设施的实际表现是否符合模型预测？从进入储雪设施的热量到冷水机组耗电，建筑信息模型（BIM）中的每个设备都可以对应一个可测量的物理量。</p></div></div>
+    <div class="equipment-grid">
+      <details open><summary>储雪设施与保温层</summary><p>记录装填体积、冰当量密度、占地面积和覆盖层构造。称量代表性样品，测量储雪体积的变化，并记录覆盖层与底面的热流密度，以核查储存期损失。</p></details>
+      <details><summary>集水槽与水冰接触</summary><p>记录集水槽液位、融雪水温度和回水分布。在相同负荷和流量下，出水温度上升可能说明水冰接触变差。测量排水量和电导率，以计入流失的水和溶解盐。</p></details>
+      <details><summary>板式换热器与清洁冷却液回路</summary><p>融雪水回路与清洁冷却液回路通过换热板片交换热量。测量两侧流量和四个进出口的温度。分别计算各侧的质量流量 × 比热容 × 温差，并与假设的有效换热功率比较。</p></details>
+      <details><summary>水泵、冷水机组与积雪处理</summary><p>分别计量融雪水泵和冷水机组的用电量，并记录运行小时数。称量收集的雪，记录新增运输与压实所用的电能和燃料。在相同负荷和气象条件下，与“干式冷却器 + 冷水机组”方案比较。</p></details>
+    </div>
+    <p class="source-line"><a href="{{REFERENCES_URL}}#snow">储雪研究的资料来源与情景假设</a>。瑞典和日本均有该技术的实际应用。只有数据中心供冷计算使用阿斯塔纳典型年的逐时天气数据。三种储雪方式的比较采用各设施的假设平均得热功率，按 91 天计算。七天模拟则在 120 天储存期后采用规定的夏季边界条件。 <a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=86">松兹瓦尔医院储雪系统</a> · <a href="https://www.city.bibai.hokkaido.jp/soshiki/13/417.html">日本美唄白色数据中心</a></p>
+    <p class="fine">七天模拟取自 <cite>《Astana SnowCool：基于物理原理的阿斯塔纳数据中心季节性储雪供冷设计》</cite>（核查版 v1.1，2026 年 9 月 16 日）。项目 ZIP 压缩包包含逐时结果及其推导说明。</p>
+  </section>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap">{{PROJECT_CREDIT}}</div></footer>
+<script id="snow-text" type="application/json">{{SNOW_TEXT}}</script>
+<script id="snow-data" type="application/json">{{DATA}}</script>
+<script>{{MODEL}}</script>
+<script>{{UI}}</script>
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body></html>

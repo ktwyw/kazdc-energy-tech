@@ -1,0 +1,34 @@
+{
+  "en": {
+    "copy": "Copy this case",
+    "copied": "Case details and link copied.",
+    "manual": "Copy the selected case details and link.",
+    "model": "Model version {version}",
+    "link": "Case link: {url}",
+    "versionNotice": "This case was shared with model version {requested}. This page runs version {version}."
+  },
+  "zh-Hans": {
+    "copy": "复制此算例",
+    "copied": "已复制算例信息和链接。",
+    "manual": "请复制已选中的算例信息和链接。",
+    "model": "模型版本 {version}",
+    "link": "算例链接：{url}",
+    "versionNotice": "分享此算例时使用的模型版本为 {requested}。本页使用版本 {version}。"
+  },
+  "ru": {
+    "copy": "Скопировать расчёт",
+    "copied": "Параметры расчёта и ссылка скопированы.",
+    "manual": "Скопируйте выделенные параметры расчёта и ссылку.",
+    "model": "Версия модели {version}",
+    "link": "Ссылка на расчёт: {url}",
+    "versionNotice": "При создании ссылки использовалась версия модели {requested}. На этой странице расчёт выполняется в версии {version}."
+  },
+  "kk": {
+    "copy": "Осы есепті көшіру",
+    "copied": "Есептің параметрлері мен сілтемесі көшірілді.",
+    "manual": "Белгіленген есеп параметрлері мен сілтемені көшіріңіз.",
+    "model": "Модель нұсқасы {version}",
+    "link": "Есепке сілтеме: {url}",
+    "versionNotice": "Бұл есепті бөліскен кезде модельдің {requested} нұсқасы қолданылған. Бұл бетте {version} нұсқасы қолданылады."
+  }
+}

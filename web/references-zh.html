@@ -1,0 +1,121 @@
+<header class="ref-hero">
+  <div>
+    <div class="ref-heading-row"><p class="kicker">KazDC-BIM · 方法与数据</p></div>
+    <h1>参考资料</h1>
+    <p class="deck">各城市的气象数据来自哪里？每项研究用了哪些方程？哪些参数可以自行调整？</p>
+  </div>
+  <aside class="ref-feature" aria-labelledby="ref-feature-title">
+    <p class="ref-feature-label">阿斯塔纳参考算例</p>
+    <h2 id="ref-feature-title">一小时的制冷用电量是怎样算出来的？</h2>
+    <p>从一个小时的室外气温出发，算出干冷器和冷水机组各自承担的热负荷，再用逐时结果核对耗电量。</p>
+    <a href="{{METHODS_URL}}#worked-hours">查看逐时算例 <span aria-hidden="true">→</span></a>
+  </aside>
+</header>
+
+<div class="ref-layout">
+  <nav class="ref-index" aria-label="参考资料目录">
+    <h2>本页目录</h2>
+    <a href="#weather">气象数据与时间</a><a href="#stations">各城市气象档案</a>
+    <a href="#cooling">冷源系统与空气冷却</a><a href="#liquid">液冷回路与热量计量</a>
+    <a href="#heat">余热回收</a><a href="#storage">冷冻水蓄冷</a>
+    <a href="#snow">季节性储雪供冷</a><a href="#power">不间断电源、光伏与电池</a>
+    <a href="#reproduce">复现计算结果</a>
+  </nav>
+
+  <div class="ref-content">
+    <section id="weather" class="ref-section"><h2>气象数据与时间</h2>
+      <p>每个城市都使用一个典型气象年（TMYx），共 8,760 个小时。其中的十二个月可能选自不同年份。这些数据适合比较各季节的运行表现。分析极端设计工况或预测某个具体年份的运行情况，需要另选相应的气象序列。</p>
+      <dl class="ref-list">
+        <dt>Climate.OneBuilding 的全球典型气象年数据</dt>
+        <dd>Linda K. Lawrie 和 Drury B. Crawley 编制了 TMYx 数据系列。哈萨克斯坦 2011–2025 年数据集提供室外干球温度、相对湿度、站点气压和水平面太阳总辐射量。太阳辐射数据取自 ERA5 再分析资料。<span><a href="https://climate.onebuilding.org/contact/default.html">发布者与署名信息</a> · <a href="https://climate.onebuilding.org/sources/default.html">TMYx 编制方法</a> · <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">哈萨克斯坦气象文件目录</a></span></dd>
+        <dt>EnergyPlus 气象文件（EPW）的字段与来源标记</dt>
+        <dd>这些文件中，上述四个字段的来源及不确定性标记均为 <code>?9</code>。仅凭该标记，无法判断某个数值是否来自直接观测。原文件的小时编号为 1 至 24，分钟字段均为 30。太阳辐射量以 Wh/m² 表示，是一小时内单位面积接收的能量。将其除以一小时，即得光伏模型使用的小时平均辐照度（W/m²）。<span><a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/energyplus-weather-file-epw-data-dictionary.html">EPW 字段与单位</a> · <a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/data-sources-uncertainty.html">来源与不确定性代码</a></span></dd>
+        <dt>用 NOAA 观测记录核对气温，按当地时间安排运行</dt>
+        <dd>平台用美国国家海洋和大气管理局（NOAA）的逐日和逐时记录核对阿拉木图气温。典型年选用的 2024 年 6 月，机场气象文件中的月平均气温为 21.2 °C，同期机场观测值为 24.3 °C。偏低的气温可能使模型低估制冷用电量。21 个 EPW 文件中，16 个采用 UTC+6，5 个采用 UTC+5。月度结果沿用各文件的日历。蓄冷水罐的充、放冷时段则按哈萨克斯坦现行时间 UTC+5 确定。<span><a href="https://www.ncei.noaa.gov/products/land-based-station/integrated-surface-database">NOAA 逐时记录</a> · <a href="https://registry.opendata.aws/noaa-gsod/">NOAA 逐日汇总</a> · <a href="{{REGIONAL_URL}}#almaty-source">阿拉木图站点对照</a> · <a href="https://www.gov.kz/org/vko-shemonaiha-volchan/press/news/details/720058?lang=en">哈萨克斯坦时区调整说明</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="stations" class="ref-section"><h2>各城市气象档案</h2>
+      <p>可按 EPW 站点编号核对数据来源。厄斯克门的机场站在文件中写作 Ust.Kamenogorsk.AP，库纳耶夫则沿用旧称 Kapchagay（卡普恰盖）。埃基巴斯图兹、库纳耶夫和塔尔迪库尔干使用 ERA5 格点再分析数据。其余文件的来源标记包括美国国家环境信息中心（NCEI）的地面站资料和 ERA5。阿克套的典型年从 14 年资料中选取，塔拉兹从 10 年中选取，其余城市各有 15 年源资料。</p>
+      {{WEATHER_FIGURE}}
+      <details class="ref-directory"><summary>浏览 {{CITY_COUNT}} 个城市的气象文件 <span>城市、资料年限及原始 ZIP 压缩包</span></summary>
+        <div class="ref-table-wrap" tabindex="0" role="region" aria-label="可横向滚动的气象站档案表">
+          <table><caption>中文城市名与模型英文名并列，EPW 站名及编号沿用原文件。</caption>
+            <thead><tr><th scope="col">城市</th><th scope="col">EPW 原始站名</th><th scope="col">EPW 站号</th><th scope="col">数据来源</th><th scope="col">年数（起止年份）</th><th scope="col">文件时区</th><th scope="col">原始文件</th></tr></thead>
+            <tbody>{{STATION_ROWS}}</tbody>
+          </table>
+        </div>
+      </details>
+      <p class="ref-action"><a href="data/regions/stations.json" download>下载站点元数据与 SHA-256 校验值（JSON）</a></p>
+    </section>
+
+    <section id="cooling" class="ref-section"><h2>冷源系统与空气冷却</h2>
+      <dl class="ref-list">
+        <dt>干冷器与备用冷水机组</dt>
+        <dd>美国能源部《EnergyPlus 工程参考手册》24.2 版说明了单速和双速干冷器如何向空气排放显热。KazDC 用一个假定的额定工况确定简化的散热能力曲线。参考算例取 IT 设备发热功率 {{IT_MW}} MW、冷却液流经 IT 设备的温升 {{LOOP_RISE}} K、额定工况下干冷器出口液温与进口气温之差 {{APPROACH}} K、冷水机组制冷性能系数（COP）{{COP}}、风机全速功率 {{FAN}} kW、循环泵功率 {{PUMP}} kW。只有整整一小时都无需压缩机制冷，才计入“冷水机组停机小时数”。<span><a href="https://bigladdersoftware.com/epx/docs/24-2/engineering-reference/cooling-towers-and-evaporative-fluid-coolers.html#one-and-two-speed-fluid-coolers">EnergyPlus 干冷器模型</a> · <a href="{{METHODS_URL}}#dispatch">KazDC 运行控制方程</a> · <a href="case.json" download>系统参数（JSON）</a></span></dd>
+        <dt>绝热蒸发预冷湿帘与湿球温度</dt>
+        <dd>美国供暖、制冷与空调工程师学会（ASHRAE）《基础手册》（2017）第 1 章给出了湿空气热力学关系式。平台用 Meyer 和 Thevenard 开发的 PsychroLib（2019）核对了以摄氏度表示、保留一位小数的湿球温度序列。EnergyPlus 26.2 版第 16.3 节给出了湿帘饱和效率与进、出口温度的关系。空气质量流量、2 kW 喷淋泵、按蒸发量额外补水 10%、夏季启用条件和用水上限，均为本算例的设定。<span><a href="https://handbook.ashrae.org/Handbooks/F17/SI/f17_ch01/f17_ch01_si.aspx">ASHRAE 湿空气热力学</a> · <a href="https://joss.theoj.org/papers/10.21105/joss.01137">PsychroLib 论文</a> · <a href="https://energyplus.readthedocs.io/en/v26.2.0/guides/engineering-reference/16.3-evaporative-coolers.html">EnergyPlus 湿帘方程</a> · <a href="{{TECH_URL}}?study=pad">湿帘预冷模型</a></span></dd>
+        <dt>间接空气冷却与空气换热器</dt>
+        <dd>EnergyPlus 26.2 版第 16.8 节用换热器有效度、两股气流中较小的热容流率及两侧入口温差计算显热换热量。ASHRAE《暖通空调应用手册》（2015）第 19 章介绍了数据中心的自然冷却方式。KazDC 假定两股气流的热容流率相等，允许用户设定附加风机功率，并用一个室外温度下限控制低温停用。<span><a href="https://energyplus.readthedocs.io/en/v26.2.0/guides/engineering-reference/16.8-heat-exchangers.html">EnergyPlus 换热器方程</a> · <a href="https://handbook.ashrae.org/Handbooks/A15/IP/A15_CH19/a15_ch19_ip.aspx">ASHRAE 数据中心章节</a> · <a href="{{TECH_URL}}?study=air">间接空气冷却模型</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="liquid" class="ref-section"><h2>液冷回路与热量计量</h2>
+      <dl class="ref-list">
+        <dt>怎样测量水带走的热量</dt>
+        <dd>ASHRAE《暖通空调系统与设备手册》（2024）第 12 章“流量与能量计量”介绍了计算热量所需的流量和温度测量。Sickinger、Van Geet 和 Ravenscroft（2014）在报告 NREL/TP-2C00-62905 第 2.4 节给出机架实测案例。本页链接的计算表取水的比热容为 4.18 kJ/(kg·K)，假定读数在所填时段内稳定，并给出加热器输入能量减去水吸热量的带符号差值。<span><a href="https://handbook.ashrae.org/Handbooks/S24/IP/s24_ch12/s24_ch12_ip.aspx">ASHRAE 热量计量</a> · <a href="https://www.nlr.gov/docs/fy15osti/62905.pdf#page=23">NREL 机架实验</a> · <a href="{{BENCH_URL}}">水回路实验计算表</a></span></dd>
+        <dt>冷板热阻与压降的测量边界</dt>
+        <dd>开放计算项目（OCP）《Cold Plate Development and Qualification》（2022）第 1.3.2.1、1.3.2.2 节分别定义了器件外壳至冷却液入口的热阻，以及冷板的进出口压降。KazDC 算例将测温探头置于冷板表面，因此计算的是冷板表面与入口冷却液的温差除以加热器输入功率。要得到器件外壳至入口的热阻，还需测量外壳温度。泵功率估算只计入流体通过冷板的压降。<span><a href="https://www.opencompute.org/documents/ocp-cold-plate-development-and-qualification-with-integrated-comments-pdf">OCP 冷板试验指南</a> · <a href="https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-federal-data-centers">美国能源部液冷指南</a> · <a href="{{TECH_URL}}?study=cold">冷板实验计算表</a></span></dd>
+        <dt>丙二醇溶液的初始结冰温度与泵功率</dt>
+        <dd>陶氏《DOWFROST 工程与运行指南》（2001）表 3、10、14 和 22 提供了结冰温度和溶液物性。Pátek 等（2009）给出了 0.1 MPa 下液态水的物性。美国环境保护署《EPANET 2.2 用户手册》（2020）第 3、12 章介绍了达西–魏斯巴赫水头损失公式。KazDC 给定管壁粗糙度和局部阻力系数，并在雷诺数 2,300 至 4,000 之间对沿程阻力系数作线性插值。模型统计室外气温低于初始结冰温度的小时数。管内流体是否实际结冰，还取决于流动和保温条件。<span><a href="https://ingredi.com/content/pdfs/DOWFROST_Manual.pdf">陶氏溶液物性表</a> · <a href="https://www.nist.gov/publications/reference-correlations-thermophysical-properties-liquid-water-01-mpa">液态水物性关联式</a> · <a href="https://nepis.epa.gov/Exe/ZyPURL.cgi?Dockey=P10113EM.TXT">美国环境保护署管道水力计算</a> · <a href="{{TECH_URL}}?study=glycol">丙二醇回路模型</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="heat" class="ref-section"><h2>余热回收</h2>
+      <dl class="ref-list">
+        <dt>机架余热能满足多少建筑供热需求？</dt>
+        <dd>Van Geet 和 Sickinger 编写的美国能源部《高能效数据中心设计最佳实践指南》（2024）第 5.6 和 7.1 节介绍了直接液冷和余热利用。建筑逐时供热需求曲线、液冷回路可回收的 IT 热量比例、直接换热所需的最小温差 3 K，以及用户侧供回水温差 10 K，均为本算例的设定。<span><a href="https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf">美国能源部设计指南</a> · <a href="{{HEAT_URL}}">余热回收模型</a></span></dd>
+        <dt>怎样核对热泵的制热性能系数（COP）</dt>
+        <dd>OpenStax《大学物理》第 2 卷第 4.5 节给出了用绝对温度表示的可逆热泵性能上限。KazDC 将蒸发温度和冷凝温度各视为一个定值，并假定热源侧的水经过蒸发器后降温 6 K。用热源侧冷却后的出水温度和用户要求的供水温度计算，可得到理想条件下的制热 COP 上限。实际 COP 需要从相应工况下的设备性能曲线确定。<span><a href="https://openstax.org/books/university-physics-volume-2/pages/4-5-the-carnot-cycle">OpenStax 可逆热力循环</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="storage" class="ref-section"><h2>冷冻水蓄冷</h2>
+      <dl class="ref-list">
+        <dt>水罐能蓄多少冷量，何时充冷和放冷？</dt>
+        <dd>ASHRAE《暖通空调系统与设备手册》（2024）第 50 章介绍了显热蓄冷和分层式冷冻水蓄冷罐。模型用水的体积、密度、比热容和温升计算可用蓄冷量，再逐时记录充冷量、放冷量、储存损失和时段末剩余冷量。夜间充冷时段、午后放冷时段和输送泵用电均按算例设定。<span><a href="https://handbook.ashrae.org/handbooks/S24/SI/s24_ch50/s24_ch50_si.aspx">ASHRAE 蓄能章节</a> · <a href="{{TECH_URL}}?study=tank">蓄冷水罐模型</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="snow" class="ref-section"><h2>季节性储雪供冷</h2>
+      <dl class="ref-list">
+        <dt>冰的熔化潜热与阿斯塔纳的三个算例</dt>
+        <dd>Feistel（2003）在《Progress in Oceanography》第 58 卷第 83 页式（60）中给出，淡水冰在大气压下、接近 0 °C 时的熔化潜热约为 333.5 kJ/kg。数据中心算例用这一数值和假定的可利用储雪量，逐时计算融雪能承担多少干冷器处理后的剩余冷负荷。储雪算例采用 55、60 和 50 m³ 三个示例容积，按各设施假设的平均得热功率计算 91 天内传入的热量。默认雪的冰当量密度为 550 kg/m³，每种设施的平均得热功率均设为 200 W。</dd>
+        <dd>独立的 <cite>Astana SnowCool</cite> 模拟结果回放（v1.1，2026 年 9 月 16 日）沿用原始模型的熔化潜热 334 kJ/kg。该算例先将雪储存 120 天，再连续 168 小时施加 5 kW 试验热负荷。下载文件给出不同水–冰接触条件下的模拟值，第 0 小时为初始状态，后续 168 行分别对应各小时的结果。<span><a href="https://www.teos-10.org/pubs/Feistel_2003.pdf#page=41">Feistel 的冰熔化焓数据</a> · <a href="data/snowcool_replay.csv" download>SnowCool 逐时结果（CSV）</a> · <a href="{{SNOW_URL}}">阿斯塔纳储雪供冷算例</a></span></dd>
+        <dt>瑞典和日本的实际运行案例</dt>
+        <dd>Skogsberg 和 Nordell（2001）在《Cold Regions Science and Technology》第 32 卷第 63–70 页介绍了瑞典松兹瓦尔医院的储雪设施。Skogsberg（2002）在同刊第 34 卷第 135–142 页报告了首个运行季的结果。日本北海道美呗市的“白色数据中心”资料介绍了用雪为服务器供冷的试验。这些案例记录了储雪供冷的实际应用。阿斯塔纳的计算采用本算例设定的集雪、储雪和换热条件。<span><a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=86">松兹瓦尔医院的储雪设计</a> · <a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=96">首个运行季的实测结果</a> · <a href="https://www.city.bibai.hokkaido.jp/soshiki/13/417.html">美呗市资料（日文）</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="power" class="ref-section"><h2>不间断电源、光伏与电池</h2>
+      <dl class="ref-list">
+        <dt>在相同输出功率下比较不间断电源（UPS）</dt>
+        <dd>美国环境保护署“能源之星”不间断电源产品指标的表 1 列出了规定的负载点。计算表以输出功率除以输入功率，求得该负载点的效率。效率分别为 94% 和 97% 的两个示例，均假定设备全年以相同且恒定的输出功率运行。<span><a href="https://www.energystar.gov/products/uninterruptible_power_supplies/key_product_criteria">“能源之星”UPS 指标</a> · <a href="{{POWER_URL}}">UPS 对比模型</a></span></dd>
+        <dt>光伏发电与电池充放电</dt>
+        <dd>Dobos（2014）的《PVWatts 第 5 版手册》（NREL/TP-6A20-62641）第 10 节式（8）说明了如何用辐照度和电池片温度修正光伏直流输出功率。System Advisor Model（SAM）文档介绍了光伏系统设计和用户侧储能调度。KazDC 假定光伏组件水平安装、表面无积雪，采用简化的电池片温度模型和固定损耗。储能电池保留最低备用电量，充电和放电效率各为 95%。光伏发电优先供应本地负荷，余电用于充电，仍有剩余则计为弃光。光伏出力不足时，电池可在保留备用电量的前提下向本地负荷放电。<span><a href="https://research-hub.nlr.gov/en/publications/pvwatts-version-5-manual/">PVWatts 手册</a> · <a href="https://samrepo.nlr.gov/help/pvwatts_system_design.html">SAM 光伏设计</a> · <a href="https://samrepo.nlr.gov/help/battery_dispatch_btm.html">SAM 电池调度</a> · <a href="{{TECH_URL}}?study=solar">光伏与储能电池模型</a></span></dd>
+        <dt>六个城市的太阳辐射时标</dt>
+        <dd>利用 NOAA 太阳位置方程核对各小时区间的日照条件后发现，阿克套、阿特劳、科斯塔奈、乌拉尔斯克、突厥斯坦和热兹卡兹甘的文件在当地日照时段之外也出现了部分太阳辐射量。模型沿用原始时间标记，并在这六个城市的光伏计算结果和 CSV 文件中标注这一问题。分析当地电池调度和从电网取电的峰值功率时，尤其需要用当地辐照度序列核实。<span><a href="https://gml.noaa.gov/grad/solcalc/solareqns.PDF">NOAA 太阳位置方程</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="reproduce" class="ref-section ref-reproduce"><h2>复现计算结果</h2>
+      <p>以阿斯塔纳冷却液供液温度 18 °C 的工况为例，用气象数据和设备参数逐小时计算。将各小时的制冷用电量相加，即可核对全年制冷用电量。统计运行模式为 <code>dry_only</code> 的行数，即可核对全年冷水机组停机小时数。</p>
+      <ul class="ref-files">
+        <li><strong>输入数据</strong><span><a href="case.json" download>设备参数（JSON）</a> · <a href="data/astana_hourly.csv" download>阿斯塔纳逐时气象数据（CSV）</a></span></li>
+        <li><strong>计算方法</strong><span><a href="{{METHODS_URL}}#reproduce">方程、算例与重新生成结果的命令</a></span></li>
+        <li><strong>参考计算结果</strong><span><a href="reference/hourly.csv" download>逐时 CSV</a> · <a href="reference/monthly.csv" download>月度 CSV</a> · <a href="reference/annual.csv" download>年度 CSV</a></span></li>
+      </ul>
+      <p class="ref-date">资料和计算的核对日期为 2026 年 11 月 14 日。原始数据文件沿用原字段名。</p>
+    </section>
+  </div>
+</div>

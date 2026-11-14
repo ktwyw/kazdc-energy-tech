@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123c3a"><title>Қазақстандағы зерттеу басымдықтары · KazDC энергетика технологиялары</title>
+<meta name="description" content="Қазақстанда қандай салқындату шешімдерін тереңірек зерттеген жөн? Жұмыс істеп тұрған бір деректер орталығының көрсеткіштері өңірлік модельді тексеруге, сондай-ақ келесі жобалық шешімге қандай бастапқы деректер көбірек әсер ететінін анықтауға мүмкіндік берер еді.">
+<meta property="og:site_name" content="KazDC энергетика технологиялары">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Қазақстандағы зерттеу басымдықтары · KazDC энергетика технологиялары">
+<meta property="og:description" content="Қазақстанда қандай салқындату шешімдерін тереңірек зерттеген жөн? Жұмыс істеп тұрған бір деректер орталығының көрсеткіштері өңірлік модельді тексеруге, сондай-ақ келесі жобалық шешімге қандай бастапқы деректер көбірек әсер ететінін анықтауға мүмкіндік берер еді.">
+<link rel="alternate" hreflang="en" href="research-priorities.html">
+<link rel="alternate" hreflang="kk" href="research-priorities-kk.html">
+<link rel="alternate" hreflang="ru" href="research-priorities-ru.html">
+<link rel="alternate" hreflang="zh-Hans" href="research-priorities-zh.html">
+<script>"use strict";
+
+window.SiteI18n = (() => {
+  const data = {"lang":"kk","locale":"kk","months":["қаңтар","ақпан","наурыз","сәуір","мамыр","маусым","шілде","тамыз","қыркүйек","қазан","қараша","желтоқсан"],"shortMonths":["қаң.","ақп.","нау.","сәу.","мам.","мау.","шіл.","там.","қыр.","қаз.","қар.","жел."],"cities":{"aktau":"Ақтау","aktobe":"Ақтөбе","almaty":"Алматы","astana":"Астана","atyrau":"Атырау","ekibastuz":"Екібастұз","karaganda":"Қарағанды","kokshetau":"Көкшетау","kostanay":"Қостанай","kyzylorda":"Қызылорда","oral":"Орал","oskemen":"Өскемен","pavlodar":"Павлодар","petropavl":"Петропавл","qonaev":"Қонаев","semey":"Семей","shymkent":"Шымкент","taldykorgan":"Талдықорған","taraz":"Тараз","turkistan":"Түркістан","zhezkazgan":"Жезқазған"},"station":{"station":"{city} метеостанциясы","airport":"{city} әуежайының метеостанциясы","internationalAirport":"{city} халықаралық әуежайының метеостанциясы","era":"{city} үшін ERA5 реанализі","qonaev":"Қонаев үшін ERA5 реанализі (файлда Қапшағай деп көрсетілген)","origin":"{location} · {period} жылдар аралығындағы {years} жылдың дерегі","quality":"Файлдағы кейбір өкілдік айлар әуежайдағы бақылаудан салқынырақ. 2024 жылғы маусымның орташа температурасы файлда 21,2 °C, әуежай бақылауында 24,3 °C. Салқындатуға жұмсалатын электр энергиясы кем бағалануы мүмкін."}};
+  const cityName = (slug, fallback) => data.cities[slug] || fallback || slug;
+  function formatNumber(value, options) {
+    if (data.lang !== "kk") return value.toLocaleString(data.locale, options);
+    // Some browsers ship a partial Kazakh locale and silently use English punctuation.
+    return value.toLocaleString("en-US", options).replaceAll(",", "\u00a0").replace(".", ",");
+  }
+  function stationNote(station) {
+    const location = station.location_note || "";
+    let kind = "station";
+    if (location.includes("ERA5")) kind = station.slug === "qonaev" ? "qonaev" : "era";
+    else if (location.includes("International Airport")) kind = "internationalAirport";
+    else if (location.includes("Airport")) kind = "airport";
+    const place = data.lang === "en" && location ? location :
+      data.station[kind].replace("{city}", cityName(station.slug, station.name));
+    const origin = data.station.origin.replace("{location}", place)
+      .replace("{years}", station.source_years).replace("{period}", station.period);
+    const quality = station.slug === "almaty" && station.quality_note ? ". " + data.station.quality : "";
+    return origin + quality;
+  }
+  return {lang: data.lang, locale: data.locale, months: data.months, shortMonths: data.shortMonths, cityName, stationNote, formatNumber};
+})();
+</script>
+<style>:root{--paper:#f6f5ef;--panel:#fffefa;--ink:#203630;--secondary:#4b6158;--rule:#d0d8cb;--forest:#143f3a;--teal:#087b69;--light:#d7e6d9;--mint:#a9dfbf;--ochre:#986026;font-family:"Inter","Arial",sans-serif;color:var(--ink);background:var(--paper);font-variant-numeric:tabular-nums}
+*{box-sizing:border-box}body{margin:0;line-height:1.52}a{color:#126452;text-underline-offset:.18em}a:hover{text-decoration:underline}button,input,select{font:inherit}button,a,input,select,summary{touch-action:manipulation}button{cursor:pointer}h1,h2,h3,h4,p,figure{margin:0}h1,h2,.brand,.chart-head h2{letter-spacing:-.045em}h1,h2{font-family:"DM Sans","Inter","Arial",sans-serif}h3{letter-spacing:-.025em}b,strong{font-weight:700}a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #bd7b36;outline-offset:3px}
+.inner{width:min(1190px,calc(100% - 80px));margin-inline:auto}.mast{border-bottom:1px solid var(--rule);background:var(--panel)}.mast-row{display:flex;align-items:center;justify-content:space-between;min-height:74px;gap:28px}.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-size:22px;font-weight:750;white-space:nowrap}.brand b{font-weight:480}.coil{position:relative;display:grid;gap:3px;padding:6px 5px;background:var(--forest);border-radius:4px;width:28px}.coil i{display:block;height:3px;background:#a8debc;transform:skew(-22deg)}.mast nav,.foot nav{display:flex;align-items:center;gap:23px}.mast nav a,.foot nav a{font-size:.86rem;font-weight:600;text-decoration:none;color:var(--secondary);white-space:nowrap}.mast nav a:hover,.foot nav a:hover{text-decoration:underline}.mast nav a[aria-current]{color:var(--teal);box-shadow:0 2px var(--teal)}.skip{position:absolute;left:-300px;top:0;background:white;padding:.8em;z-index:10}.skip:focus{left:6px}
+.hero{display:grid;grid-template-columns:.93fr 1.07fr;gap:5vw;align-items:center;padding:56px 0 50px;border-bottom:1px solid var(--rule)}.kicker{color:var(--teal);font-size:.7rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}.hero h1{font-size:clamp(54px,5.6vw,82px);line-height:.96;font-weight:660}.hero h1 span,.page-intro h1 span{color:var(--teal)}.deck{font-size:clamp(1rem,1.35vw,1.22rem);line-height:1.48;color:var(--secondary);margin:20px 0 0;max-width:43rem}.text-links,.tools{display:flex;gap:18px;flex-wrap:wrap;align-items:center}.text-links{margin-top:23px}.text-links a,.details-body>a,.sources a{font-weight:650;font-size:.91rem}.climate-card{background:var(--forest);color:#fcfff9;padding:25px 27px 17px;border-radius:8px;min-width:0}.chart-head,.result-title,.heading,.range-line,.cities-head,.ends,.foot,.legend{display:flex;align-items:center;justify-content:space-between;gap:12px}.chart-head h2,.chart-head h3{font-family:inherit;font-size:1.05rem;font-weight:680;letter-spacing:-.02em}.chart-head>span,.result-title>span,.cities-head>span,.fine,.details-body,.climate-card figcaption,.control-note,.ends{font-size:.84rem}.chart-head>span,.result-title>span,.cities-head>span,.fine,.control-note,.ends{color:var(--secondary)}.climate-card .chart-head span,.climate-card figcaption{color:#d4e6d7}.graphic{width:100%;min-width:0;line-height:1}.graphic svg{display:block;width:100%;height:auto;overflow:visible}.climate-card figcaption{line-height:1.4;margin-top:4px}.climate-card figcaption span{display:inline-flex;align-items:center;margin:3px 14px 2px 0;gap:5px;font-weight:600}.chart-head{margin-bottom:10px}
+.workspace,.studies,.reading{padding:39px 0 43px;border-bottom:1px solid var(--rule);scroll-margin-top:14px}.heading{margin-bottom:23px;flex-wrap:wrap}.heading h2,.reading h2{font-size:clamp(27px,3vw,40px);line-height:1.1;font-weight:635}.heading .kicker{margin-bottom:7px}.quiet,.action{border:1px solid #a6bcac;border-radius:5px;padding:.54em .86em;font-weight:620;font-size:.88rem;line-height:1.4;display:inline-flex;align-items:center;justify-content:center}.quiet{background:transparent;color:var(--forest)}.quiet:hover{background:#e1e9de}.action{background:var(--forest);color:white;border-color:var(--forest)}.action:hover{background:#20584d}.action:disabled{opacity:.42;cursor:default}.compare-grid{display:grid;grid-template-columns:minmax(220px,.79fr) minmax(0,1.9fr);gap:20px;align-items:stretch}.controls,.result-panel{border:1px solid var(--rule);border-radius:7px;padding:23px 26px;min-width:0}.controls{background:#e8eee4;align-self:start}.result-panel{background:var(--panel)}.controls h3,.result-title h3{font-size:1.2rem;line-height:1.35}.controls h3{margin-bottom:17px}.controls label{display:block;margin:12px 0 4px;font-size:.86rem;font-weight:640}.controls select,.controls input:not([type=range]){width:100%;min-width:0;border:1px solid #9aafa0;border-radius:4px;background:#fffffa;color:var(--ink);padding:7px 9px;min-height:39px}.range-line{margin-top:18px;align-items:baseline}.range-line label{margin:0}.range-line output{font-size:1.24rem;color:var(--forest);font-weight:700}.controls input[type=range]{display:block;width:100%;accent-color:var(--teal);margin:10px 0 0}.ends{font-size:.72rem}.control-note,.controls .fine{margin-top:13px;line-height:1.45}.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:18px 0 24px}.metrics>div+div{border-left:1px solid var(--rule);padding-left:16px}.metrics span,.metrics small{display:block;color:var(--secondary);font-size:.79rem;line-height:1.3}.metrics strong{display:block;color:var(--forest);font-size:clamp(24px,3vw,43px);letter-spacing:-.05em;line-height:1.22;font-weight:650}.cities-head{font-size:.89rem;margin:0 0 8px}.city-bars{display:grid;gap:7px}.bar-row{display:grid;grid-template-columns:minmax(65px,.7fr) 2fr minmax(65px,.4fr);gap:12px;align-items:center;font-size:.87rem}.bar-row>span:first-child{color:var(--secondary)}.bar-row.active>span:first-child{font-weight:750;color:var(--ink)}.bar-track{height:9px;background:#edf1e9;border-radius:1px;overflow:hidden}.bar-track i{display:block;height:100%;background:#8ba89a}.active .bar-track i{background:var(--teal)}.bar-row>strong{text-align:right;font-weight:650}.fine{line-height:1.46}.result-panel>.fine{margin-top:14px}
+.details{border-top:1px solid var(--rule);margin-top:13px}.details+.details{margin-top:0}.details summary{padding:12px 1px;font-weight:650;font-size:.92rem;cursor:pointer;color:var(--forest)}.details-body{padding:4px 0 13px;font-size:.95rem;line-height:1.55}.details-body p+p,.reading p+p{margin-top:12px}.details-body button{margin:10px 9px 0 0}.table-wrap{min-width:0;overflow-x:auto}.table-wrap table{border-collapse:collapse;width:100%;margin:12px 0 7px;font-size:.82rem;line-height:1.35}.table-wrap th,.table-wrap td{text-align:right;border-bottom:1px solid var(--rule);padding:8px 9px}.table-wrap th:first-child,.table-wrap td:first-child{text-align:left}.table-wrap thead th{color:var(--secondary);background:#ecf0e8;font-weight:650}.table-wrap tfoot{font-weight:700}.study-rows{border-top:1px solid var(--rule)}.study-rows a{display:grid;grid-template-columns:minmax(110px,.55fr) 2fr 30px;gap:20px;align-items:center;padding:16px 6px;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none}.study-rows a:hover{background:#ebefe6}.study-rows b,.study-rows small{display:block}.study-rows b{font-size:1.13rem}.study-rows small{font-size:.88rem;color:var(--secondary);margin-top:2px}.study-tag{color:var(--teal);font-weight:650;font-size:.78rem}.study-rows i{color:var(--teal);font-size:1.45rem;font-style:normal;text-align:center}
+.page-intro{padding:47px 0 32px;border-bottom:1px solid var(--rule)}.page-intro h1{overflow-wrap:anywhere;hyphens:auto;font-size:clamp(42px,5.4vw,74px);line-height:1.02;font-weight:650}.page-intro .deck{max-width:56rem;margin-top:14px}.reading{display:grid;grid-template-columns:.78fr 1.7fr;gap:45px}.reading h3{font-size:1.16rem;margin:20px 0 7px}.reading h3:first-child{margin-top:0}.reading p{color:#364b42;font-size:.97rem}.reading .sources{margin:18px 0 3px}.equation,.interpretation{background:#eaf1e8;border-left:3px solid var(--teal);padding:12px 15px;color:var(--forest);font-size:.95rem;line-height:1.5}.interpretation{margin:18px 0}.equation{font-weight:620;margin:15px 0}.legend{justify-content:flex-start;color:var(--secondary);gap:6px;font-size:.8rem}.dot{width:9px;height:9px;border-radius:50%;display:inline-block}.dot.teal{background:var(--teal)}.dot.muted{background:#b0c0b6;margin-left:12px}.error,.notice{padding:11px 13px;margin:12px 0;background:#fcf1e4;border-left:3px solid var(--ochre);color:#693f1f}.foot{padding:28px 0 33px;flex-wrap:wrap}.foot>div{display:flex;gap:15px;align-items:baseline}.foot>div span{font-size:.85rem;color:var(--secondary)}.foot strong{letter-spacing:-.02em}.foot nav{gap:19px}.error[hidden]{display:none}button:disabled,.controls input:disabled{opacity:.54}
+@media(max-width:900px){.inner{width:calc(100% - 42px)}.mast-row{align-items:flex-start;justify-content:flex-start;gap:13px;flex-wrap:wrap;padding:11px 0}.mast nav{flex-wrap:wrap;gap:6px 19px}.hero{gap:28px;padding:38px 0}.climate-card{padding:16px 19px}.controls,.result-panel{padding:18px}.compare-grid{grid-template-columns:minmax(200px,.8fr) minmax(0,1.7fr)}.metrics{gap:10px}.metrics>div+div{padding-left:11px}.mast nav a{font-size:.8rem}.range-line{gap:5px}}
+@media(max-width:670px){.inner{width:calc(100% - 32px)}.mast-row{display:block}.mast nav{padding-top:7px;gap:4px 14px}.hero{grid-template-columns:1fr;padding:32px 0 27px;gap:24px}.hero h1 br{display:none}.hero h1{font-size:clamp(44px,10vw,63px)}.deck{margin-top:13px}.text-links{gap:8px 16px;margin-top:14px}.climate-card{padding:15px 19px}.compare-grid,.reading{grid-template-columns:1fr;gap:14px}.workspace,.studies,.reading{padding:25px 0}.heading{margin-bottom:14px}.controls h3{margin-bottom:8px}.range-line{margin-top:12px}.metrics span,.metrics small{font-size:.73rem}.metrics strong{font-size:clamp(23px,6.8vw,34px)}.metrics{gap:6px}.metrics>div+div{padding-left:8px}.page-intro{padding:31px 0 25px}.study-rows a{grid-template-columns:1fr 28px;gap:2px 10px;padding:12px 1px}.study-tag{grid-row:1;grid-column:1}.study-rows a>span:nth-child(2){grid-row:2;grid-column:1}.study-rows i{grid-column:2;grid-row:1/3}.foot>div{flex-wrap:wrap;gap:2px 12px}.foot nav{gap:6px 15px;flex-wrap:wrap}.foot{gap:10px}.table-wrap th,.table-wrap td{padding:7px 5px}.reading h2{max-width:25ch}.tools{gap:7px}}
+@media print{.mast nav,.foot,.tools,button,.text-links{display:none}.inner{width:100%}.controls,.result-panel,.climate-card{break-inside:avoid}.hero{padding:10px 0}.workspace,.reading{padding:15px 0}}
+
+.climate-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;padding-top:8px;border-top:1px solid #507168}
+.climate-pair label{min-width:0}
+.climate-card .climate-pair span{display:flex;gap:7px;margin:0 0 4px;font-size:.78rem}
+.climate-pair i{width:19px;border-top:3px solid #a5e5bd}
+.climate-pair .peer-line{border-top:2px dashed #ebc888}
+.climate-pair select{display:block;width:100%;min-height:34px;padding:4px 7px;border:1px solid #75958b;border-radius:4px;color:#f6fff8;background:#234d44;font-weight:600}
+.city-export{margin-top:12px}
+#city-bars{display:block}
+#city-bars .bar-row{break-inside:avoid;grid-template-columns:minmax(5.7rem,.92fr) 1.3fr 3.8rem;gap:8px;padding:3px 0}
+@media(min-width:950px){
+  #city-bars{column-count:2;column-gap:24px;column-rule:1px solid var(--rule)}
+  #city-bars .bar-row{font-size:.80rem}
+}
+@media(max-width:370px){.climate-pair{gap:9px}.climate-card .climate-pair span{gap:4px;font-size:.71rem}}
+
+
+@media (max-width: 500px) {
+  .result-panel .metrics {grid-template-columns: 1fr; gap: 0}
+  .result-panel .metrics > div {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center; column-gap: 12px; padding-block: 8px;
+  }
+  .result-panel .metrics > div + div {border-left: 0; border-top: 1px solid var(--rule); padding-left: 0}
+  .result-panel .metrics span {grid-row: 1 / 3; font-size: .85rem}
+  .result-panel .metrics strong, .result-panel .metrics small {grid-column: 2; text-align: right}
+  .result-panel .metrics small {max-width: 15ch; overflow-wrap: anywhere}
+  .bar-row > span:first-child {overflow-wrap: anywhere; hyphens: auto}
+  #power-bars .bar-row {grid-template-columns: minmax(8rem, 1.6fr) minmax(0, 1fr) auto}
+}
+
+.research-intro {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:center;gap:clamp(24px,5vw,78px);padding:46px 0 38px;border-bottom:1px solid var(--rule)}
+.research-intro h1 {font-size:clamp(2.45rem,4.9vw,4.6rem);line-height:1.02;font-weight:650;overflow-wrap:break-word}
+.research-intro .deck {max-width:44ch;margin:17px 0 22px}
+.brief-download {display:inline-block;font-size:.93rem;font-weight:650}
+.research-case {margin:0;background:var(--forest);color:#fffef7;border-radius:8px;padding:clamp(19px,2.2vw,29px)}
+.research-case h2 {font-size:clamp(1.35rem,2.2vw,2.05rem);letter-spacing:-.035em;line-height:1.12}
+.research-case figcaption p,.research-case .case-meaning {color:#e1eee2;font-size:.9rem;line-height:1.45}
+.research-case figcaption p {margin-top:9px}
+.july-metric {margin-top:20px;font-size:.88rem;font-weight:650;color:#e8f6e6}
+#july-comparison {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:6px 0 11px}
+#july-comparison>div {border-top:1px solid #699389;padding:9px 0 0}
+#july-comparison dt {font-size:.88rem;color:#e9f7ec}
+#july-comparison dd {margin:3px 0 0;font-size:.85rem;line-height:1.5;color:#d3e7d9}
+#july-comparison strong {font-size:clamp(1.8rem,3.3vw,2.8rem);color:white;line-height:1.15}
+#july-comparison a {display:block;width:fit-content;color:#b9f0d0;font-weight:650;margin-top:6px}
+.research-case a:focus-visible {outline-color:#ffc980}
+.research-case .case-meaning {border-top:1px solid #699389;margin-top:15px;padding-top:11px}
+.research-questions,.research-pilot,.research-close {padding:34px 0;scroll-margin:15px;border-bottom:1px solid var(--rule)}
+:is(.research-questions,.research-pilot,.research-close) h2 {font-size:clamp(1.65rem,3vw,2.35rem);font-weight:635;line-height:1.14}
+.research-question {display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr) minmax(0,1fr);gap:clamp(18px,3vw,45px);padding:19px 0;border-bottom:1px solid var(--rule)}
+.research-question:first-of-type {margin-top:10px}
+.research-question:last-of-type {border-bottom:0;padding-bottom:0}
+.research-question h3 {font-size:1.12rem;line-height:1.38;font-weight:650}
+.research-question h4,.research-plan dt {font-size:.85rem;font-weight:650;color:#21604f;letter-spacing:0}
+.research-question p,.research-plan dd,.research-pilot header p {color:var(--secondary);font-size:.94rem;line-height:1.5}
+.research-question p {margin-top:4px}
+.research-pilot {display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.45fr);gap:clamp(26px,5vw,75px)}
+.research-pilot header p {margin:12px 0 15px;max-width:42ch}
+.research-plan {margin:0}
+.research-plan>div {display:grid;grid-template-columns:minmax(110px,.48fr) minmax(0,1.52fr);gap:17px;border-top:1px solid var(--rule);padding:10px 0}
+.research-plan dd {margin:0}
+.research-close {display:flex;gap:24px;align-items:center;justify-content:space-between;border-bottom:0}
+.research-close h2 {max-width:33ch;font-size:clamp(1.45rem,2.7vw,2.1rem)}
+.research-close .action {text-align:center}
+.research-sources {display:flex;flex-wrap:wrap;gap:8px 20px;padding:0 0 30px;font-size:.86rem}
+@media (max-width:800px) {
+  .research-intro {grid-template-columns:1fr;gap:20px;padding:30px 0}
+  .research-question {grid-template-columns:1fr 1fr;gap:8px 18px}
+  .research-question h3 {grid-column:1 / -1}
+  .research-pilot {grid-template-columns:1fr;gap:16px}
+  .research-close {align-items:flex-start;flex-direction:column;gap:14px}
+}
+@media (max-width:480px) {
+  .research-question {grid-template-columns:1fr;gap:8px}
+  .research-plan>div {grid-template-columns:1fr;gap:4px}
+  .research-case {padding:16px}
+}
+@media print {
+  .research-case {print-color-adjust:exact}
+  .research-question,.research-plan>div,.research-case {break-inside:avoid}
+}
+.mast .mast-row, .mast .mast-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px clamp(12px, 1.7vw, 25px);
+}
+.mast .mast-row > nav, .mast .mast-inner > nav {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px clamp(10px, 1.35vw, 20px);
+}
+.language-menu {position: relative; justify-self: end; z-index: 3; color: #173f36}
+.language-menu summary {
+  display: flex; align-items: center; gap: 6px; min-height: 38px;
+  padding: 5px 9px; cursor: pointer; list-style: none;
+  border: 1px solid #9bb6a8; border-radius: 5px;
+  background: #fffefa; font-family: inherit; line-height: 1.35;
+  font-size: .86rem; font-weight: 600; white-space: nowrap;
+}
+.language-menu summary::-webkit-details-marker {display: none}
+.language-menu summary::after {
+  content: ""; width: 6px; height: 6px; margin: -3px 2px 0;
+  border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg);
+}
+.language-menu[open] summary::after {margin-top: 3px; transform: rotate(225deg)}
+.language-menu summary:hover, .language-menu[open] summary {background: #eaf2e9}
+.language-menu svg {width: 17px; height: 17px; flex: none}
+.language-options {
+  position: absolute; right: 0; top: calc(100% + 5px); min-width: 10rem; width: max-content;
+  max-width: min(19rem, calc(100vw - 36px)); padding: 5px;
+  background: #fffefa; border: 1px solid #aac1b5; border-radius: 6px;
+  box-shadow: 0 5px 14px #143d3429;
+}
+.language-options p {margin: 4px 6px 5px; font: inherit; font-size: .8rem; color: #405a4e}
+.language-options a, .language-options [aria-current] {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  min-height: 40px; padding: 5px 9px; color: #173f36;
+  border-radius: 3px; font-size: .92rem; text-decoration: none;
+}
+.language-options a:hover, .language-options a:focus-visible {background: #e9f2e9; text-decoration: underline}
+.language-options [aria-current] {background: #e9f2e9; font-weight: 650}
+.language-menu :focus-visible {outline: 2px solid #886020; outline-offset: 2px}
+html:lang(zh-Hans) body {font-family: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif}
+html:lang(zh-Hans) :is(h1, h2) {font-family: inherit; letter-spacing: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .hero h1 {font-size: clamp(2.25rem, 4.1vw, 3.9rem); overflow-wrap: anywhere}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line label {min-width: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line output {flex-shrink: 0}
+@media (max-width: 1050px) {
+  .mast .mast-row, .mast .mast-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand language" "nav nav"; gap: 5px 10px; padding: 8px 0;
+  }
+  .mast .brand {grid-area: brand; min-width: 0; width: fit-content; white-space: normal; line-height: 1.2}
+  .mast .brand .coil {flex: none}
+  .mast .language-menu {grid-area: language}
+  .mast .mast-row > nav, .mast .mast-inner > nav {grid-area: nav; justify-content: flex-start; padding: 0}
+}
+@media print {.mast .language-menu {display: none}}
+.project-credit {
+  scroll-margin-top: 1rem;
+  border-block: 1px solid #cbd8cc;
+  background: #e9efe7;
+  color: #203b32;
+}
+.credit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.35rem clamp(2rem, 5vw, 5rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+}
+.credit-grid h2 {
+  margin: 0 0 .45rem;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: normal;
+  color: #476054;
+}
+.credit-grid p {margin: .13rem 0 0; font-size: .93rem; line-height: 1.5; overflow-wrap: anywhere}
+.credit-grid address {font-style: normal}
+.credit-grid .credit-institute {margin: 0 0 .35rem; font-size: clamp(1.5rem, 2.1vw, 1.9rem); line-height: 1.12; font-weight: 700}
+.credit-grid .credit-name {font-size: 1.05rem; line-height: 1.4; font-weight: 600; margin-bottom: .25rem}
+.credit-grid a {color: #15594a; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .17em}
+.credit-grid a:hover {text-decoration-thickness: 2px}
+@media (max-width: 670px) {
+  .credit-grid {grid-template-columns: minmax(0, 1fr)}
+}
+@media print {
+  .project-credit {background: transparent; break-inside: avoid}
+  .credit-grid {padding-block: .8rem}
+}
+
+.credit-grid .credit-feedback {margin-top: .7rem; max-width: 49ch; color: #405b4f}
+.case-share {display: flex; align-items: center; flex-wrap: wrap; gap: 4px 9px; max-width: 100%; margin: .35rem 0}
+.case-share button {padding: 5px 10px; border: 1px solid #92ab9d; border-radius: 4px; background: transparent; color: #164e40; font: inherit; font-size: .82rem; font-weight: 630; line-height: 1.4; cursor: pointer}
+.case-share button:hover {background: #e2ece3}
+.case-share button:disabled {cursor: default; opacity: .56}
+.case-share output,.case-version-note {font-size: .81rem; line-height: 1.35; color: #3c594c}
+.case-version-note {margin: 0}
+.case-share textarea {display: block; flex: 1 0 100%; width: 100%; max-width: 100%; min-height: 6rem; box-sizing: border-box; font: inherit; font-size: .86rem}
+.case-share[hidden],.case-share [hidden],.case-share.private-readings {display: none}
+@media print {.case-share {display: none}}
+</style>
+</head>
+<body data-page="research">
+<a href="#main" class="skip">Негізгі мазмұнға өту</a>
+<header class="mast"><div class="inner mast-row">
+<a class="brand" href="regional-kk.html" data-study-link="regional"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span><span>KazDC <b>энергетика технологиялары</b></span></a>
+<nav aria-label="Модельдер мен тәжірибелер"><a href="regional-kk.html" data-study-link="regional">Қалалар</a><a href="technologies-kk.html" data-study-link="tech">Технологиялар</a><a href="snow-kk.html" data-study-link="snow">Қар сақтау</a><a href="heat-kk.html" data-study-link="heat">Жылуды пайдалану</a><a href="power-kk.html" data-study-link="power">Электрмен жабдықтау</a><a href="bench-kk.html" data-study-link="bench">Тәжірибе</a><a href="references-kk.html" data-study-link="references">Дереккөздер</a><a href="research-priorities-kk.html" data-study-link="research" aria-current="page">Зерттеу басымдықтары</a><a href="#project-contact">Байланыс</a></nav>
+<details class="language-menu"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>Тіл</summary><div class="language-options"><a lang="en" hreflang="en" href="research-priorities.html" data-language-section>English</a><span lang="kk" aria-current="page">Қазақша<b aria-hidden="true">✓</b></span><a lang="ru" hreflang="ru" href="research-priorities-ru.html" data-language-section>Русский</a><a lang="zh-Hans" hreflang="zh-Hans" href="research-priorities-zh.html" data-language-section>简体中文</a></div></details>
+</div></header>
+<main class="inner" id="main">
+<header class="research-intro">
+  <div class="research-intro-text">
+    <p class="kicker">INMET · KazDC-BIM</p>
+    <h1>Қазақстандағы зерттеу басымдықтары</h1>
+    <p class="deck">Қазақстанда қандай салқындату шешімдерін тереңірек зерттеген жөн? Жұмыс істеп тұрған бір деректер орталығының көрсеткіштері өңірлік модельді тексеруге, сондай-ақ келесі жобалық шешімге қандай бастапқы деректер көбірек әсер ететінін анықтауға мүмкіндік берер еді.</p>
+    <a class="brief-download" href="reference/KazDC_Research_Brief_KK.pdf" download>Кездесуге арналған бір беттік анықтаманы жүктеу (PDF)</a>
+  </div>
+  <figure class="research-case" aria-labelledby="july-title">
+    <figcaption><h2 id="july-title">Шілдеде Екібастұзда чиллерді қанша сағатқа өшіруге болады?</h2><p>Екі есепте де бір типтік жылдың метеодеректері алынады. Құрғақ салқындатқыш 1 МВт тұрақты IT жүктемесінен бөлінетін жылуды әкетеді, қажет болғанда чиллер қосылады. Екі есепте тек берілетін салқындатқыш сұйықтықтың температурасы өзгереді.</p></figcaption>
+    <p class="july-metric" id="july-metric">Шілдеде чиллер өшірулі болатын сағат саны</p>
+    <dl id="july-comparison" aria-labelledby="july-metric" data-it-mw="1" data-hours="744">
+      <div data-supply="18" data-off="6"><dt>Беру температурасы 18 °C</dt><dd>744 сағаттың <strong>6</strong> сағаты<a href="regional-kk.html?city=ekibastuz&amp;supply=18">18 °C үшін есепті ашу</a></dd></div>
+<div data-supply="24" data-off="246"><dt>Беру температурасы 24 °C</dt><dd>744 сағаттың <strong>246</strong> сағаты<a href="regional-kk.html?city=ekibastuz&amp;supply=24">24 °C үшін есепті ашу</a></dd></div>
+    </dl>
+    <p class="case-meaning">Контурға берілетін сұйықтықтың температурасы жоғарылағанда бүкіл жылуды сыртқы ауамен әкетуге болатын сағат саны артады. Нақты нысанның жабдығы қандай беру температурасында жұмыс істей алады?</p>
+  </figure>
+</header>
+
+<section class="research-questions" id="questions" aria-labelledby="research-questions-title">
+  <h2 id="research-questions-title">Келесі зерттеулерге арналған үш сұрақ</h2>
+  <article class="research-question"><h3>Модель деректер орталығының нақты жұмысын қаншалықты дәл сипаттайды?</h3><div><h4>Нені зерттеу керек?</h4><p>Нақты ауа райын, IT жүктемесін және салқындатқыш сұйықтықтың температурасын сол уақыттағы электр есептегіш пен чиллердің қосылу және өшу журналының деректерімен салыстыру. Модель параметрлерін баптамас бұрын тұтас апталардың деректерін тексеруге бөлек қалдыру.</p></div><div><h4>Нәтиже нені көрсетеді?</h4><p>Оператор баптауға кірмеген апталарда модельдің салқындатуға жұмсалған электр энергиясы мен чиллер өшірулі болған сағат санын қандай қателікпен болжағанын көре алады.</p></div></article>
+<article class="research-question"><h3>Ең ыстық сағаттарда қанша резервтік салқындату қуаты қажет?</h3><div><h4>Нені зерттеу керек?</h4><p>Таңдалған қалалар үшін бірнеше жылдың сағаттық метеодеректері бойынша есеп жүргізу. Есепте жабдықтың жұмыс сипаттамалары мен нысандағы салқындатқыш сұйықтықтың рұқсат етілген температурасын ескеру.</p></div><div><h4>Нәтиже нені көрсетеді?</h4><p>Жобалаушы жылдық электр энергиясының үнемін жүктеме ең жоғары кездегі резервтік салқындату қуатымен салыстыра алады. Нәтиже сол сағаттарда қанша жылуды әкету керегін кВт-пен көрсетеді.</p></div></article>
+<article class="research-question"><h3>Деректер орталығының жылуын қай ғимарат пайдалана алады?</h3><div><h4>Нені зерттеу керек?</h4><p>Деректер орталығынан алуға болатын жылуды жақын маңдағы бір ғимараттың немесе жылу желісінің сағаттық сұранысымен салыстыру. Тұтынушыға қажет температураны, тарату кезіндегі жылу шығынын, сорғыларға және қолданылса, жылу сорғысына жұмсалатын электр энергиясын ескеру.</p></div><div><h4>Нәтиже нені көрсетеді?</h4><p>Ғимаратты пайдаланушы ұйым тұтынушыға ай сайын қанша жылу жететінін және оны жеткізуге қанша қосымша электр энергиясы қажет болатынын көре алады.</p></div></article>
+</section>
+
+<section class="research-pilot" id="first-study" aria-labelledby="research-pilot-title">
+  <header><h2 id="research-pilot-title">Бір оператормен жүргізілетін алғашқы зерттеу</h2><p>Бұл жұмыс жоспары серіктес нысанның бұрынғы жұмыс деректерін ұсына алады деген жорамалға негізделген. Кесте мен еңбек шығынын серіктеспен бірге нақтылауға болады.</p>
+    <a class="brief-download" href="reference/KazDC_Research_Brief_KK.pdf" download>Кездесуге арналған бір беттік анықтаманы жүктеу (PDF)</a>
+  </header>
+  <dl class="research-plan">
+    <div><dt>Дерек ұсынатын серіктес</dt><dd>Қазақстанда зерттеуге қатысуға дайын бір деректер орталығының операторы және оның өлшеу аспаптары мен басқару жүйесін білетін пайдалану инженері.</dd></div>
+    <div><dt>Сағаттық деректер</dt><dd>Кемінде сегіз аптаның уақыты сәйкестендірілген, нысанның атауы көрсетілмеген деректерін алу. Оларға IT жүктемесі, сыртқы ауа температурасы, беру және қайту желілерінің температурасы, салқындату жүйесінің электр тұтынуы және чиллердің жұмыс күйі кіреді.</dd></div>
+    <div><dt>Ұсынылатын кесте</dt><dd>1–2-апталарда есептегіштерді тексеріп, деректердің соңғы екі аптасын бөлек қалдыру. 3–5-апталарда модельді одан бұрынғы деректермен баптау. 6–8-апталарда бөлек қалдырылған деректермен модельді тексеріп, ауытқуларды оператормен бірге талдау.</dd></div>
+    <div><dt>Мамандардың жұмыс уақыты</dt><dd>Сегіз апталық зерттеуге талдаушының 12 жұмыс күні және оператор инженерінің 3 жұмыс күні қажет деп болжанады. Бұл бағалау жұмысты жоспарлауға арналған.</dd></div>
+    <div><dt>Өлшеу шығындары</dt><dd>Қолда бар аспаптар барлық қажетті шаманы өлшесе, қосымша аспап жалдау құны 0 теңге болады. Жетіспейтін өлшеулер үшін жалдау күндерінің санын жергілікті тәуліктік тарифке көбейтіп, орнату мен калибрлеу құнын қосу қажет. Нысандағы жұмыс басталғанға дейін теңгемен берілген баға ұсынысын оператормен нақтылау керек.</dd></div>
+    <div><dt>Алғашқы нәтиже</dt><dd>Нысанның атауы көрсетілмеген бір эталондық есеп. Онда тексеруге бөлінген апталардағы салқындатуға жұмсалған электр энергиясы (кВт·сағ) мен чиллердің өшірулі болған сағат саны бойынша болжам, нақты көрсеткіш және олардың айырмасы беріледі.</dd></div>
+  </dl>
+</section>
+<section class="research-close" aria-labelledby="partner-question">
+  <h2 id="partner-question">Қазақстандағы қай деректер орталығы алғашқы болжамды тексеруге қатысуға дайын?</h2>
+  <a class="action" href="#project-contact">INMET-пен нақты нысанға арналған эталондық есепті талқылау</a>
+</section>
+<div class="research-sources"><a href="methods-kk.html#limits">Салқындату моделі және оның жорамалдары</a><a href="references-kk.html#stations">Метеодеректер мен станциялар туралы мәлімет</a></div>
+
+
+</main>
+<footer><div class="project-credit" id="project-contact" tabindex="-1"><div class="inner"><div class="credit-grid">
+  <div>
+    <h2>Жобаны ұсынған ұйым</h2>
+    <p class="credit-institute"><a href="https://inmet.nu.edu.kz/kz" aria-label="INMET — Жаңа материалдар және энергетикалық технологиялар институты">INMET</a></p>
+    <p>Жаңа материалдар және энергетикалық технологиялар институты</p>
+    <p>Назарбаев Университеті</p>
+  </div>
+  <div>
+    <h2>Байланыс тұлғасы</h2>
+    <address>
+      <p class="credit-name"><a href="https://research.nu.edu.kz/en/persons/yanwei-wang/">Янвей Ванг, PhD</a></p>
+      <p><a href="mailto:yanwei.wang@nu.edu.kz">yanwei.wang@nu.edu.kz</a></p>
+    </address>
+    <p class="credit-feedback"><a href="mailto:yanwei.wang@nu.edu.kz?subject=KazDC%20Energy%20Tech%3A%20%D0%BD%D0%B0%D2%9B%D1%82%D1%8B%20%D0%BD%D1%8B%D1%81%D0%B0%D0%BD%D2%93%D0%B0%20%D0%B0%D1%80%D0%BD%D0%B0%D0%BB%D2%93%D0%B0%D0%BD%20%D1%8D%D1%82%D0%B0%D0%BB%D0%BE%D0%BD%D0%B4%D1%8B%D2%9B%20%D0%B5%D1%81%D0%B5%D0%BF">INMET-пен нақты нысанға арналған эталондық есепті талқылау</a></p>
+  </div>
+</div>
+</div></div>
+<div class="inner foot"><div><strong>KazDC-BIM</strong><span>Қазақстандағы деректерді өңдеу орталықтарының энергия тұтынуы</span></div>
+<nav aria-label="Материалдар"><a href="methods-kk.html">Астанаға арналған есептеу әдісі</a><a href="references-kk.html" data-reference-link>Дереккөздер</a><a href="bench-kk.html">Тәжірибе</a><a href="source.zip" data-source-download download>Жобаны жүктеу (ZIP)</a></nav></div></footer>
+
+<script>// Native disclosure and links also work without JavaScript.
+(() => {
+  const menu = document.querySelector(".language-menu");
+  const summary = menu.querySelector("summary");
+  document.addEventListener("click", event => {
+    if (menu.open && !menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && menu.open) {
+      menu.open = false;
+      summary.focus();
+    }
+  });
+  function syncLanguageLinks() {
+    for (const link of menu.querySelectorAll("a[hreflang]")) {
+      const destination = new URL(link.href);
+      // Offline studies set their target queries directly because file URLs cannot be rewritten with history.
+      if (location.protocol !== "file:") destination.search = location.search;
+      destination.hash = location.hash;
+      link.href = destination.href;
+    }
+  }
+  syncLanguageLinks();
+  menu.addEventListener("toggle", syncLanguageLinks);
+  menu.addEventListener("click", syncLanguageLinks, true);
+  window.addEventListener("hashchange", syncLanguageLinks);
+  window.addEventListener("popstate", syncLanguageLinks);
+})();
+</script>
+</body></html>

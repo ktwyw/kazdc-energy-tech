@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>制冷模型与计算方法 · 阿斯塔纳 · {{SITE_TITLE}}</title>
+  {{SITE_METADATA}}
+  <style>$style{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body class="methods-page">
+<a class="skip" href="#content">跳至计算方法</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" href="{{REGIONAL_URL}}" aria-label="{{SITE_TITLE}} 首页"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>{{SITE_TITLE}}</a>
+  <nav aria-label="项目页面"><a href="$dashboard_url">← 制冷计算</a><a href="{{SNOW_URL}}">储雪供冷</a><a href="{{TECH_URL}}">技术模型</a><a href="{{REFERENCES_URL}}">参考资料</a><a href="{{RESEARCH_URL}}">{{RESEARCH_NAV_LABEL}}</a><a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main id="content" class="wrap method-book">
+  <div class="guide-intro">
+    <p class="eyebrow">阿斯塔纳数据中心制冷</p>
+    <h1>制冷模型与计算方法</h1>
+    <p class="guide-deck">从阿斯塔纳一条逐时气象记录出发，查看冷却液回路在这一小时如何运行，再把典型年 8,760 个小时的结果累加，估算全年制冷耗电量。</p>
+  </div>
+  <div class="reading-layout">
+    <aside class="toc"><nav aria-label="目录"><strong>本页目录</strong>
+      <a href="#plant">系统与输入参数</a><a href="#weather">气象年数据</a>
+      <a href="#capacity">干冷器的排热能力</a><a href="#dispatch">风机何时运行</a>
+      <a href="#worked-hours">逐时计算示例</a><a href="#annual">从逐时计算到全年结果</a>
+      <a href="#limits">设备参数敏感性</a><a href="#reproduce">复现计算</a>
+    </nav></aside>
+    <div class="chapters">
+      <section id="plant">
+        <h2>系统与输入参数</h2>
+        <p>两种方案都以相同的供液温度 <i>T</i><sub>s</sub> 向 IT 设备供给冷却液。设备持续释放恒定的显热负荷 <i>Q</i>。冷却液吸热后以回液温度 <i>T</i><sub>r</sub> 返回制冷系统。基准方案由冷水机组承担全部冷负荷。在另一种方案中，回液先进入室外干冷器，再由冷水机组承担剩余负荷。</p>
+        <figure class="loop-figure"><figcaption>基准供液温度下的闭式冷却液回路</figcaption>
+          <div class="loop-units"><div><strong>IT 设备</strong><span>向回路传入 $load kW 热量</span></div><b aria-hidden="true">→</b>
+            <div><strong>干冷器</strong><span>接收 $return_c °C 的回液</span></div><b aria-hidden="true">→</b>
+            <div><strong>冷水机组</strong><span>按需将冷却液进一步冷却至 $supply °C</span></div></div>
+          <p class="loop-back">两种方案都使用循环泵，将冷却后的液体送回 IT 设备。</p>
+        </figure>
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="plant-parameters-caption"><table class="input-table"><caption id="plant-parameters-caption">基准系统参数。温度指冷却液温度或室外空气温度。</caption>
+          <thead><tr><th scope="col">输入参数</th><th scope="col">数值</th><th scope="col">在计算中的作用</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">IT 热负荷 <i>Q</i></th><td>$load kW<sub>th</sub></td><td>持续传入回路的热功率。</td></tr>
+            <tr><th scope="row">供液温度 <i>T</i><sub>s</sub></th><td>$supply °C</td><td>冷却液离开制冷系统时的温度，可在计算页面调整。</td></tr>
+            <tr><th scope="row">回路温升 Δ<i>T</i></th><td>$rise K</td><td>冷却液流过 IT 设备的温升，故 <i>T</i><sub>r</sub> = <i>T</i><sub>s</sub> + Δ<i>T</i>。</td></tr>
+            <tr><th scope="row">额定接近温差 <i>A</i></th><td>$approach K</td><td>满负荷、设计风量下，干冷器出口液温与入口气温之差。</td></tr>
+            <tr><th scope="row">冷水机组性能系数 COP</th><td>$cop</td><td>制冷功率与机组输入电功率之比，后者包括冷凝侧辅助设备。</td></tr>
+            <tr><th scope="row">风机功率 <i>F</i></th><td>$fan kW<sub>e</sub></td><td>干冷器的定速风机开启时消耗的电功率。</td></tr>
+            <tr><th scope="row">泵功率 <i>P</i><sub>p</sub></th><td>$pump kW<sub>e</sub></td><td>两种方案的泵功率相同且恒定，冷水机组停机时泵仍然运行。</td></tr>
+          </tbody></table></div>
+        <p>下标 <em>th</em> 表示热功率或热量，<em>e</em> 表示电功率或电能。回路热平衡只计入 IT 设备的散热。电耗比较的范围为制冷系统；机架用电、机房空气处理机组、UPS 损耗及其他建筑用能另计。</p>
+      </section>
+      <section id="weather">
+        <h2>气象年数据</h2>
+        <p><a href="{{REFERENCES_URL}}#weather">气象参考资料</a>说明了文件及其来源标识。输入采用 Climate.OneBuilding 发布的哈萨克斯坦阿斯塔纳站（站号 <strong>351880</strong>）的 TMYx 气象文件。典型气象年由 2011–2025 年间选出的代表月份组成。文件中的室外干球温度范围为 $low 至 $high °C。干盘管通过显热交换将热量传给空气，因而使用干球温度。</p>
+        <p>读取程序从每条 EnergyPlus 气象（EPW）记录中提取干球温度，并保留原始年份、月份、日期和小时编号（1–24）。每行代表一小时。EPW 文件头规定当地标准时间为 UTC+6，记录中的分钟字段为 30。月度汇总沿用原始时间标签。哈萨克斯坦现采用 UTC+5，只有按日蓄冷的水箱模型会将原始时间转换为当前民用时间，以执行其控制时段。程序检查日期顺序及全年覆盖情况，遇到重复小时、缺失值或无效温度即报错。</p>
+        <p>在<a href="{{REGIONAL_URL}}#compare">哈萨克斯坦城市比较</a>中，每座城市分别用自己的 8,760 小时气象文件计算同一套设备。城市选择器显示气象站位置及编制典型年时可用的年份。2011–2025 数据集中的塔拉兹机场仅有 2011–2021 年间的 10 个来源年，阿克套有 14 个来源年。埃基巴斯图兹、科纳耶夫和塔尔迪库尔干采用 ERA5 再分析重建的温度。各城市结果均附原始文件链接。</p>
+        <details class="source-detail"><summary>各月来源年份与原始文件</summary>
+          <p>从一月到十二月，各月依次取自以下年份：$years。下文使用的六月记录取自 2022 年。</p>
+          <p>项目中的 <code>data/astana_hourly.csv</code> 包含提取出的逐时温度。<code>data/README.md</code> 给出了源压缩包及压缩包、EPW 文件和提取数据的 SHA-256 校验值。</p>
+        </details>
+        <p class="doc-source">气象资料由 Linda K. Lawrie 与 Drury B. Crawley 编制。<a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">气象站文件</a> · <a href="https://climate.onebuilding.org/sources/default.html">TMYx 编制方法</a> · <a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/energyplus-weather-file-epw-data-dictionary.html">EPW 字段定义</a></p>
+      </section>
+      <section id="capacity">
+        <h2>干冷器的排热能力</h2>
+        <p>额定接近温差确定了干冷器性能曲线上的一个已知点。当风机连续运行，干冷器独立承担设计负荷时，冷却液出口温度为 <i>T</i><sub>s</sub>，室外进风温度比出口液温低 <i>A</i> 度。此时入口冷却液与入口空气之间的传热温差为 Δ<i>T</i> + <i>A</i> = $design_diff K。</p>
+        <div class="formula"><span>室外温度为 <i>T</i><sub>a</sub> 时，风机满速运行下的排热能力</span>
+          <p><i>G</i> = <i>Q</i> / (Δ<i>T</i> + <i>A</i>)</p>
+          <p><i>Q</i><sub>cap</sub> = <i>G</i> × max(0, <i>T</i><sub>r</sub> − <i>T</i><sub>a</sub>)</p></div>
+        <p>对基准系统，<i>G</i> = $load / $design_diff = <strong>$coefficient kW/K</strong>。这一有效传热系数由一个额定工况拟合得到。更详细的换热器模型需分别求解两股流体及其换热特性。低温天气下，满速风机对应的排热能力可超过 IT 热负荷，实际利用的冷量以上述负荷为限。</p>
+        <p>在流量恒定时，冷却液的热容量流率为 <i>C</i><sub>w</sub> = <i>Q</i>/Δ<i>T</i> = $capacity_rate kW/K。若干冷器排走的热功率为 <i>Q</i><sub>d</sub>，其小时平均出口液温为 <i>T</i><sub>r</sub> − <i>Q</i><sub>d</sub>/<i>C</i><sub>w</sub>。冷水机组再移除剩余热量，使冷却液达到供液设定温度。由此可独立核对两台设备分担的热负荷。</p>
+      </section>
+      <section id="dispatch">
+        <h2>风机何时运行</h2>
+        <p>单独使用冷水机组时，系统始终消耗 <i>P</i><sub>base</sub> = <i>P</i><sub>p</sub> + <i>Q</i>/COP = $pump + $base_chiller = <strong>$base_kw kW<sub>e</sub></strong>。控制器将该功率与利用室外空气供冷的候选方案所需功率进行比较。</p>
+        <div class="formula"><span>干冷器可用排热能力大于零时</span>
+          <p><i>Q</i><sub>d,cand</sub> = min(<i>Q</i>, <i>Q</i><sub>cap</sub>),&ensp; <i>d</i> = <i>Q</i><sub>d,cand</sub> / <i>Q</i><sub>cap</sub></p>
+          <p><i>P</i><sub>cand</sub> = <i>P</i><sub>p</sub> + <i>dF</i> + (<i>Q</i> − <i>Q</i><sub>d,cand</sub>) / COP</p></div>
+        <p>风机占空比 <i>d</i> 是风机以额定功率运行的时间占该小时的比例。在寒冷天气下，模型让风机间歇运行，并假定回路具有足够的热缓冲能力来满足小时负荷。干冷器和冷水机组联合运行时，风机整小时开启。两种情况下循环泵都运行。</p>
+        <p>只要排热能力为正，候选方案可节省的功率就是 <i>d</i>(<i>Q</i><sub>cap</sub>/COP − <i>F</i>)。因此，仅当 <i>Q</i><sub>cap</sub> &gt; COP × <i>F</i> 时才开启风机。当两者相等或排热能力为零时，控制器让冷却液旁通干冷器。此时干冷器排热量和风机功率均为零。</p>
+        <div class="boundaries"><div><h3>干冷器承担全部负荷的温度界限</h3><p class="boundary-value">$full_c °C<span> 室外</span></p>
+          <p>令 <i>Q</i><sub>cap</sub> = <i>Q</i>，得到物理界限 <i>T</i><sub>s</sub> − <i>A</i>。在此温度下，风机连续运行即可承担全部负荷。</p></div>
+          <div><h3>耗电持平点</h3><p class="boundary-value">$bypass_c °C<span> 室外</span></p>
+          <p>令 <i>Q</i><sub>cap</sub> = COP × <i>F</i> = $break_heat kW<sub>th</sub>，相应室外温度为 <i>T</i><sub>r</sub> − COP × <i>F</i>/<i>G</i>。</p></div></div>
+        <p>$regimes</p>
+      </section>
+      <section id="worked-hours">
+        <h2>逐时计算示例</h2>
+        <p>从原始文件的五条逐时记录中任选一条。室外气温是气象输入，下列热负荷、出口液温和电功率是供液温度为 $supply °C 时的模型输出。每条记录覆盖一小时。</p>
+        <div class="trace interactive-trace" hidden><div class="trace-head"><label for="example">气象记录</label><select id="example">$hour_options</select></div>
+          <h3 id="trace-title"></h3><div id="trace-steps" aria-live="polite"></div></div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="五条逐时计算结果，必要时可横向滚动">
+          <table class="numbers"><caption>所选气象记录对应的运行结果</caption><thead><tr>
+            <th scope="col">原始记录</th><th scope="col">室外气温</th><th scope="col">模式</th><th scope="col">干冷器<br>kW<sub>th</sub></th><th scope="col">冷水机组<br>kW<sub>th</sub></th><th scope="col">风机占空比</th><th scope="col">系统用电<br>kW<sub>e</sub></th>
+          </tr></thead><tbody>$example_rows</tbody></table>
+        </div>
+        <p class="marginal">小时编号遵循 EPW 的 1–24 约定。按来源年份、月份、日期及 EPW 小时编号，即可在 <code>reference/hourly.csv</code> 中找到相应记录。</p>
+      </section>
+      <section id="annual">
+        <h2>从逐时计算到全年结果</h2>
+        <p>计算月度或年度电耗时，将各小时的平均功率乘以一小时后相加，再除以 1,000，把 kWh 换算为 MWh。每条逐时记录只计入一种运行模式。各项年度百分比均由年度总量计算，使各月按实际小时数和能耗加权。</p>
+        <div class="formula"><span>期间耗电量及节电率</span>
+          <p><i>E</i> [MWh] = Σ<sub>h</sub> <i>P</i><sub>h</sub> [kW] × 1 h / 1,000</p>
+          <p>节电率 [%] = 100 × (<i>E</i><sub>base</sub> − <i>E</i><sub>hybrid</sub>) / <i>E</i><sub>base</sub></p></div>
+        <p><strong>以七月为例核对月度结果。</strong>共 $july_hours 小时，其中冷水机组停机 $july_full 小时、联合运行 $july_assist 小时、单独使用冷水机组 $july_bypass 小时。基准方案耗电 $july_base MWh，联合系统耗电 $july_hybrid MWh，节电率为 $july_saved%。</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="annual-measures-caption"><table class="reconcile"><caption id="annual-measures-caption">供液温度为 $supply °C 时的三项年度指标</caption><thead><tr><th scope="col">指标</th><th scope="col">分子与分母</th><th scope="col">占比</th></tr></thead>
+          <tbody><tr><th scope="row">冷水机组停机时间</th><td>$off h / $hours h</td><td>$off_pct%</td></tr>
+          <tr><th scope="row">干冷器排走的热量</th><td>$dry_heat / $heat MWh<sub>th</sub></td><td>$dry_pct%</td></tr>
+          <tr><th scope="row">节省的制冷用电量</th><td>$saving_mwh / $base_mwh MWh<sub>e</sub></td><td>$saving_pct%</td></tr></tbody></table></div>
+        <p>干冷器单独运行时供冷 $off_heat MWh<sub>th</sub>；在 $assisted 个联合运行小时中，干冷器又供冷 $assisted_heat MWh<sub>th</sub>。冷水机组全年供冷 $chiller_heat MWh<sub>th</sub>。这几项之和等于 IT 设备全年释放的热量。</p>
+        <p>在电耗方面，联合系统中冷水机组耗电 $chiller_mwh MWh，干冷器风机耗电 $fan_mwh MWh，循环泵耗电 $pump_mwh MWh。由各项未舍入值相加得到总电耗 <strong>$hybrid_mwh MWh</strong>。两种方案的泵耗电量相同，计算节电量之差时这部分相互抵消。两种方案的年度总电耗以及节电率的分母都包含泵耗电。</p>
+      </section>
+      <section id="limits">
+        <h2>设备参数敏感性与现场解读</h2>
+        <p>在相同排热量下，较小的额定接近温差需要较大的有效传热能力。下表仅改变额定接近温差，在 $supply °C 的供液温度下重新计算全部 $hours 条逐时记录。风机功率、泵功率及冷水机组 COP 均保持恒定。</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="干冷器额定接近温差的敏感性"><table class="numbers"><thead>
+          <tr><th scope="col">额定接近温差</th><th scope="col">满负荷室外温度界限</th><th scope="col">冷水机组停机小时数</th><th scope="col">联合系统耗电 MWh<sub>e</sub></th></tr>
+        </thead><tbody>$check_rows</tbody></table></div>
+        <p><strong>设备标定。</strong>应采用目标冷却液流量及乙二醇浓度下干冷器的额定性能点、实际风机控制曲线、实测泵功率，以及随环境温度、供液设定值和部分负荷变化的冷水机组 COP。基准模型采用恒定 COP，因此在改变供液温度时，基准电耗保持不变。改变 <code>it_kw</code> 还会通过 <i>G</i> 改变模型中干冷器的设计容量。</p>
+        <p><strong>现场运行核对。</strong>在相同天气、负荷和回路温度下，将预测的各模式运行小时数和系统电耗与计量数据比较。在实际工程中，防冻加热、启停限制、结垢、泵发热及输配损耗均可能影响结果。评估年际变化需采用多年气象序列，设备选型还需考虑设计极端工况。典型年结果用于估算给定假设下的运行能耗。</p>
+        <p class="doc-source">EnergyPlus 工程参考手册给出了更详细的单速和双速干冷器模型，采用换热器有效度及传热单元数（NTU）。本算例采用上文由单个额定点得到的系数。<a href="https://bigladdersoftware.com/epx/docs/24-2/engineering-reference/cooling-towers-and-evaporative-fluid-coolers.html#one-and-two-speed-fluid-coolers">EnergyPlus 干冷器模型</a></p>
+      </section>
+      <section id="reproduce">
+        <h2>复现计算</h2>
+        <p>下载并解压项目 ZIP。{{SOURCE_LINK}} 在项目根目录中，使用 Python 3.10 或更高版本及随附的气象 CSV 文件运行以下命令。计算、测试及页面构建均使用 Python 标准库。</p>
+        <pre><code>python cooling.py --supply $supply --output results_reference
+python -m unittest discover -s tests -v
+python build.py</code></pre>
+        <p>浏览器中的算例另有一套 JavaScript 测试。构建页面后，使用 Node.js 18 或更高版本运行 <code>node --test</code>。测试将逐时制冷计算与城市汇总结果比较，并核对能量平衡、储能约束和热泵运行限制。</p>
+        <p>在 <code>results_reference/hourly.csv</code> 中，检查每行的 <code>dry_kw_th</code> + <code>chiller_kw_th</code> 是否等于 IT 热负荷。将 <code>hybrid_kw_e</code> 列求和并除以 1,000，得到联合系统年度电耗（MWh）。统计 <code>mode</code> 为 <code>dry_only</code> 的行数，可得到冷水机组停机小时数。可供核对的结果见 <code>reference/monthly.csv</code> 和 <code>reference/annual.csv</code>。</p>
+        <p>测试涵盖寒冷时段的风机占空比、部分负荷时的热平衡、耗电相等时的控制选择、全年气象记录完整性，以及 49 个供液温度设定值下各运行模式的小时数。这些测试用于检查代码是否实现了所述模型；验证设备现场表现还需要设备与现场测量数据。</p>
+        <a class="guide-link" href="$dashboard_url">返回制冷计算 <span aria-hidden="true">→</span></a>
+      </section>
+    </div>
+  </div>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap">{{PROJECT_CREDIT}}</div></footer>
+<script id="trace-data" type="application/json">$trace_data</script>
+<script>$script</script>
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body></html>
+

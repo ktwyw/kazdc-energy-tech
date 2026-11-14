@@ -1,0 +1,21 @@
+<section class="page-intro"><p class="kicker">Experiment bench · Water calorimetry</p><h1>Test a cooling loop<span>.</span></h1><p class="deck">Can the heat carried by a water stream account for a metered heater input? Use the example to practise the balance or enter measurements from a steady run.</p></section>
+<section class="workspace">
+<div class="heading"><h2>Prediction and observation</h2><div class="tools"><button id="sample" class="quiet">Load example</button><button id="new-run" class="action">Enter a measured run</button></div></div>
+<div class="compare-grid"><form id="bench-form" class="controls"><h3 id="run-kind">Illustrative readings</h3>
+<label for="run-name">Run identifier</label><input id="run-name" required maxlength="64" value="Classroom example">
+<label for="predicted">Predicted heat duty (kW)</label><input id="predicted" required type="number" value="2" min="0" max="500" step="any">
+<label for="flow">Water mass flow (kg/s)</label><input id="flow" required type="number" value="0.1" min="0" max="20" step="any">
+<div class="field-pair"><div><label for="tin">Inlet (°C)</label><input id="tin" required type="number" value="20" min="1" max="95" step="any"></div><div><label for="tout">Outlet (°C)</label><input id="tout" required type="number" value="25" min="1" max="95" step="any"></div></div>
+<div class="field-pair"><div><label for="duration">Duration (min)</label><input id="duration" required type="number" min="0.01" max="10080" step="any" value="30"></div><div><label for="meter">Heater (kWh)</label><input id="meter" required type="number" min="0" max="100000" step="any" value="1.10"></div></div>
+</form>
+<div class="result-panel"><div class="result-title"><h3>Water-side heat balance</h3><span id="evidence">Illustrative example</span></div>
+<div class="metrics"><div><span>Water-side duty</span><strong id="duty">—</strong><small>kW thermal</small></div><div><span>Heat carried by water</span><strong id="absorbed">—</strong><small>kWh thermal</small></div><div><span>Heater minus water</span><strong id="gap">—</strong><small>kWh difference</small></div></div>
+<p class="interpretation" id="bench-note" role="status"></p><div class="table-wrap"><table id="bench-table"></table></div>{{COPY_CASE}}<button id="download-run" class="action">Export run record</button><p class="fine">Readings stay in this browser page. Export the CSV to keep the inputs, evidence label and result.</p></div></div><p class="error" id="bench-error" role="status" hidden></p></section>
+<section class="reading"><div><p class="kicker">Teaching and testing</p><h2>From a prediction to a test</h2></div><div>
+ <h3>Before the run</h3><p>Define the test section around the heater and the two water-temperature sensors. Record a prediction before taking readings. Note the flow-meter and probe uncertainties. Check the two probes side by side at the same temperature to estimate their relative offset.</p>
+ <h3>Collect one matched interval</h3><p>Use the same time window for flow, inlet and outlet readings, and the heater’s energy meter. Enter mean values once flow and temperatures have settled. With appreciable fluctuations, divide the run into shorter steady intervals and sum their energies. Record the pump’s meter separately if its heat enters the test section.</p>
+ <p class="equation">Water duty = mass flow × 4.18 kJ/(kg·K) × (outlet − inlet)</p>
+ <p>For the example, 0.100 kg/s through a 5.0 K rise carries 2.09 kW. Over half an hour this gives 1.045 kWh. The 4.18 value approximates liquid water’s specific heat. A glycol loop needs its own heat capacity at the measured concentration and temperature.</p>
+ <h3>Explain the residual</h3><p>The signed difference includes heat exchanged with the surroundings, energy stored while the rig warms, and meter uncertainty. A positive result alone cannot distinguish them. Repeat at a second flow rate with the same heater power and compare the two balances. A smaller temperature rise makes probe offsets more important.</p>
+ <p class="sources"><a href="{{REFERENCES_URL}}#liquid">Sources for liquid-loop measurements</a> · <a href="https://www.nlr.gov/docs/fy15osti/62905.pdf#page=23">NREL rack experiment and metering example</a> · <a href="https://handbook.ashrae.org/Handbooks/S24/IP/s24_ch12/s24_ch12_ip.aspx">ASHRAE Handbook, metering of thermal energy</a></p>
+</div></section>

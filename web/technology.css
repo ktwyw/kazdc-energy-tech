@@ -1,0 +1,54 @@
+.tech-intro{padding-block:40px 29px}
+.tech-intro .deck{max-width:54rem}
+.study-switch{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;border-bottom:1px solid var(--rule)}
+.study-switch a{display:grid;align-content:center;min-height:52px;padding:10px 12px;color:var(--secondary);font-weight:650;text-decoration:none;font-size:.88rem;border-bottom:3px solid transparent;line-height:1.25}
+.study-switch a:hover{background:#e6eee5}
+.study-switch a[aria-current]{color:var(--forest);background:#e3eee2;border-color:var(--teal)}
+.tech-work .heading{margin-bottom:8px}
+.tech-question{font-size:1.03rem;color:var(--secondary);margin-bottom:20px;max-width:65ch}
+.tech-work .compare-grid{grid-template-columns:minmax(270px,1fr) minmax(0,2.1fr)}
+.tech-work .controls,.tech-results{padding:20px 23px}
+.tech-work .controls h3{margin-bottom:8px}
+.tech-work .controls .fine{margin-top:8px}
+.tech-work .controls label{font-size:.84rem}
+.tech-work input[type=number]{font-variant-numeric:tabular-nums}
+.tech-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px;align-items:end}
+.tech-fields>div{min-width:0}
+.tech-fields label{line-height:1.35}
+.tech-results{align-self:start}
+.tech-results .metrics{margin:18px 0}
+.tech-results .metrics strong{font-size:clamp(24px,2.9vw,39px)}
+.tech-results .interpretation{margin:14px 0 17px}
+.tech-results .chart-head{margin-bottom:3px}
+.tech-plot{width:100%;min-width:0}
+.tech-plot svg{width:100%;display:block}
+.tech-legend,.tech-legend span,.tech-sources{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px}
+.tech-legend{margin-top:2px;color:var(--secondary);font-size:.82rem}
+.tech-legend span{gap:6px}.tech-legend i{width:12px;height:8px}
+.tech-download{margin:16px 0}
+.capture-link{display:inline-block;margin-top:10px;font-size:.89rem;font-weight:640}
+.tech-method{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 24px}
+.tech-method h3{font-size:1rem;margin-bottom:5px}
+.tech-method p{font-size:.91rem;line-height:1.55}
+.tech-sources{grid-column:1/-1;margin:3px 0 8px;font-weight:610}
+#tech-table th:first-child{position:sticky;left:0;background:var(--panel)}
+#tech-table thead th:first-child{background:#ecf0e8}
+#tech-table thead th{min-width:82px}#tech-table thead th:first-child{min-width:60px}
+#bench-results td{white-space:nowrap}
+.tech-work [hidden]{display:none!important}
+@media(max-width:1000px){
+  .study-switch{grid-template-columns:repeat(3,1fr);row-gap:1px}
+  .study-switch a{min-height:40px}
+  .tech-work .compare-grid{grid-template-columns:minmax(245px,.9fr) minmax(0,1.6fr)}
+  .tech-work .controls,.tech-results{padding:15px}
+}
+@media(max-width:720px){
+  .tech-work .compare-grid,.tech-method{grid-template-columns:1fr}
+  .tech-method{gap:14px}.tech-intro{padding-block:24px 17px}
+}
+@media(max-width:450px){
+  .study-switch{grid-template-columns:repeat(2,1fr)}
+  .study-switch a{font-size:.8rem;min-height:35px;padding:6px 8px}
+  .tech-work .metrics{gap:5px}.tech-work .metrics strong{font-size:clamp(20px,6.1vw,27px)}
+  .tech-work .metrics>div+div{padding-left:6px}
+}

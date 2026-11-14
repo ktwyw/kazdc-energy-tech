@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123c3a"><title>{{TITLE}} · {{SITE_TITLE}}</title>
+{{SITE_METADATA}}
+<style>{{STYLE}}{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body data-page="{{PAGE}}">
+<a href="#main" class="skip">{{SKIP_LABEL}}</a>
+<header class="mast"><div class="inner mast-row">
+<a class="brand" href="{{REGIONAL_URL}}" data-study-link="regional"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span><span>KazDC <b>{{BRAND_LABEL}}</b></span></a>
+<nav aria-label="{{NAV_LABEL}}">{{NAV}}<a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main class="inner" id="main">
+{{BODY}}
+{{FALLBACK}}
+</main>
+<footer><div class="project-credit" id="project-contact" tabindex="-1"><div class="inner">{{PROJECT_CREDIT}}</div></div>
+<div class="inner foot"><div><strong>KazDC-BIM</strong><span>{{FOOT_DESCRIPTION}}</span></div>
+<nav aria-label="{{RESOURCES_LABEL}}"><a href="{{METHODS_URL}}">{{METHODS_LABEL}}</a><a href="{{LOCAL_REFERENCES_URL}}" data-reference-link>{{REFS_LABEL}}</a><a href="{{BENCH_URL}}">{{BENCH_LABEL}}</a>{{SOURCE_LINK}}</nav></div></footer>
+{{SCRIPTS}}
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body></html>

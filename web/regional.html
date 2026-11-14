@@ -1,0 +1,131 @@
+<section class="hero">
+  <div class="intro"><p class="kicker">{{R_country}}</p>
+    <h1>{{R_headingFirst}} <br>{{R_headingSecond}}<span>.</span></h1>
+    <p class="deck">{{R_intro}}</p>
+    <div class="text-links"><a href="#compare">{{R_compareCities}}</a><a href="#city-comparison">{{R_compareLink}}</a><a href="{{TECH_URL}}" data-study-link="tech">{{R_openWorkbench}} <span class="link-arrow" aria-hidden="true"></span></a></div>
+    <aside class="equipment-note"><h2>{{R_sensitivityLink}}</h2><p>{{SENSITIVITY_CASE}} <a href="{{METHODS_URL}}#limits">{{R_sensitivityMethod}}</a></p></aside>
+  </div>
+  <figure class="cooling-result" aria-labelledby="cooling-result-title">
+    <figcaption>
+      <p class="case-context" id="case-context">{{CASE_CONTEXT}}</p>
+      <h2 id="cooling-result-title"><strong id="case-saving">{{CASE_SAVING}}</strong> <span>{{R_lessElectricity}}</span></h2>
+    </figcaption>
+    <p class="energy-unit">{{R_energyUnit}}</p>
+    <dl class="energy-comparison">
+      <div><dt>{{R_chillerOnly}}</dt><dd><strong id="case-baseline">{{CASE_BASELINE}}</strong><span class="energy-track" aria-hidden="true"><i></i></span></dd></div>
+      <div><dt>{{R_hybridSystem}}</dt><dd><strong id="case-hybrid">{{CASE_HYBRID}}</strong><span class="energy-track" aria-hidden="true"><i id="case-hybrid-bar" style="width:{{CASE_RATIO}}%"></i></span></dd></div>
+    </dl>
+    <p class="chiller-time" id="case-off">{{CASE_OFF}}</p>
+    <p class="july-result" id="case-july">{{CASE_JULY}}</p>
+    <div class="july-experiment" id="experiment" hidden>
+      <p id="experiment-prompt">{{R_experimentPrompt}}</p>
+      <p id="experiment-result" role="status" hidden></p>
+      <button type="button" id="try-supply" aria-controls="experiment-result">{{R_try24}}</button>
+    </div>
+    <div class="hero-case-actions"><a class="case-adjust" href="#compare">{{R_adjustCase}} <span aria-hidden="true">↓</span></a>
+    {{COPY_CASE}}</div>
+    <p class="research-result-link"><a href="{{RESEARCH_URL}}">{{RESEARCH_LINK}}</a></p>
+  </figure>
+</section>
+
+<section class="study-results" aria-labelledby="study-results-title" hidden>
+  <h2 id="study-results-title">{{R_otherResults}}</h2>
+  <div class="study-result-grid">
+    <article>
+      <h3>{{R_snowResultTitle}}</h3>
+      <p class="study-value"><strong id="snow-result"></strong> <span>{{R_extraHours}}</span></p>
+      <p class="study-description" id="snow-result-context"></p>
+      <a id="snow-result-link" href="{{SNOW_URL}}">{{R_openSnow}} <span class="link-arrow" aria-hidden="true"></span></a>
+    </article>
+    <article>
+      <h3>{{R_heatResultTitle}}</h3>
+      <p class="study-value"><strong id="heat-result"></strong> <span>{{R_heatUnit}}</span></p>
+      <p class="study-description" id="heat-result-context"></p>
+      <a id="heat-result-link" href="{{HEAT_URL}}">{{R_openHeat}} <span class="link-arrow" aria-hidden="true"></span></a>
+    </article>
+    <article>
+      <h3>{{R_upsResultTitle}}</h3>
+      <p class="study-value"><strong id="ups-result"></strong> <span>{{R_electricUnit}}</span></p>
+      <p class="study-description" id="ups-result-context"></p>
+      <a id="ups-result-link" href="{{POWER_URL}}">{{R_openUps}} <span class="link-arrow" aria-hidden="true"></span></a>
+    </article>
+  </div>
+</section>
+
+<section id="compare" class="workspace">
+  <div class="heading"><div><p class="kicker">{{R_regionalCooling}}</p><h2>{{R_comparisonTitle}}</h2></div><button class="quiet" id="reset">{{R_reset}}</button></div>
+  <div class="compare-grid">
+    <form class="controls" id="regional-form"><h3>{{R_settings}}</h3>
+      <label for="city">{{R_location}}</label><select id="city" name="city" aria-describedby="weather-origin"></select>
+      <p class="fine" id="weather-origin"></p>
+      <div class="range-line"><label for="supply">{{R_supply}}</label><output for="supply" id="supply-value"></output></div>
+      <input id="supply" type="range" min="8" max="32" value="18" step="0.5"><div class="ends"><span>8 °C</span><span>32 °C</span></div>
+      <p class="control-note" id="threshold"></p><p class="fine"><b>{{R_fixedLabel}}</b> {{R_fixedValues}}</p>
+    </form>
+    <div class="result-panel">
+      <p class="selected-cooling" id="selected-cooling" role="status"></p>
+      <div class="result-title"><h3>{{R_cityRanking}}</h3><span>{{R_rankingUnit}}</span></div>
+      <div class="city-bars" id="city-bars"></div>
+      <p class="fine" id="baseline-note"></p>
+      <a class="pair-jump" href="#city-comparison">{{R_compareLink}}</a>
+      <p class="fine"><b>{{R_almatyAirport}}</b> {{R_almatyCaution}} <a href="#almaty-source" id="almaty-details">{{R_stationCheck}}</a></p>
+      <button class="quiet city-export" id="download-cities">{{R_exportCities}}</button>
+    </div>
+  </div>
+  <details class="details" id="monthly-results"><summary>{{R_monthlyDetails}}</summary><div class="details-body"><p id="station-detail"></p><div class="table-wrap"><table id="regional-table"></table></div><button class="action" id="download-months">{{R_exportMonths}}</button> <a id="station-source" href="{{DEFAULT_WEATHER_ARCHIVE}}">{{R_stationArchive}}</a> · <a href="{{LOCAL_REFERENCES_URL}}#weather-comparison" data-weather-link>{{R_compareWeather}}</a></div></details>
+  <details class="details" id="regional-method"><summary>{{R_comparisonMethod}}</summary><div class="details-body">
+    <p>{{R_weatherMethod}}</p>
+    <p id="almaty-source"><b>{{R_almatyCheck}}</b> {{R_almatyEvidence}} <a href="https://noaa-gsod-pds.s3.amazonaws.com/2014/36870099999.csv">{{R_cityStation2014}}</a> · <a href="https://noaa-gsod-pds.s3.amazonaws.com/2022/36872099999.csv">{{R_airport2022}}</a> · <a href="https://noaa-global-hourly-pds.s3.amazonaws.com/2024/36872099999.csv">{{R_airport2024}}</a></p>
+    <p>{{R_coolingMethod}} <a href="{{METHODS_URL}}">{{R_hourlyMethod}}</a> · <a href="{{LOCAL_REFERENCES_URL}}#weather-comparison" data-weather-link>{{R_compareWeather}}</a> · <a href="{{LOCAL_REFERENCES_URL}}#stations">{{R_stationReferences}}</a> · <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">{{R_weatherCatalogue}}</a></p>
+  </div></details>
+</section>
+
+<section class="workspace city-comparison" id="city-comparison" aria-labelledby="pair-title">
+  <div class="heading"><div><h2 id="pair-title">{{R_pairTitle}}</h2></div>
+    <button type="button" id="example-pair" class="quiet">{{R_pairExample}}</button>
+  </div>
+  <p class="pair-intro">{{R_pairIntro}}</p>
+  <form class="pair-settings" id="pair-form">
+    <label for="pair-first">{{R_firstCity}}<select id="pair-first"></select></label>
+    <label for="pair-second">{{R_secondCity}}<select id="pair-second"></select></label>
+    <label for="pair-supply">{{R_pairSupply}}<select id="pair-supply"></select></label>
+  </form>
+  <fieldset class="pair-metric"><legend class="visually-hidden">{{R_compareLink}}</legend>
+    <label><input type="radio" name="pair-metric" value="hybrid" checked>{{R_pairPower}}</label>
+    <label><input type="radio" name="pair-metric" value="off">{{R_pairOff}}</label>
+  </fieldset>
+  <figure class="pair-figure">
+    <figcaption><span id="pair-unit"></span><span class="pair-legend">
+      <span><i aria-hidden="true"></i><b id="pair-name-first"></b></span>
+      <span><i class="dashed" aria-hidden="true"></i><b id="pair-name-second"></b></span>
+    </span></figcaption>
+    <div id="pair-chart" class="graphic"></div>
+  </figure>
+  <p id="pair-difference" class="pair-difference" role="status"></p>
+  <p class="pair-caution fine" id="pair-caution" hidden></p>
+  <details class="details" id="pair-values"><summary>{{R_pairTable}}</summary>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="{{R_pairTable}}">
+      <table id="pair-table"><caption class="visually-hidden">{{R_pairTitle}}</caption>
+      <thead><tr><th scope="col" rowspan="2">{{R_pairMonth}}</th><th colspan="2" scope="colgroup" id="pair-heading-first"></th><th colspan="2" scope="colgroup" id="pair-heading-second"></th></tr>
+      <tr><th scope="col">{{R_pairPower}} ({{R_pairEnergyUnit}})</th><th scope="col">{{R_pairOff}} ({{R_pairHoursUnit}})</th>
+      <th scope="col">{{R_pairPower}} ({{R_pairEnergyUnit}})</th><th scope="col">{{R_pairOff}} ({{R_pairHoursUnit}})</th></tr></thead>
+      <tbody></tbody><tfoot></tfoot></table>
+    </div>
+  </details>
+  <div class="pair-actions">{{COPY_CASE@city-comparison}} <button type="button" class="quiet" id="download-pair">{{R_pairExport}}</button></div>
+</section>
+
+<section class="studies" id="studies"><div class="heading"><div><p class="kicker">{{R_technologyStudies}}</p><h2>{{R_studiesTitle}}</h2></div></div>
+ <div class="study-rows">
+  <a href="{{TECH_URL}}?study=pad" data-study-link="tech"><span class="study-tag">{{R_heatRejection}}</span><span><b>{{R_adiabatic}}</b><small>{{R_adiabaticDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+  <a href="{{TECH_URL}}?study=cold" data-study-link="tech"><span class="study-tag">{{R_liquidCooling}}</span><span><b>{{R_coldPlate}}</b><small>{{R_coldPlateDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+  <a href="{{TECH_URL}}?study=air" data-study-link="tech"><span class="study-tag">{{R_airCooling}}</span><span><b>{{R_indirectAir}}</b><small>{{R_indirectAirDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+  <a href="{{TECH_URL}}?study=glycol" data-study-link="tech"><span class="study-tag">{{R_hydraulics}}</span><span><b>{{R_glycol}}</b><small>{{R_glycolDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+  <a href="{{TECH_URL}}?study=tank" data-study-link="tech"><span class="study-tag">{{R_dailyStorage}}</span><span><b>{{R_tank}}</b><small>{{R_tankDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+  <a href="{{TECH_URL}}?study=solar" data-study-link="tech"><span class="study-tag">{{R_onsitePower}}</span><span><b>{{R_solar}}</b><small>{{R_solarDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+  <a href="{{DASHBOARD_URL}}" id="astana-link"><span class="study-tag">{{R_heatRejection}}</span><span><b>{{R_astana}}</b><small>{{R_astanaDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+  <a href="{{SNOW_URL}}" id="snow-link"><span class="study-tag">{{R_thermalStorage}}</span><span><b>{{R_snow}}</b><small>{{R_snowDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+  <a href="{{HEAT_URL}}" id="heat-link"><span class="study-tag">{{R_heatRecovery}}</span><span><b>{{R_heat}}</b><small>{{R_heatDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+  <a href="{{POWER_URL}}"><span class="study-tag">{{R_powerDelivery}}</span><span><b>{{R_ups}}</b><small>{{R_upsDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+  <a href="{{BENCH_URL}}"><span class="study-tag">{{R_experiment}}</span><span><b>{{R_bench}}</b><small>{{R_benchDetail}}</small></span><i class="link-arrow" aria-hidden="true"></i></a>
+ </div></section>

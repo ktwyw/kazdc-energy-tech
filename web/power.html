@@ -1,0 +1,16 @@
+<section class="page-intro"><p class="kicker">Technology study · Power delivery</p><h1>The cost of conversion<span>.</span></h1>
+<p class="deck">An uninterruptible power supply (UPS) draws more electricity than it delivers to the servers. Compare two operating efficiencies at the same continuous IT output.</p></section>
+<section class="workspace"><div class="heading"><h2>Compare UPS conversion losses</h2><button class="quiet" id="reset">Reset case</button></div>
+<div class="compare-grid"><form id="power-form" class="controls"><h3>Operating point</h3>
+<label for="load">Power delivered to IT (kW)</label><input required id="load" type="number" min="1" max="20000" step="any" value="{{IT_KW}}">
+<label for="reference-eff">Reference UPS efficiency (%)</label><input required id="reference-eff" type="number" min="75" max="100" step="0.1" value="94">
+<label for="alternative-eff">Alternative UPS efficiency (%)</label><input required id="alternative-eff" type="number" min="75" max="100" step="0.1" value="97">
+<p class="fine">Use efficiencies at the same delivered load. Both units supply IT for 8,760 hours.</p></form>
+<div class="result-panel"><div class="result-title"><h3>Annual UPS conversion losses</h3></div><div class="metrics"><div><span>Reference losses</span><strong id="power-before">—</strong><small>MWh electric</small></div><div><span>Alternative losses</span><strong id="power-after">—</strong><small>MWh electric</small></div><div><span>Electricity saved</span><strong id="power-saving">—</strong><small>MWh per year</small></div></div>
+<div id="power-bars" class="city-bars"></div><p class="interpretation" id="power-note" role="status"></p>{{COPY_CASE}}<button id="download-power" class="action">Download comparison</button></div></div><p class="error" id="power-error" role="status" hidden></p></section>
+<section class="reading"><div><p class="kicker">Methods</p><h2>Measure both sides of the UPS</h2></div><div>
+<p class="equation">Electrical loss (kW) = IT output (kW) × (1 / efficiency − 1)</p>
+<p>Use efficiency as a fraction in the equation. Multiplying loss by 8,760 hours gives annual kWh. The reference and alternative supply identical IT output, so the difference in input electricity is the difference in their losses. A negative saving means the alternative draws more electricity.</p>
+<p>At 1 MW delivered, an increase from 94% to 97% reduces conversion losses by about 33 kW. Where the UPS is installed determines how much of that heat enters a cooled room. The calculator counts only the electricity measured across the UPS. Battery discharge, recharge, redundancy switching and any extra cooling require separate operating data.</p>
+<h3>Try a load-and-meter demonstration</h3><p>For each UPS, measure input and output simultaneously at the same stable output power. Efficiency is output divided by input. If the two units have been tested at different loads, use their measured efficiency curves to select values at a common output before comparing annual losses. Electric power at part load can differ from a nameplate rating.</p>
+<p class="sources"><a href="{{REFERENCES_URL}}#power">Power and storage references</a> · <a href="https://www.energystar.gov/products/uninterruptible_power_supplies/key_product_criteria">ENERGY STAR UPS efficiency at defined load points</a></p></div></section>

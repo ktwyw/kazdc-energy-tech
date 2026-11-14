@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>Астанадағы деректер орталығын салқындату · {{SITE_TITLE}}</title>
+  {{SITE_METADATA}}
+  <style>{{STYLE}}{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body>
+<a class="skip" href="#controls">Беру температурасын баптауға өту</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" data-snow-link href="{{REGIONAL_URL}}" aria-label="{{SITE_TITLE}} басты беті"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>{{SITE_TITLE}}</a>
+  <nav aria-label="Есеп бөлімдері"><a href="#charts">Салыстыру</a><a href="#monthly">Айлық деректер</a><a href="{{METHODS_URL}}">Әдістеме</a><a href="{{SNOW_URL}}" data-snow-link>Қармен салқындату</a><a href="{{REFERENCES_URL}}">Дереккөздер</a><a href="{{RESEARCH_URL}}">{{RESEARCH_NAV_LABEL}}</a><a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main class="wrap" id="top">
+  <div class="intro"><div><p class="eyebrow">Деректер орталығының тірек моделі</p>
+    <h1>Астанадағы деректер орталығын салқындату</h1>
+    <p class="lead">Тұрақты IT жүктемесі <span data-val="load-mw">1</span> МВт болса, сыртқы ауа құрғақ салқындатқыш арқылы бөлінген жылудың қанша бөлігін әкете алады?</p>
+  </div><div class="station"><strong>Астана, Қазақстан</strong><span>EPW станциясының коды 351880 · 2011–2025 жылдар деректерінен жасалған TMYx типтік жылы</span><span>Құрғақ термометр бойынша 8 760 сағаттық температура мәні</span></div></div>
+  <noscript><p class="notice">Нәтижелерді интерактивті түрде көру үшін JavaScript-ті қосыңыз. Есептің бастапқы нәтижелері жоба мұрағатында CSV пішімінде де берілген.</p></noscript>
+  <section class="scenario" aria-label="Беру температурасы және жылдық нәтижелер">
+    <div class="control-card" id="controls"><div class="label-line"><label for="supply">Берілетін салқындатқыш сұйықтықтың температурасы</label><button id="reset" class="reset" type="button">Бастапқы мәнге қайтару</button></div>
+      <div class="value-line"><output id="supply-value" for="supply">18<span> °C</span></output>
+        <div class="steppers"><button id="down" aria-label="Беру температурасын 0,5 градусқа төмендету">−</button><button id="up" aria-label="Беру температурасын 0,5 градусқа көтеру">+</button></div>
+      </div>
+      <input id="supply" type="range" min="8" max="32" step="0.5" value="18" aria-describedby="threshold">
+      <div class="range-ends" aria-hidden="true"><span>8 °C</span><span>20 °C</span><span>32 °C</span></div>
+      <p id="threshold"></p>
+    </div>
+    <div class="results-card"><div class="result-heading"><h2>Жылдық нәтижелер</h2><span>Құрғақ салқындатқыш пен чиллер</span></div>
+      <div class="kpi-grid">
+        <div><h3>Салқындатуға жұмсалатын электр энергиясының үнемі</h3><p class="big" id="savings"></p><p class="small" id="saved-energy"></p></div>
+        <div><h3>Чиллер өшірулі</h3><p class="big" id="off"></p><p class="small" id="off-share"></p></div>
+        <div><h3>Құрғақ салқындатқыш әкеткен жылудың үлесі</h3><p class="big" id="dry-share"></p><p class="small" id="dry-energy"></p></div>
+      </div>
+    </div>
+  </section>
+  {{COPY_CASE@controls}}
+  <section id="charts" class="charts" aria-label="Айлар бойынша салыстыру графиктері">
+    <article class="panel">
+      <h2>Салқындатуға жұмсалатын электр энергиясы</h2><p class="unit">Жүйенің айлық электр тұтынуы, МВт·сағ</p>
+      <div class="legend"><span><i class="base"></i>Тек чиллер</span><span><i class="hybrid"></i>Құрғақ салқындатқыш пен чиллер</span></div>
+      <div id="power-chart" class="chart"></div>
+      <p id="power-note" class="chart-note"></p>
+    </article>
+    <article class="panel">
+      <h2>Чиллердің әр режимдегі жұмыс уақыты</h2><p class="unit">Құрғақ салқындатқыш пен чиллер жүйесінің ай ішіндегі сағат саны</p>
+      <div class="legend"><span><i class="dry"></i>Чиллер өшірулі</span><span><i class="assist"></i>Бірлескен жұмыс</span><span><i class="mech"></i>Тек чиллер</span></div>
+      <div id="mode-chart" class="chart"></div>
+      <p id="mode-note" class="chart-note"></p>
+    </article>
+  </section>
+  <section id="monthly" class="panel table-panel"><div class="section-heading"><div><h2>Айлық нәтижелер</h2>
+    <p class="unit">Электр тұтынуға чиллер қондырғысы, жұмыс істеп тұрған құрғақ салқындатқыш желдеткіші және екі нұсқаға ортақ айналым сорғысы кіреді.</p></div>
+    <button class="download" id="download" type="button">CSV жүктеу <span aria-hidden="true">↓</span></button></div>
+    <div class="scroll" role="region" aria-label="Айлық нәтижелер кестесі. Экран тар болса, кестені көлденең жылжытуға болады" tabindex="0"><table>
+      <caption class="sr-only">Нұсқаларды айлар бойынша салыстыру және жылдық қорытынды</caption>
+      <thead><tr><th scope="col">Кезең</th><th scope="col">Тек чиллер<br><em>МВт·сағ электр энергиясы</em></th><th scope="col">Құрғақ салқындатқыш пен чиллер<br><em>МВт·сағ электр энергиясы</em></th><th scope="col">Электр энергиясының үнемі<br><em>%</em></th><th scope="col">Чиллер өшірулі<br><em>сағ</em></th><th scope="col">Бірлескен жұмыс<br><em>сағ</em></th><th scope="col">Тек чиллер<br><em>сағ</em></th></tr></thead>
+      <tbody id="table-body"></tbody><tfoot id="table-foot"></tfoot>
+    </table></div>
+  </section>
+  <section id="method" class="panel method"><div class="section-heading"><div><h2>Салқындату көрсеткіштері қалай есептеледі?</h2>
+    <p class="unit">Екі нұсқа бірдей IT жүктемесі және бірдей беру температурасы жағдайында әр сағат үшін салыстырылады.</p></div>
+    <a class="guide-link" href="{{METHODS_URL}}">Толық әдістеме <span aria-hidden="true">→</span></a></div>
+    <div class="method-grid"><div><h3>Жүйенің есептік параметрлері</h3><dl id="assumptions"></dl>
+      <h3 class="method-subhead">Бастапқы метеодеректер</h3><p class="method-copy">Модель Астананың типтік жылындағы сыртқы ауаның құрғақ термометр бойынша өлшенген 8 760 сағаттық температурасын пайдаланады. Басқару ережесі әр сағатқа жеке қолданылады, сондықтан салқын түндер мен жылы күндізгі сағаттар бөлек есептеледі.</p>
+      <p class="sources"><a href="{{REFERENCES_URL}}#cooling">Салқындату моделінің дереккөздері мен жорамалдары</a> · <a href="data/astana_hourly.csv" download>Астананың сағаттық метеодеректері (CSV)</a></p></div>
+      <div class="prose"><h3>Жылу сыртқы ауаға қалай беріледі?</h3>
+      <p>IT жабдығы айналымдағы салқындатқыш сұйықтықты қыздырады. Қайтарма ағын алдымен сырттағы құрғақ салқындатқышқа түседі. Қалған жылуды чиллер әкетеді, ал сорғы сұйықтықты IT жабдығына қайта жібереді.</p>
+      <h3>Беру температурасы <span id="method-supply"></span> болғандағы жұмыс режимдерінің шектері</h3>
+      <p id="method-thresholds"></p>
+      <h3>Үш пайыздық көрсеткіштің мағынасы</h3><p>Чиллер өшірулі болған уақыт үлесіне бүкіл жүктемені сыртқы ауа көтерген толық сағаттар ғана кіреді. Құрғақ салқындатқыш әкеткен жылу үлесіне оның чиллермен бірге жұмыс істеген кезде әкеткен жылуы да кіреді. Электр энергиясының үнемін анықтау үшін екі жүйеде чиллер, желдеткіш және сорғы тұтынған энергия салыстырылады.</p>
+      <p><a href="{{METHODS_URL}}#worked-hours">Жекелеген сағаттарға жасалған есеп мысалдары</a> бір қондырғының сыртқы ауа суық, қоңыржай және жылы болғанда қалай жұмыс істейтінін көрсетеді.</p>
+      <p>Берілген температурада қыста жиналған шектеулі қар қоры жазда чиллер атқаратын жұмыстың қанша бөлігін алмастыра алатынын зерттеңіз. <a href="{{SNOW_URL}}" data-snow-link>Маусымдық қар қорын есептеу</a></p>
+    </div></div>
+  </section>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap">{{PROJECT_CREDIT}}</div></footer>
+<div id="live" class="sr-only" role="status" aria-live="polite"></div>
+<div id="tip" class="tip" hidden></div>
+<script id="case-data" type="application/json">{{DATA}}</script>
+<script id="dashboard-text" type="application/json">{{DASHBOARD_TEXT}}</script>
+<script>{{SCRIPT}}</script>
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>Модель и методика расчёта охлаждения · Астана · KazDC Энерготехнологии</title>
+  <meta name="description" content="Проследите, как температура воздуха в один из часов в Астане определяет работу контура охлаждения. Сумма таких расчётов за 8 760 часов даёт годовой расход электроэнергии.">
+<meta property="og:site_name" content="KazDC Энерготехнологии">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Модель и методика расчёта охлаждения · Астана · KazDC Энерготехнологии">
+<meta property="og:description" content="Проследите, как температура воздуха в один из часов в Астане определяет работу контура охлаждения. Сумма таких расчётов за 8 760 часов даёт годовой расход электроэнергии.">
+<link rel="alternate" hreflang="en" href="methods.html">
+<link rel="alternate" hreflang="kk" href="methods-kk.html">
+<link rel="alternate" hreflang="ru" href="methods-ru.html">
+<link rel="alternate" hreflang="zh-Hans" href="methods-zh.html">
+<script>"use strict";
+
+window.SiteI18n = (() => {
+  const data = {"lang":"ru","locale":"ru","months":["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"],"shortMonths":["янв.","февр.","март","апр.","май","июнь","июль","авг.","сент.","окт.","нояб.","дек."],"cities":{"aktau":"Актау","aktobe":"Актобе","almaty":"Алматы","astana":"Астана","atyrau":"Атырау","ekibastuz":"Экибастуз","karaganda":"Караганда","kokshetau":"Кокшетау","kostanay":"Костанай","kyzylorda":"Кызылорда","oral":"Уральск","oskemen":"Усть-Каменогорск","pavlodar":"Павлодар","petropavl":"Петропавловск","qonaev":"Конаев","semey":"Семей","shymkent":"Шымкент","taldykorgan":"Талдыкорган","taraz":"Тараз","turkistan":"Туркестан","zhezkazgan":"Жезказган"},"station":{"station":"Метеостанция · {city}","airport":"Метеостанция аэропорта · {city}","internationalAirport":"Станция международного аэропорта · {city}","era":"Реанализ ERA5 · {city}","qonaev":"Реанализ ERA5 для Конаева (в файле указан Капчагай)","origin":"{location} · число исходных лет за период {period}: {years}","quality":"В отдельные представительные месяцы погода в файле прохладнее, чем по наблюдениям в аэропорту. Средняя температура июня 2024 года — 21,2 °C в файле и 24,3 °C по наблюдениям. Расход электроэнергии может быть занижен."}};
+  const cityName = (slug, fallback) => data.cities[slug] || fallback || slug;
+  function formatNumber(value, options) {
+    if (data.lang !== "kk") return value.toLocaleString(data.locale, options);
+    // Some browsers ship a partial Kazakh locale and silently use English punctuation.
+    return value.toLocaleString("en-US", options).replaceAll(",", "\u00a0").replace(".", ",");
+  }
+  function stationNote(station) {
+    const location = station.location_note || "";
+    let kind = "station";
+    if (location.includes("ERA5")) kind = station.slug === "qonaev" ? "qonaev" : "era";
+    else if (location.includes("International Airport")) kind = "internationalAirport";
+    else if (location.includes("Airport")) kind = "airport";
+    const place = data.lang === "en" && location ? location :
+      data.station[kind].replace("{city}", cityName(station.slug, station.name));
+    const origin = data.station.origin.replace("{location}", place)
+      .replace("{years}", station.source_years).replace("{period}", station.period);
+    const quality = station.slug === "almaty" && station.quality_note ? ". " + data.station.quality : "";
+    return origin + quality;
+  }
+  return {lang: data.lang, locale: data.locale, months: data.months, shortMonths: data.shortMonths, cityName, stationNote, formatNumber};
+})();
+</script>
+  <style>:root {
+  color-scheme: light;
+  --ink:#182e30; --muted:#52696a; --line:#d5ded9; --paper:#f1f4ef;
+  --teal:#00786f; --deep:#073e41; --ice:#b0e6cc; --slate:#7b8c98;
+  --ochre:#ba792a; --dark-slate:#445666; --white:#fff;
+  font-family:Inter,"Source Sans 3","Segoe UI",Arial,sans-serif;
+  font-variant-numeric:tabular-nums;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:18px}
+body{margin:0;background:var(--paper);color:var(--ink);font-size:16px;line-height:1.45}
+a{color:inherit;text-underline-offset:3px}
+button,input{font:inherit}
+button{cursor:pointer;color:var(--ink)}
+:focus-visible{outline:3px solid #cc8020;outline-offset:3px}
+.wrap{max-width:1440px;width:calc(100% - clamp(32px,9vw,144px));margin-inline:auto}
+.mast{border-bottom:1px solid var(--line);background:#fafbf8}
+.mast-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;font-weight:720;font-size:17px;letter-spacing:-.035em}
+.coil{display:inline-flex;gap:2px;align-items:center;justify-content:center;width:32px;height:31px;background:var(--deep);border-radius:7px}
+.coil i{width:3px;height:13px;transform:skewY(-25deg);background:var(--ice)}
+.coil i:nth-child(2){height:19px}
+nav{display:flex;gap:clamp(16px,3vw,38px)}
+nav a{font-size:13px;font-weight:600;text-decoration:none;color:#3e5959}
+nav a:hover,.sources a:hover{text-decoration:underline}
+main{padding:37px 0 52px}
+.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:25px}
+.eyebrow{font-size:11px;line-height:1.3;font-weight:750;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:0 0 8px}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(32px,3.5vw,56px);letter-spacing:-.055em;line-height:1.09;font-weight:670}
+.lead{color:var(--muted);font-size:clamp(14px,1.22vw,18px);margin-top:8px;line-height:1.5}
+.intro>div:first-child{min-width:0}
+.station{flex:0 1 auto;min-width:0;padding-left:15px;border-left:2px solid #9ab5a7;text-align:left}
+.station strong,.station span{display:block;font-size:12px;line-height:1.55}
+.station span{color:var(--muted)}
+.scenario{display:grid;grid-template-columns:minmax(270px,.95fr) minmax(0,2.15fr);gap:16px;margin-bottom:16px}
+.control-card,.panel,.results-card{border-radius:12px;border:1px solid var(--line);background:var(--white)}
+.control-card{padding:18px 22px}
+.label-line,.value-line,.result-heading,.section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.label-line label{font-weight:650;font-size:14px}
+.reset{border:0;border-radius:3px;background:none;color:var(--teal);font-size:12px;padding:3px}
+.reset:disabled{color:var(--muted);cursor:default}
+.value-line{margin:4px 0 5px}
+#supply-value{font-size:34px;line-height:1.12;font-weight:670;letter-spacing:-.055em}
+#supply-value span{font-size:19px;font-weight:570;letter-spacing:-.03em}
+.steppers{display:flex;gap:5px}
+.steppers button{width:30px;height:30px;background:#fafbf8;border:1px solid var(--line);border-radius:5px;font-weight:600;display:grid;place-content:center}
+.steppers button:disabled{opacity:.45;cursor:default}
+#supply{display:block;accent-color:var(--teal);width:100%;height:20px;margin:0;cursor:pointer}
+.range-ends{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+#threshold{margin-top:9px;font-size:12px;color:#3b5655}
+.results-card{background:var(--deep);color:var(--white);border-color:var(--deep);padding:19px 26px 22px}
+.result-heading{padding-bottom:12px;border-bottom:1px solid #3c6665;align-items:baseline}
+.result-heading h2{font-size:16px;color:#f5fbf7;letter-spacing:-.015em}
+.result-heading>span{font-size:12px;color:#c2d8d0}
+.kpi-grid{display:grid;grid-template-columns:1.08fr .9fr 1fr;gap:14px;margin-top:17px}
+.kpi-grid>div+div{border-left:1px solid #3c6665;padding-left:17px}
+.kpi-grid h3{font-size:12px;font-weight:540;color:#deeee6;line-height:1.35}
+.big{line-height:1.1;letter-spacing:-.05em;font-size:clamp(25px,2.95vw,47px);font-weight:630;white-space:nowrap;margin:4px 0}
+.big span{font-size:.55em;letter-spacing:-.025em;font-weight:550}
+.small{color:#c2d8d0;font-size:12px}
+.kpi-grid>div:first-child .big{color:#b4f1c9}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:16px}
+.panel{padding:23px 24px 18px}
+.panel h2{font-size:20px;line-height:1.22;font-weight:660;letter-spacing:-.035em}
+.unit{color:var(--muted);font-size:12px;margin-top:5px}
+.legend{display:flex;flex-wrap:wrap;gap:5px 16px;margin:15px 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:6px;color:#3c5255;font-size:12px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px}
+.base{background:var(--slate)}.hybrid,.dry{background:var(--teal)}.assist{background:var(--ochre)}.mech{background:var(--dark-slate)}
+.chart{width:100%;min-width:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart svg text{font-family:inherit;fill:#465e5e;font-size:12px}
+.chart .grid{stroke:#dce4de;stroke-width:1}
+.chart .hit{fill:transparent}
+.chart .hit:hover,.chart .hit:focus-visible{fill:#94afac;fill-opacity:.13}
+.chart .hit:focus-visible{outline:none;stroke:#32696a;stroke-width:1.25}
+.chart-note{border-top:1px solid #e0e6e0;padding-top:10px;font-size:12px;color:var(--muted);min-height:28px}
+.chart-note b{color:var(--ink);font-weight:620}
+.table-panel{padding-bottom:11px;margin-bottom:16px}
+.section-heading{align-items:flex-start;margin-bottom:16px}
+.download{border:1px solid #a5bdb2;background:#eff6f1;color:var(--deep);font-size:12px;padding:7px 12px;font-weight:650;border-radius:6px;white-space:nowrap}
+.download span{margin-left:5px}.download:hover,.steppers button:hover:enabled{background:#e3eee6}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;text-align:right;font-size:13px;white-space:nowrap}
+th,td{padding:8px 9px;border-bottom:1px solid #e1e7e2}
+th:first-child,td:first-child{text-align:left}
+thead th{font-size:12px;font-weight:650;background:#f0f4f0;vertical-align:top}
+thead em{font-style:normal;color:var(--muted);font-size:11px;font-weight:480}
+tbody th{font-weight:570}tbody tr:hover{background:#f6f9f6}
+tfoot{color:var(--deep);font-weight:700}tfoot th,tfoot td{border-top:2px solid #acc4b7;border-bottom:0}
+.method-grid{display:grid;grid-template-columns:.85fr 1.55fr;gap:clamp(22px,4vw,62px);margin-top:18px}
+.method h3{font-size:14px;margin-bottom:5px;font-weight:680}
+dl{margin:0}dl div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #e1e7e2;padding:5px 0;font-size:13px}
+dt{color:var(--muted)}dd{margin:0;font-weight:580;white-space:nowrap}
+.prose p{font-size:13px;color:#415957;margin-bottom:8px}
+.guide-link{display:inline-flex;align-items:center;gap:8px;flex-shrink:0;color:var(--deep);background:#edf5ef;border:1px solid #abc6b9;border-radius:6px;padding:7px 11px;font-size:13px;font-weight:640;text-decoration:none}
+.guide-link:hover{background:#deece3}
+.method .method-subhead{margin:18px 0 4px}
+.method-copy{color:var(--muted);font-size:13px;line-height:1.55}
+.method .sources{font-size:12px;margin-top:6px}
+.method .prose a{color:var(--teal)}
+.prose h3:not(:first-child){margin-top:15px}
+.sources{display:flex;flex-wrap:wrap;gap:8px 16px}.sources a{color:var(--teal);font-weight:580}
+.tip{position:fixed;z-index:3;background:#153e3e;color:white;padding:8px 11px;border-radius:5px;font-size:12px;white-space:pre;line-height:1.5;pointer-events:none;box-shadow:0 3px 12px #173d3626}
+.skip,.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip:focus{position:fixed;z-index:4;width:auto;height:auto;overflow:visible;clip:auto;background:white;padding:8px}
+.notice{background:#fff2d5;padding:12px}
+@media(max-width:1000px){
+ .wrap{width:calc(100% - 44px)}.scenario{grid-template-columns:minmax(230px,.9fr) minmax(0,1.9fr)}
+ .results-card{padding:18px}.kpi-grid{gap:8px}.kpi-grid>div+div{padding-left:10px}
+ .panel{padding:18px 16px 14px}.small{font-size:11px}
+}
+@media(max-width:760px){
+ .wrap{width:calc(100% - 32px)}.mast-inner{min-height:53px}.brand{font-size:15px}.coil{width:27px;height:26px}
+ nav{gap:12px}nav a{font-size:11px}
+ main{padding-top:24px}.intro{display:block;margin-bottom:17px}.station{display:flex;flex-wrap:wrap;gap:3px 10px;padding-left:0;border:0;margin-top:10px}
+ .station strong,.station span{font-size:11px}.scenario{grid-template-columns:1fr}.control-card{padding:14px 17px}
+ .results-card{padding:15px 17px}.kpi-grid{margin-top:12px}.big{font-size:clamp(24px,5.5vw,36px)}.kpi-grid h3{font-size:11px;min-height:2.7em}
+ .charts,.method-grid{grid-template-columns:1fr}.charts{gap:12px}.method-grid{gap:18px}
+ .section-heading{gap:9px}.download{font-size:11px;padding:6px 8px}
+}
+@media(max-width:375px){nav{gap:8px}.wrap{width:calc(100% - 24px)}.kpi-grid{gap:5px}.kpi-grid>div+div{padding-left:6px}.panel{padding:17px 12px}.station{gap:2px 6px}}
+@media(max-width:540px){.method .section-heading{flex-direction:column;align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{.mast nav,.steppers,#supply,.range-ends,.reset,.download,.tip{display:none}.wrap{width:100%}.panel,.control-card,.results-card{break-inside:avoid}.results-card{print-color-adjust:exact}main{padding:10px 0}}
+
+.methods-page{background:#fbfcf8}
+.method-book{max-width:1190px;padding-top:38px}
+.guide-intro{padding:5px 0 26px;border-bottom:1px solid #c9d8cc}
+.guide-intro h1{font-size:clamp(35px,4.5vw,59px);max-width:900px}
+.guide-deck{max-width:740px;font-size:clamp(16px,1.5vw,20px);color:#48605b;margin-top:11px;line-height:1.5}
+.reading-layout{display:grid;grid-template-columns:202px minmax(0,1fr);gap:clamp(30px,5vw,80px);align-items:start}
+.toc{position:sticky;top:20px;margin-top:28px;padding:0 16px 8px 0;border-right:1px solid var(--line)}
+.toc nav{display:flex;gap:0;align-items:stretch;flex-direction:column}
+.toc strong{font-size:14px;margin-bottom:8px}
+.toc a{font-size:13px;font-weight:530;line-height:1.4;padding:6px 0}
+.chapters{max-width:850px;min-width:0}
+.chapters>section{padding:29px 0 27px;border-bottom:1px solid var(--line);scroll-margin-top:15px}
+.chapters>section:last-child{border-bottom:0}
+.chapters h2{font-size:clamp(24px,2.1vw,32px);font-weight:660;line-height:1.2;letter-spacing:-.04em;margin-bottom:11px}
+.chapters p{font-size:16px;line-height:1.63;max-width:78ch;color:#304c49}
+.chapters p+p,.chapters table+p,.chapters .table-scroll+p{margin-top:10px}
+.chapters p strong{color:var(--ink);font-weight:650}
+.chapters .doc-source,.chapters .marginal{font-size:13px;color:var(--muted);line-height:1.6}
+.doc-source a,.source-detail a{color:#00665f;font-weight:590}
+.chapters sub{line-height:0;font-size:.73em}
+.loop-figure{background:#eaf2eb;margin:16px 0;border:1px solid #ceded1;border-radius:9px;padding:14px 17px}
+.loop-figure figcaption{color:#28584d;font-size:13px;font-weight:650;margin-bottom:10px}
+.loop-units{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.loop-units>div{min-width:0;flex:1}
+.loop-units strong,.loop-units span{display:block}.loop-units strong{font-size:16px}
+.loop-units span{font-size:12px;line-height:1.45;color:#48635c}
+.loop-units b{color:#447f6d;margin-right:8px}
+.loop-figure .loop-back{font-size:12px;border-top:1px solid #cbded1;padding-top:7px;margin-top:11px;color:#3f5c55}
+.chapters table{white-space:normal;margin:11px 0 12px;line-height:1.45}
+.chapters th,.chapters td{font-size:14px;padding:9px 10px}
+.chapters thead th{font-size:12px;color:#39514a}
+.chapters caption{font-size:12px;font-weight:600;text-align:left;color:#557067;margin:0 0 6px}
+.input-table,.reconcile{text-align:left}
+.input-table th:first-child{width:28%}.input-table td:nth-child(2){width:16%;white-space:nowrap}
+.chapters .table-scroll{overflow-x:auto;max-width:100%}
+.chapters .numbers td{white-space:nowrap}
+.source-detail{margin:12px 0;padding:10px 14px;background:#edf3ed;border-radius:6px}
+.source-detail summary{font-size:14px;font-weight:620;color:var(--deep);cursor:pointer}
+.source-detail p{font-size:14px;margin-top:8px}
+.chapters .formula{border-left:3px solid #268075;background:#eaf2ef;padding:12px 18px;margin:14px 0}
+.formula>span{font-size:12px;color:#416258;display:block;margin-bottom:5px}
+.chapters .formula p{font-family:"Cambria Math","STIX Two Text",Georgia,serif;font-size:19px;line-height:1.55;color:var(--deep);margin:0}
+.boundaries{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}
+.boundaries>div{border:1px solid #cadacf;border-top:3px solid var(--teal);border-radius:7px;padding:12px 15px;background:#f1f6f0}
+.boundaries>div+div{border-top-color:var(--ochre);background:#f8f4e9}
+.boundaries h3{font-size:14px;font-weight:650}
+.chapters .boundaries .boundary-value{font-size:28px;letter-spacing:-.05em;color:var(--deep);line-height:1.35;font-weight:650}
+.boundary-value span{font-size:13px;letter-spacing:0;font-weight:500}
+.boundaries p:not(.boundary-value){font-size:14px;line-height:1.5;margin-top:4px}
+.trace{border:1px solid #b9d0c0;border-radius:9px;padding:16px 18px 12px;background:#f0f5ef;margin:16px 0}
+.trace-head{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.trace label{font-size:13px;font-weight:640}
+.trace select{font:inherit;font-size:13px;padding:6px 7px;background:#fff;border:1px solid #9eb5ab;color:var(--ink);border-radius:5px;max-width:100%}
+.trace h3{margin:12px 0 9px;font-size:18px;letter-spacing:-.02em;color:var(--deep)}
+#trace-steps dl{margin:0}
+#trace-steps dl div{display:grid;grid-template-columns:minmax(120px,.6fr) 1.8fr;align-items:baseline;border-top:1px solid #d4e2d4;border-bottom:0;gap:13px;padding:6px 0}
+#trace-steps dt{font-size:12px;color:#426356;font-weight:630}
+#trace-steps dd{white-space:normal;font-size:14px;line-height:1.55;font-weight:450}
+.chapters code{font-family:"IBM Plex Mono",Consolas,monospace;font-size:.88em;overflow-wrap:anywhere}
+.chapters pre{background:#153c39;color:#ecf7ec;border-radius:6px;padding:14px 16px;line-height:1.65;overflow:auto}
+.chapters p+.guide-link{margin-top:15px}
+@media(max-width:900px){
+ .reading-layout{grid-template-columns:165px minmax(0,1fr);gap:23px}
+ .toc{padding-right:10px}.chapters th,.chapters td{padding:7px}.loop-units{gap:5px}
+}
+@media(max-width:760px){
+ .method-book{padding-top:22px}.guide-intro{padding-bottom:18px}.reading-layout{display:block}
+ .toc{position:static;margin:0;padding:12px 0;border:0;border-bottom:1px solid var(--line)}
+ .toc nav{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+ .toc strong{grid-column:1/-1;margin-bottom:3px}.toc a{padding:4px 0;font-size:12px}
+ .chapters>section{padding:20px 0}.chapters p{font-size:15px}
+ .chapters table th,.chapters table td{font-size:12px}
+ .chapters table thead th{font-size:11px}.chapters .formula p{font-size:17px}
+}
+@media(max-width:520px){
+ .loop-figure{padding:12px}.loop-units{align-items:flex-start}
+ .loop-units b{margin-right:0}.loop-units strong{font-size:13px}.loop-units span{font-size:11px}
+ .boundaries{grid-template-columns:1fr;gap:8px}.boundaries>div{padding:10px 12px}
+ .trace{padding:12px}.trace-head{align-items:flex-start;flex-direction:column;gap:4px}
+ #trace-steps dl div{display:block;padding:6px 0}#trace-steps dt{margin-bottom:2px}
+ .input-table th:first-child{width:27%}.chapters .numbers{min-width:440px}
+}
+@media print{
+ .toc,.guide-link,.trace-head{display:none}.method-book,.chapters{max-width:none}
+ .reading-layout{display:block}.chapters>section{break-inside:auto}
+ .chapters h2,.chapters h3{break-after:avoid}.formula,.trace,.boundaries,.loop-figure,table{break-inside:avoid}
+ .chapters p{font-size:10.5pt}.table-scroll{overflow:visible}
+}
+
+@media (max-width: 450px) {
+  .loop-units {flex-direction: column; align-items: flex-start; gap: 4px}
+  .loop-units b {align-self: flex-start; margin-left: .35rem; transform: rotate(90deg)}
+}
+.mast .mast-row, .mast .mast-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px clamp(12px, 1.7vw, 25px);
+}
+.mast .mast-row > nav, .mast .mast-inner > nav {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px clamp(10px, 1.35vw, 20px);
+}
+.language-menu {position: relative; justify-self: end; z-index: 3; color: #173f36}
+.language-menu summary {
+  display: flex; align-items: center; gap: 6px; min-height: 38px;
+  padding: 5px 9px; cursor: pointer; list-style: none;
+  border: 1px solid #9bb6a8; border-radius: 5px;
+  background: #fffefa; font-family: inherit; line-height: 1.35;
+  font-size: .86rem; font-weight: 600; white-space: nowrap;
+}
+.language-menu summary::-webkit-details-marker {display: none}
+.language-menu summary::after {
+  content: ""; width: 6px; height: 6px; margin: -3px 2px 0;
+  border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg);
+}
+.language-menu[open] summary::after {margin-top: 3px; transform: rotate(225deg)}
+.language-menu summary:hover, .language-menu[open] summary {background: #eaf2e9}
+.language-menu svg {width: 17px; height: 17px; flex: none}
+.language-options {
+  position: absolute; right: 0; top: calc(100% + 5px); min-width: 10rem; width: max-content;
+  max-width: min(19rem, calc(100vw - 36px)); padding: 5px;
+  background: #fffefa; border: 1px solid #aac1b5; border-radius: 6px;
+  box-shadow: 0 5px 14px #143d3429;
+}
+.language-options p {margin: 4px 6px 5px; font: inherit; font-size: .8rem; color: #405a4e}
+.language-options a, .language-options [aria-current] {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  min-height: 40px; padding: 5px 9px; color: #173f36;
+  border-radius: 3px; font-size: .92rem; text-decoration: none;
+}
+.language-options a:hover, .language-options a:focus-visible {background: #e9f2e9; text-decoration: underline}
+.language-options [aria-current] {background: #e9f2e9; font-weight: 650}
+.language-menu :focus-visible {outline: 2px solid #886020; outline-offset: 2px}
+html:lang(zh-Hans) body {font-family: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif}
+html:lang(zh-Hans) :is(h1, h2) {font-family: inherit; letter-spacing: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .hero h1 {font-size: clamp(2.25rem, 4.1vw, 3.9rem); overflow-wrap: anywhere}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line label {min-width: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line output {flex-shrink: 0}
+@media (max-width: 1050px) {
+  .mast .mast-row, .mast .mast-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand language" "nav nav"; gap: 5px 10px; padding: 8px 0;
+  }
+  .mast .brand {grid-area: brand; min-width: 0; width: fit-content; white-space: normal; line-height: 1.2}
+  .mast .brand .coil {flex: none}
+  .mast .language-menu {grid-area: language}
+  .mast .mast-row > nav, .mast .mast-inner > nav {grid-area: nav; justify-content: flex-start; padding: 0}
+}
+@media print {.mast .language-menu {display: none}}
+.project-credit {
+  scroll-margin-top: 1rem;
+  border-block: 1px solid #cbd8cc;
+  background: #e9efe7;
+  color: #203b32;
+}
+.credit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.35rem clamp(2rem, 5vw, 5rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+}
+.credit-grid h2 {
+  margin: 0 0 .45rem;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: normal;
+  color: #476054;
+}
+.credit-grid p {margin: .13rem 0 0; font-size: .93rem; line-height: 1.5; overflow-wrap: anywhere}
+.credit-grid address {font-style: normal}
+.credit-grid .credit-institute {margin: 0 0 .35rem; font-size: clamp(1.5rem, 2.1vw, 1.9rem); line-height: 1.12; font-weight: 700}
+.credit-grid .credit-name {font-size: 1.05rem; line-height: 1.4; font-weight: 600; margin-bottom: .25rem}
+.credit-grid a {color: #15594a; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .17em}
+.credit-grid a:hover {text-decoration-thickness: 2px}
+@media (max-width: 670px) {
+  .credit-grid {grid-template-columns: minmax(0, 1fr)}
+}
+@media print {
+  .project-credit {background: transparent; break-inside: avoid}
+  .credit-grid {padding-block: .8rem}
+}
+
+.credit-grid .credit-feedback {margin-top: .7rem; max-width: 49ch; color: #405b4f}
+.case-share {display: flex; align-items: center; flex-wrap: wrap; gap: 4px 9px; max-width: 100%; margin: .35rem 0}
+.case-share button {padding: 5px 10px; border: 1px solid #92ab9d; border-radius: 4px; background: transparent; color: #164e40; font: inherit; font-size: .82rem; font-weight: 630; line-height: 1.4; cursor: pointer}
+.case-share button:hover {background: #e2ece3}
+.case-share button:disabled {cursor: default; opacity: .56}
+.case-share output,.case-version-note {font-size: .81rem; line-height: 1.35; color: #3c594c}
+.case-version-note {margin: 0}
+.case-share textarea {display: block; flex: 1 0 100%; width: 100%; max-width: 100%; min-height: 6rem; box-sizing: border-box; font: inherit; font-size: .86rem}
+.case-share[hidden],.case-share [hidden],.case-share.private-readings {display: none}
+@media print {.case-share {display: none}}
+</style>
+</head>
+<body class="methods-page">
+<a class="skip" href="#content">Перейти к методике</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" href="regional-ru.html" aria-label="KazDC Энерготехнологии — главная страница"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>KazDC Энерготехнологии</a>
+  <nav aria-label="Страницы проекта"><a href="astana-ru.html">← Расчёт охлаждения</a><a href="snow-ru.html">Охлаждение снегом</a><a href="technologies-ru.html">Модели технологий</a><a href="references-ru.html">Источники</a><a href="research-priorities-ru.html">Приоритеты исследований</a><a href="#project-contact">Контакты</a></nav>
+<details class="language-menu"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>Язык</summary><div class="language-options"><a lang="en" hreflang="en" href="methods.html" data-language-section>English</a><a lang="kk" hreflang="kk" href="methods-kk.html" data-language-section>Қазақша</a><span lang="ru" aria-current="page">Русский<b aria-hidden="true">✓</b></span><a lang="zh-Hans" hreflang="zh-Hans" href="methods-zh.html" data-language-section>简体中文</a></div></details>
+</div></header>
+<main id="content" class="wrap method-book">
+  <div class="guide-intro">
+    <p class="eyebrow">Охлаждение дата-центра в Астане</p>
+    <h1>Модель и методика расчёта охлаждения</h1>
+    <p class="guide-deck">Проследите, как температура воздуха в один из часов в Астане определяет работу контура охлаждения. Сумма таких расчётов за 8&#8239;760 часов даёт годовой расход электроэнергии.</p>
+  </div>
+  <div class="reading-layout">
+    <aside class="toc"><nav aria-label="Содержание"><strong>На этой странице</strong>
+      <a href="#plant">Установка и исходные параметры</a><a href="#weather">Типичный метеорологический год</a>
+      <a href="#capacity">Мощность сухого охладителя</a><a href="#dispatch">Когда включается вентилятор</a>
+      <a href="#worked-hours">Расчёт для отдельного часа</a><a href="#annual">От часовых значений к годовому итогу</a>
+      <a href="#limits">Чувствительность к параметрам</a><a href="#reproduce">Как воспроизвести расчёт</a>
+    </nav></aside>
+    <div class="chapters">
+      <section id="plant">
+        <h2>Установка и исходные параметры</h2>
+        <p>В обеих схемах теплоноситель подаётся к ИТ-оборудованию при одинаковой температуре <i>T</i><sub>s</sub>. Постоянная тепловая нагрузка от оборудования равна <i>Q</i> и полностью приходится на явное тепло. Теплоноситель нагревается и возвращается на установку с температурой <i>T</i><sub>r</sub>. В базовой схеме всё тепло отводит чиллер. В альтернативной схеме обратный поток сначала проходит через наружный сухой охладитель, а затем через чиллер, который покрывает остаток нагрузки.</p>
+        <figure class="loop-figure"><figcaption>Замкнутый контур при базовой температуре подачи</figcaption>
+          <div class="loop-units"><div><strong>ИТ-оборудование</strong><span>выделяет 1 000 кВт тепла</span></div><b aria-hidden="true">→</b>
+            <div><strong>Сухой охладитель</strong><span>принимает обратный поток при 24 °C</span></div><b aria-hidden="true">→</b>
+            <div><strong>Чиллер</strong><span>при необходимости доохлаждает до 18 °C</span></div></div>
+          <p class="loop-back">Общий для обеих схем насос возвращает охлаждённый теплоноситель к ИТ-оборудованию.</p>
+        </figure>
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="plant-parameters-caption"><table class="input-table"><caption id="plant-parameters-caption">Параметры базовой установки. Температуры относятся к теплоносителю и наружному воздуху.</caption>
+          <thead><tr><th scope="col">Параметр</th><th scope="col">Значение</th><th scope="col">Роль в расчёте</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">ИТ-нагрузка <i>Q</i></th><td>1 000 кВт<sub>th</sub></td><td>Тепловая мощность, непрерывно поступающая в контур.</td></tr>
+            <tr><th scope="row">Температура подачи <i>T</i><sub>s</sub></th><td>18 °C</td><td>Температура на выходе из установки. Её можно менять на странице расчёта.</td></tr>
+            <tr><th scope="row">Нагрев в контуре Δ<i>T</i></th><td>6 К</td><td>Повышение температуры теплоносителя при прохождении через ИТ-оборудование. Поэтому <i>T</i><sub>r</sub> = <i>T</i><sub>s</sub> + Δ<i>T</i>.</td></tr>
+            <tr><th scope="row">Расчётная разность температур <i>A</i></th><td>5 К</td><td>Разность между температурой жидкости на выходе из сухого охладителя и температурой воздуха на входе при полной нагрузке и расчётном расходе воздуха.</td></tr>
+            <tr><th scope="row">Холодильный коэффициент чиллера (COP)</th><td>4</td><td>Холодопроизводительность, делённая на электрическую мощность агрегата с учётом вспомогательных устройств конденсатора.</td></tr>
+            <tr><th scope="row">Мощность вентилятора <i>F</i></th><td>25 кВт<sub>e</sub></td><td>Электрическая мощность работающего односкоростного вентилятора сухого охладителя.</td></tr>
+            <tr><th scope="row">Мощность насоса <i>P</i><sub>p</sub></th><td>15 кВт<sub>e</sub></td><td>Постоянна в обеих схемах, в том числе при выключенном чиллере.</td></tr>
+          </tbody></table></div>
+        <p>Индекс <em>th</em> обозначает тепловую величину, а <em>e</em> — электрическую. В тепловой баланс контура входит только тепловыделение ИТ-оборудования. При сравнении электроэнергии учитывается оборудование системы охлаждения. Потребление стоек, вентиляционных установок машинного зала, потери ИБП и прочие нагрузки здания лежат за границами расчёта.</p>
+      </section>
+      <section id="weather">
+        <h2>Типичный метеорологический год</h2>
+        <p>В разделе <a href="references-ru.html#weather">«Метеорологические источники»</a> описаны файл и обозначения происхождения данных. Используется файл TMYx для Астаны (Казахстан) с сайта Climate.OneBuilding, станция <strong>351880</strong>. Типичный метеорологический год составлен из характерных месяцев за 2011–2025 годы. В файле температура наружного воздуха по сухому термометру меняется от -36 до 38 °C. Именно она определяет отвод явного тепла через сухую поверхность теплообменника.</p>
+        <p>Программа считывает температуру по сухому термометру из каждой часовой записи метеофайла EnergyPlus (EPW), сохраняет исходные год, месяц, день и номер часа (1–24) и отводит каждой строке один час. В заголовке EPW указано местное стандартное время UTC+6, а в записях поле минут равно 30. Месячные итоги строятся по этим меткам. В настоящее время в Казахстане действует UTC+5. Только модель суточного бака-аккумулятора переводит исходное время в действующее местное время для своего графика работы. Программа проверяет календарную последовательность и полноту ряда и отклоняет повторяющиеся часы, пропуски и недопустимые температуры.</p>
+        <p>В <a href="regional-ru.html#compare">сравнении городов Казахстана</a> одна и та же установка рассчитывается отдельно по собственному файлу каждого города на 8&#8239;760 часов. При выборе города указаны расположение станции и годы, которыми располагали составители. В коллекции за 2011–2025 годы для аэропорта Тараза доступны 10 исходных лет за период 2011–2021 годов, для Актау — 14 лет. Для Экибастуза, Конаева и Талдыкоргана используются температуры, восстановленные по данным реанализа ERA5. Рядом с региональными результатами приведены ссылки на исходные файлы городов.</p>
+        <details class="source-detail"><summary>Исходные месяцы и файлы</summary>
+          <p>Исходные годы по месяцам с января по декабрь: 2015, 2021, 2014, 2017, 2017, 2022, 2018, 2019, 2013, 2020, 2015, 2014. Например, июньская запись, разобранная ниже, относится к 2022 году.</p>
+          <p>Извлечённый ряд находится в <code>data/astana_hourly.csv</code>. Файл <code>data/README.md</code> содержит ссылку на исходный архив и контрольные суммы SHA-256 архива, файла EPW и извлечённых данных.</p>
+        </details>
+        <p class="doc-source">Метеоданные подготовили Linda K. Lawrie и Drury B. Crawley. <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">Файлы станций</a> · <a href="https://climate.onebuilding.org/sources/default.html">Методика TMYx</a> · <a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/energyplus-weather-file-epw-data-dictionary.html">Описание полей EPW</a></p>
+      </section>
+      <section id="capacity">
+        <h2>Мощность сухого охладителя</h2>
+        <p>Расчётная разность температур задаёт одну известную точку характеристики охладителя. Когда вентилятор работает непрерывно и охладитель самостоятельно покрывает расчётную нагрузку, теплоноситель выходит при <i>T</i><sub>s</sub>, а входящий воздух холоднее на <i>A</i> градусов. Тогда разность температур между теплоносителем и воздухом на входе равна Δ<i>T</i> + <i>A</i> = 11 К.</p>
+        <div class="formula"><span>Мощность при полной скорости вентилятора и наружной температуре <i>T</i><sub>a</sub></span>
+          <p><i>G</i> = <i>Q</i> / (Δ<i>T</i> + <i>A</i>)</p>
+          <p><i>Q</i><sub>cap</sub> = <i>G</i> × max(0, <i>T</i><sub>r</sub> − <i>T</i><sub>a</sub>)</p></div>
+        <p>Для базовой установки <i>G</i> = 1 000 / 11 = <strong>90,91 кВт/К</strong>. Это эффективная тепловая проводимость, определённая по одной номинальной точке. Более подробная модель теплообменника отдельно описывает оба потока и их теплообмен. В холодную погоду доступная мощность при полной скорости вентилятора может превышать ИТ-нагрузку. Полезное охлаждение ограничено величиной нагрузки.</p>
+        <p>При постоянном расходе водяной эквивалент потока теплоносителя равен <i>C</i><sub>w</sub> = <i>Q</i>/Δ<i>T</i> = 166,67 кВт/К. Если сухой охладитель отводит тепловую мощность <i>Q</i><sub>d</sub>, средняя за час температура жидкости на выходе равна <i>T</i><sub>r</sub> − <i>Q</i><sub>d</sub>/<i>C</i><sub>w</sub>. Чиллер снимает остаток нагрузки, доводя температуру до уставки подачи. Так можно проверить распределение тепловой нагрузки вторым способом.</p>
+      </section>
+      <section id="dispatch">
+        <h2>Когда включается вентилятор</h2>
+        <p>В схеме с одним чиллером установка всегда потребляет <i>P</i><sub>base</sub> = <i>P</i><sub>p</sub> + <i>Q</i>/COP = 15 + 250 = <strong>265 кВт<sub>e</sub></strong>. Контроллер сравнивает это значение с мощностью, которая потребуется при использовании наружного воздуха.</p>
+        <div class="formula"><span>При положительной доступной мощности охладителя</span>
+          <p><i>Q</i><sub>d,cand</sub> = min(<i>Q</i>, <i>Q</i><sub>cap</sub>),&ensp; <i>d</i> = <i>Q</i><sub>d,cand</sub> / <i>Q</i><sub>cap</sub></p>
+          <p><i>P</i><sub>cand</sub> = <i>P</i><sub>p</sub> + <i>dF</i> + (<i>Q</i> − <i>Q</i><sub>d,cand</sub>) / COP</p></div>
+        <p>Коэффициент включения вентилятора <i>d</i> — доля часа, в течение которой вентилятор работает на полной мощности. В холодную погоду модель предусматривает периодические включения и предполагает, что тепловой инерции контура достаточно для покрытия часовой нагрузки. При совместной работе с чиллером вентилятор включён весь час. Насос работает в обоих режимах.</p>
+        <p>При положительной доступной мощности возможная экономия электрической мощности равна <i>d</i>(<i>Q</i><sub>cap</sub>/COP − <i>F</i>). Поэтому вентилятор включается при <i>Q</i><sub>cap</sub> &gt; COP × <i>F</i>. При равенстве или нулевой доступной мощности контроллер направляет жидкость в обход охладителя. В этом режиме отвод тепла охладителем и мощность вентилятора равны нулю.</p>
+        <div class="boundaries"><div><h3>Граница полной нагрузки</h3><p class="boundary-value">13 °C<span> на улице</span></p>
+          <p>Положим <i>Q</i><sub>cap</sub> = <i>Q</i>. Физическая граница равна <i>T</i><sub>s</sub> − <i>A</i>. При этой температуре непрерывно работающий вентилятор позволяет покрыть всю нагрузку.</p></div>
+          <div><h3>Порог равного электропотребления</h3><p class="boundary-value">22,9 °C<span> на улице</span></p>
+          <p>Положим <i>Q</i><sub>cap</sub> = COP × <i>F</i> = 100 кВт<sub>th</sub>. Соответствующая наружная температура равна <i>T</i><sub>r</sub> − COP × <i>F</i>/<i>G</i>.</p></div></div>
+        <p>При наружной температуре 13 °C и ниже чиллер выключен. При температуре выше 13 °C и ниже 22,9 °C сухой охладитель и чиллер делят нагрузку. При 22,9 °C и выше контроллер направляет поток в обход сухого охладителя. Для этого оборудования повышение уставки подачи на один градус сдвигает обе границы на один градус вверх.</p>
+      </section>
+      <section id="worked-hours">
+        <h2>Расчёт для отдельного часа</h2>
+        <p>Выберите одну из пяти часовых записей исходного файла. Температура наружного воздуха служит метеорологическим входным параметром. Тепловые мощности, температура жидкости после охладителя и электрические величины ниже рассчитаны для температуры подачи 18 °C. Каждая запись охватывает один час.</p>
+        <div class="trace interactive-trace" hidden><div class="trace-head"><label for="example">Метеорологическая запись</label><select id="example"><option value="0">8 января 2015 г. · час EPW 14 · 2 °C</option>
+<option value="1">13 апреля 2017 г. · час EPW 16 · 13 °C</option>
+<option value="2" selected>12 июня 2022 г. · час EPW 3 · 18,5 °C</option>
+<option value="3">21 мая 2017 г. · час EPW 12 · 22,9 °C</option>
+<option value="4">25 апреля 2017 г. · час EPW 19 · 23 °C</option></select></div>
+          <h3 id="trace-title"></h3><div id="trace-steps" aria-live="polite"></div></div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Пять почасовых расчётов. При необходимости прокрутите таблицу по горизонтали.">
+          <table class="numbers"><caption>Результаты выбора режима для пяти метеорологических записей</caption><thead><tr>
+            <th scope="col">Исходная запись</th><th scope="col">Наружная температура</th><th scope="col">Режим</th><th scope="col">Сухой охладитель<br>кВт<sub>th</sub></th><th scope="col">Чиллер<br>кВт<sub>th</sub></th><th scope="col">Доля времени работы вентилятора</th><th scope="col">Установка<br>кВт<sub>e</sub></th>
+          </tr></thead><tbody><tr><th scope="row">8 января 2015 г. · час EPW 14</th><td>2 °C</td><td>Без чиллера</td><td>1 000</td><td>0</td><td>50 %</td><td>27,5</td></tr>
+<tr><th scope="row">13 апреля 2017 г. · час EPW 16</th><td>13 °C</td><td>Без чиллера</td><td>1 000</td><td>0</td><td>100 %</td><td>40</td></tr>
+<tr><th scope="row">12 июня 2022 г. · час EPW 3</th><td>18,5 °C</td><td>Совместная работа</td><td>500</td><td>500</td><td>100 %</td><td>165</td></tr>
+<tr><th scope="row">21 мая 2017 г. · час EPW 12</th><td>22,9 °C</td><td>Только чиллер</td><td>0</td><td>1 000</td><td>0 %</td><td>265</td></tr>
+<tr><th scope="row">25 апреля 2017 г. · час EPW 19</th><td>23 °C</td><td>Только чиллер</td><td>0</td><td>1 000</td><td>0 %</td><td>265</td></tr></tbody></table>
+        </div>
+        <p class="marginal">В файле EPW часы пронумерованы от 1 до 24. Найдите любую запись в <code>reference/hourly.csv</code> по исходным году, месяцу, дню и номеру часа EPW.</p>
+      </section>
+      <section id="annual">
+        <h2>От часовых значений к годовому итогу</h2>
+        <p>Для расчёта за месяц или год умножьте среднюю мощность каждого часа на один час, сложите результаты и разделите на 1&#8239;000 для перевода кВт·ч в МВт·ч. Каждый час относится ровно к одному режиму. Годовые проценты рассчитываются по годовым итогам, поэтому учитывают различия в количестве часов и расходе энергии по месяцам.</p>
+        <div class="formula"><span>Электропотребление и экономия за период</span>
+          <p><i>E</i> [МВт·ч] = Σ<sub>h</sub> <i>P</i><sub>h</sub> [кВт] × 1 ч / 1&#8239;000</p>
+          <p>Экономия [%] = 100 × (<i>E</i><sub>base</sub> − <i>E</i><sub>hybrid</sub>) / <i>E</i><sub>base</sub></p></div>
+        <p><strong>Проверка по итогам июля.</strong> Из 744 ч без чиллера установка работала 74 ч, в совместном режиме — 365 ч, только с чиллером — 305 ч. Базовая схема потребила 197,16 МВт·ч, комбинированная — 140,68 МВт·ч. Экономия составила 28,6 %.</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="annual-measures-caption"><table class="reconcile"><caption id="annual-measures-caption">Три годовых показателя при температуре подачи 18 °C</caption><thead><tr><th scope="col">Показатель</th><th scope="col">Числитель и знаменатель</th><th scope="col">Доля</th></tr></thead>
+          <tbody><tr><th scope="row">Время без чиллера</th><td>5 888 ч / 8 760 ч</td><td>67,2 %</td></tr>
+          <tr><th scope="row">Тепло, отведённое сухим охладителем</th><td>6 986,87 / 8 760 МВт·ч<sub>th</sub></td><td>79,8 %</td></tr>
+          <tr><th scope="row">Экономия электроэнергии на охлаждение</th><td>1 630,55 / 2 321,40 МВт·ч<sub>e</sub></td><td>70,2 %</td></tr></tbody></table></div>
+        <p>При работе без чиллера сухой охладитель отвёл 5 888 МВт·ч<sub>th</sub>, а за 1 893 ч совместной работы — ещё 1 098,87 МВт·ч<sub>th</sub>. Чиллер за год отвёл 1 773,13 МВт·ч<sub>th</sub>. В сумме это составляет всё тепло, выделенное ИТ-оборудованием.</p>
+        <p>В комбинированной схеме чиллер потребил 443,28 МВт·ч, вентилятор сухого охладителя — 116,16 МВт·ч, насос — 131,40 МВт·ч. Сумма до округления составляющих равна <strong>690,85 МВт·ч</strong>. Электропотребление насоса одинаково в обеих схемах и при вычислении абсолютной экономии сокращается. Оно входит в оба годовых итога и в знаменатель при расчёте процента экономии.</p>
+      </section>
+      <section id="limits">
+        <h2>Чувствительность к параметрам и применение на объекте</h2>
+        <p>Чтобы отвести то же количество тепла при меньшей расчётной разности температур, теплообменнику нужна большая эффективная тепловая проводимость. В таблице изменяется только расчётная разность температур. Все 8 760 ч пересчитаны при температуре подачи 18 °C, неизменных мощностях вентилятора и насоса и постоянном COP чиллера.</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Чувствительность к расчётной разности температур сухого охладителя"><table class="numbers"><thead>
+          <tr><th scope="col">Расчётная разность температур</th><th scope="col">Наружная температура полной нагрузки</th><th scope="col">Часы без чиллера</th><th scope="col">Комбинированная схема, МВт·ч<sub>e</sub></th></tr>
+        </thead><tbody><tr><th scope="row">3 К</th><td>15 °C</td><td>6 367</td><td>625,2</td></tr>
+<tr><th scope="row">5 К (базовый вариант)</th><td>13 °C</td><td>5 888</td><td>690,8</td></tr>
+<tr><th scope="row">7 К</th><td>11 °C</td><td>5 461</td><td>755,4</td></tr></tbody></table></div>
+        <p><strong>Калибровка по оборудованию.</strong> Нужны номинальная точка охладителя при заданных расходе теплоносителя и концентрации гликоля, фактическая характеристика управления вентилятором, измеренная мощность насоса и зависимость COP чиллера от температуры воздуха, уставки подачи и частичной нагрузки. В базовом расчёте COP постоянен, поэтому при изменении температуры подачи базовое потребление остаётся постоянным. Изменение <code>it_kw</code> в этой модели через <i>G</i> меняет и расчётную мощность сухого охладителя.</p>
+        <p><strong>Проверка на объекте.</strong> Сопоставьте расчётные часы по режимам и потребление установки с показаниями приборов при тех же погоде, нагрузках и температурах контура. На реальном объекте могут быть существенны обогрев для защиты от замерзания, ограничения частоты включений, загрязнение теплообменника, тепло от насоса и потери в сети. Многолетние ряды нужны для оценки межгодовой изменчивости, а расчётные экстремумы — для подбора оборудования. Типичный год даёт оценку эксплуатационного энергопотребления при принятых допущениях.</p>
+        <p class="doc-source">Технический справочник EnergyPlus описывает более подробные модели сухих охладителей с одно- и двухскоростными вентиляторами, использующие эффективность теплообменника и число единиц переноса теплоты (NTU). В этом примере используется коэффициент по одной номинальной точке, приведённый выше. <a href="https://bigladdersoftware.com/epx/docs/24-2/engineering-reference/cooling-towers-and-evaporative-fluid-coolers.html#one-and-two-speed-fluid-coolers">Справочник EnergyPlus по охладителям жидкости</a></p>
+      </section>
+      <section id="reproduce">
+        <h2>Как воспроизвести расчёт</h2>
+        <p>Распакуйте ZIP-архив проекта. <a href="source.zip" data-source-download download>Скачать проект (ZIP)</a> В его корневом каталоге выполните следующие команды с Python 3.10 или новее и прилагаемым CSV-файлом метеоданных. Для расчёта, тестов и сборки страниц используется стандартная библиотека Python.</p>
+        <pre><code>python cooling.py --supply 18 --output results_reference
+python -m unittest discover -s tests -v
+python build.py</code></pre>
+        <p>Для браузерных моделей есть также тесты на JavaScript. После сборки страниц выполните <code>node --test</code> в Node.js 18 или новее. Тесты сопоставляют почасовой расчёт охлаждения с результатами по городам и проверяют энергетические балансы, ограничения накопителей и пределы работы теплового насоса.</p>
+        <p>В каждой строке <code>results_reference/hourly.csv</code> сумма <code>dry_kw_th</code> + <code>chiller_kw_th</code> должна равняться ИТ-нагрузке. Сложите значения <code>hybrid_kw_e</code> и разделите на 1&#8239;000, чтобы получить годовое потребление комбинированной схемы в МВт·ч. Количество строк с <code>mode</code>, равным <code>dry_only</code>, соответствует числу часов без чиллера. Контрольные результаты находятся в <code>reference/monthly.csv</code> и <code>reference/annual.csv</code>.</p>
+        <p>Тесты проверяют долю времени работы вентилятора в холодные часы, тепловой баланс при частичной нагрузке, выбор режима в точке равного электропотребления, полноту календаря и часы по режимам для всех 49 температур подачи. Так проверяется соответствие кода описанной модели. Для проверки самой модели нужны измерения на оборудовании и на объекте.</p>
+        <a class="guide-link" href="astana-ru.html">Вернуться к расчёту охлаждения <span aria-hidden="true">→</span></a>
+      </section>
+    </div>
+  </div>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap"><div class="credit-grid">
+  <div>
+    <h2>Организация проекта</h2>
+    <p class="credit-institute"><a href="https://inmet.nu.edu.kz/ru" aria-label="INMET — Институт новых материалов и энергетических технологий">INMET</a></p>
+    <p>Институт новых материалов и энергетических технологий</p>
+    <p>Назарбаев Университет</p>
+  </div>
+  <div>
+    <h2>Контактное лицо</h2>
+    <address>
+      <p class="credit-name"><a href="https://research.nu.edu.kz/en/persons/yanwei-wang/">Янвей Ванг, PhD</a></p>
+      <p><a href="mailto:yanwei.wang@nu.edu.kz">yanwei.wang@nu.edu.kz</a></p>
+    </address>
+    <p class="credit-feedback"><a href="mailto:yanwei.wang@nu.edu.kz?subject=KazDC%20Energy%20Tech%3A%20%D1%80%D0%B0%D1%81%D1%87%D1%91%D1%82%20%D0%BD%D0%B0%20%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D0%B5%20%D0%BA%D0%BE%D0%BD%D0%BA%D1%80%D0%B5%D1%82%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%D0%B0">Обсудить с INMET расчёт на примере конкретного объекта</a></p>
+  </div>
+</div>
+</div></footer>
+<script id="trace-data" type="application/json">{"examples":[{"label":"8 января 2015 г. · час EPW 14","outdoor":2.0,"return_c":24.0,"capacity":2000.0,"after_dry":18.0,"mode_label":"Без чиллера","mode":"dry_only","dry_kw_th":1000.0,"chiller_kw_th":0.0,"fan_duty":0.5,"dry_fan_kw_e":12.5,"chiller_kw_e":0.0,"pump_kw_e":15.0,"baseline_kw_e":265.0,"hybrid_kw_e":27.5},{"label":"13 апреля 2017 г. · час EPW 16","outdoor":13.0,"return_c":24.0,"capacity":1000.0,"after_dry":18.0,"mode_label":"Без чиллера","mode":"dry_only","dry_kw_th":1000.0,"chiller_kw_th":0.0,"fan_duty":1.0,"dry_fan_kw_e":25.0,"chiller_kw_e":0.0,"pump_kw_e":15.0,"baseline_kw_e":265.0,"hybrid_kw_e":40.0},{"label":"12 июня 2022 г. · час EPW 3","outdoor":18.5,"return_c":24.0,"capacity":500.0,"after_dry":21.0,"mode_label":"Совместная работа","mode":"assisted","dry_kw_th":500.0,"chiller_kw_th":500.0,"fan_duty":1.0,"dry_fan_kw_e":25.0,"chiller_kw_e":125.0,"pump_kw_e":15.0,"baseline_kw_e":265.0,"hybrid_kw_e":165.0},{"label":"21 мая 2017 г. · час EPW 12","outdoor":22.9,"return_c":24.0,"capacity":100.00000000000013,"after_dry":24.0,"mode_label":"Только чиллер","mode":"chiller_only","dry_kw_th":0.0,"chiller_kw_th":1000.0,"fan_duty":0.0,"dry_fan_kw_e":0.0,"chiller_kw_e":250.0,"pump_kw_e":15.0,"baseline_kw_e":265.0,"hybrid_kw_e":265.0},{"label":"25 апреля 2017 г. · час EPW 19","outdoor":23.0,"return_c":24.0,"capacity":90.9090909090909,"after_dry":24.0,"mode_label":"Только чиллер","mode":"chiller_only","dry_kw_th":0.0,"chiller_kw_th":1000.0,"fan_duty":0.0,"dry_fan_kw_e":0.0,"chiller_kw_e":250.0,"pump_kw_e":15.0,"baseline_kw_e":265.0,"hybrid_kw_e":265.0}],"conductance":90.9090909090909,"cop":4.0,"break_even":100.0,"text":{"months":["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"],"date":"{day} {month} {year} г. · час EPW {hour}","modes":{"dry_only":"Без чиллера","assisted":"Совместная работа","chiller_only":"Только чиллер"},"reference":"{value} К (базовый вариант)","approach":"{value} К","years_separator":", ","pct":"{value} %","regimes":"При наружной температуре {full} °C и ниже чиллер выключен. При температуре выше {full} °C и ниже {bypass} °C сухой охладитель и чиллер делят нагрузку. При {bypass} °C и выше контроллер направляет поток в обход сухого охладителя. Для этого оборудования повышение уставки подачи на один градус сдвигает обе границы на один градус вверх.","no_assist":"При таких параметрах оборудования температура равного электропотребления не превышает границу полной нагрузки. Ниже {bypass} °C наружное охлаждение покрывает всю нагрузку. При этой температуре и выше контроллер выбирает чиллер. Режим совместной работы ни разу не включается.","trace_title":"{mode} при наружной температуре {outdoor} °C","terms":["Мощность при полной скорости вентилятора","Выбор режима","Тепловой баланс","Вентилятор и чиллер","Электроэнергия за этот час"],"capacity":"{conductance} кВт/К × max(0, {return_c} − ({outdoor})) К ≈ {capacity} кВт доступной мощности охлаждения.","dispatch_bypass":"Доступная мощность не превышает порог {break_even} кВт тепловой мощности, при котором схемы потребляют одинаковую электрическую мощность. Поток идёт в обход сухого охладителя.","dispatch_assisted":"Доступная мощность выше порога равного электропотребления ({break_even} кВт тепловой мощности). Чиллер покрывает остаток нагрузки.","dispatch_full":"Доступная мощность выше порога равного электропотребления ({break_even} кВт тепловой мощности). Сухой охладитель самостоятельно покрывает всю нагрузку.","balance":"Сухой охладитель отводит {dry_kw_th} кВт, чиллер — {chiller_kw_th} кВт, всего {load} кВт тепла. Средняя за час температура теплоносителя после сухого охладителя равна {after_dry} °C.","fan":"Вентилятор включён {duty} % часа и при работе потребляет {fan} кВт. Электрическая мощность чиллера равна {chiller_kw_th} / {cop} = {chiller_kw_e} кВт.","electric":"Насос потребляет {pump_kw_e} кВт, вентилятор в среднем — {dry_fan_kw_e} кВт, чиллер — {chiller_kw_e} кВт. Средняя мощность установки составляет {hybrid_kw_e} кВт. За час израсходовано {hybrid_kw_e} кВт·ч, экономия относительно схемы с одним чиллером составила {saved} кВт·ч."},"load":1000.0,"fan":25.0}</script>
+<script>"use strict";
+
+(() => {
+  const trace = JSON.parse(document.getElementById("trace-data").textContent);
+  const text = trace.text;
+  const select = document.getElementById("example");
+  const format = value => window.SiteI18n.formatNumber(value, {maximumFractionDigits: 2});
+
+  function showHour() {
+    const e = trace.examples[Number(select.value)];
+    const values = {...trace, ...e, mode: e.mode_label, duty: 100 * e.fan_duty,
+      saved: e.baseline_kw_e - e.hybrid_kw_e};
+    function line(template) {
+      return template.replace(/\{(\w+)\}/g, (_, key) => {
+        const value = values[key];
+        return typeof value === "number" ? format(value) : value;
+      });
+    }
+    document.getElementById("trace-title").textContent = line(text.trace_title);
+    const dispatchText = {chiller_only: text.dispatch_bypass, assisted: text.dispatch_assisted, dry_only: text.dispatch_full};
+    const descriptions = [text.capacity, dispatchText[e.mode], text.balance, text.fan, text.electric];
+    const list = document.createElement("dl");
+    for (const [index, description] of descriptions.entries()) {
+      const row = document.createElement("div");
+      const dt = document.createElement("dt"), dd = document.createElement("dd");
+      dt.textContent = text.terms[index];
+      dd.textContent = line(description);
+      row.append(dt, dd);
+      list.append(row);
+    }
+    document.getElementById("trace-steps").replaceChildren(list);
+  }
+
+  function updateLinks() {
+    for (const link of document.querySelectorAll(".language-menu a[hreflang]")) {
+      const url = new URL(link.href);
+      url.searchParams.set("example", select.value);
+      link.href = url.href;
+    }
+  }
+
+  const query = new URLSearchParams(location.search);
+  if ([...select.options].some(option => option.value === query.get("example"))) {
+    select.value = query.get("example");
+    updateLinks();
+  }
+  select.addEventListener("change", () => {
+    if (/^https?:$/.test(location.protocol)) {
+      const url = new URL(location.href);
+      url.searchParams.set("example", select.value);
+      history.replaceState(null, "", url);
+    }
+    updateLinks();
+    showHour();
+  });
+  document.querySelector(".interactive-trace").hidden = false;
+  showHour();
+})();
+</script>
+<script>// Native disclosure and links also work without JavaScript.
+(() => {
+  const menu = document.querySelector(".language-menu");
+  const summary = menu.querySelector("summary");
+  document.addEventListener("click", event => {
+    if (menu.open && !menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && menu.open) {
+      menu.open = false;
+      summary.focus();
+    }
+  });
+  function syncLanguageLinks() {
+    for (const link of menu.querySelectorAll("a[hreflang]")) {
+      const destination = new URL(link.href);
+      // Offline studies set their target queries directly because file URLs cannot be rewritten with history.
+      if (location.protocol !== "file:") destination.search = location.search;
+      destination.hash = location.hash;
+      link.href = destination.href;
+    }
+  }
+  syncLanguageLinks();
+  menu.addEventListener("toggle", syncLanguageLinks);
+  menu.addEventListener("click", syncLanguageLinks, true);
+  window.addEventListener("hashchange", syncLanguageLinks);
+  window.addEventListener("popstate", syncLanguageLinks);
+})();
+</script>
+</body></html>
+

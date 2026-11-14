@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>Cooling model and methods · Astana · {{SITE_TITLE}}</title>
+  {{SITE_METADATA}}
+  <style>$style{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body class="methods-page">
+<a class="skip" href="#content">Skip to the methods</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" href="{{REGIONAL_URL}}" aria-label="{{SITE_TITLE}} home"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>{{SITE_TITLE}}</a>
+  <nav aria-label="Project pages"><a href="$dashboard_url">← Cooling dashboard</a><a href="{{SNOW_URL}}">Snow cooling</a><a href="{{TECH_URL}}">Technology workbench</a><a href="{{REFERENCES_URL}}">References</a><a href="{{RESEARCH_URL}}">{{RESEARCH_NAV_LABEL}}</a><a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main id="content" class="wrap method-book">
+  <div class="guide-intro">
+    <p class="eyebrow">Astana data-centre cooling</p>
+    <h1>Cooling model and methods</h1>
+    <p class="guide-deck">Follow an hour of Astana weather through the coolant loop, then see how 8,760 such decisions produce the annual electricity estimate.</p>
+  </div>
+  <div class="reading-layout">
+    <aside class="toc"><nav aria-label="Contents"><strong>On this page</strong>
+      <a href="#plant">The plant and its inputs</a><a href="#weather">The weather year</a>
+      <a href="#capacity">Dry-cooler capacity</a><a href="#dispatch">When the fan runs</a>
+      <a href="#worked-hours">Trace a weather record</a><a href="#annual">From hours to an annual result</a>
+      <a href="#limits">Equipment sensitivity</a><a href="#reproduce">Reproduce the calculation</a>
+    </nav></aside>
+    <div class="chapters">
+      <section id="plant">
+        <h2>The plant and its inputs</h2>
+        <p>Both arrangements deliver coolant at the same supply temperature, <i>T</i><sub>s</sub>, to IT equipment releasing a steady sensible heat load, <i>Q</i>. The coolant absorbs that heat and returns to the plant at <i>T</i><sub>r</sub>. In the baseline a chiller removes all the heat. In the alternative the return coolant passes first through an outdoor dry cooler, then through a chiller that supplies any remaining cooling.</p>
+        <figure class="loop-figure"><figcaption>Closed coolant loop at the reference setpoint</figcaption>
+          <div class="loop-units"><div><strong>IT equipment</strong><span>adds $load kW of heat</span></div><b aria-hidden="true">→</b>
+            <div><strong>Dry cooler</strong><span>takes $return_c °C return coolant</span></div><b aria-hidden="true">→</b>
+            <div><strong>Chiller</strong><span>trims to $supply °C if needed</span></div></div>
+          <p class="loop-back">The common pump circulates the supply coolant back to the IT equipment.</p>
+        </figure>
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="plant-parameters-caption"><table class="input-table"><caption id="plant-parameters-caption">Reference plant. Temperatures describe the coolant loop and outdoor air.</caption>
+          <thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">Role in the calculation</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">IT load, <i>Q</i></th><td>$load kW<sub>th</sub></td><td>Heat delivered continuously to the loop.</td></tr>
+            <tr><th scope="row">Supply, <i>T</i><sub>s</sub></th><td>$supply °C</td><td>Temperature leaving the plant. The dashboard varies this input.</td></tr>
+            <tr><th scope="row">Loop rise, Δ<i>T</i></th><td>$rise K</td><td>Coolant warming across the IT load. Thus <i>T</i><sub>r</sub> = <i>T</i><sub>s</sub> + Δ<i>T</i>.</td></tr>
+            <tr><th scope="row">Rated approach, <i>A</i></th><td>$approach K</td><td>Leaving coolant minus entering air at full duty and design airflow.</td></tr>
+            <tr><th scope="row">Chiller COP</th><td>$cop</td><td>Cooling duty divided by package electrical input, including condenser auxiliaries.</td></tr>
+            <tr><th scope="row">Fan power, <i>F</i></th><td>$fan kW<sub>e</sub></td><td>Electrical input while the single-speed dry-cooler fan is on.</td></tr>
+            <tr><th scope="row">Pump power, <i>P</i><sub>p</sub></th><td>$pump kW<sub>e</sub></td><td>Constant in both arrangements, including chiller-off hours.</td></tr>
+          </tbody></table></div>
+        <p>The subscripts <em>th</em> and <em>e</em> distinguish heat duty from electrical input. The only thermal load in the loop balance is the IT heat. The electrical comparison counts the cooling plant. Rack electricity, room air handlers, UPS losses and other building loads fall outside this boundary.</p>
+      </section>
+      <section id="weather">
+        <h2>The weather year</h2>
+        <p>The <a href="{{REFERENCES_URL}}#weather">weather references</a> document the file and its source flags. The input is the Climate.OneBuilding TMYx file for Astana, Kazakhstan, station <strong>351880</strong>. A typical meteorological year joins representative months drawn from 2011–2025. The file’s outdoor dry-bulb temperatures range from $low to $high °C. Dry bulb is the relevant air temperature because this model transfers sensible heat to air through a dry coil.</p>
+        <p>The reader takes the dry-bulb field from each hourly EnergyPlus weather (EPW) record. It preserves the source year, month, day and hour index (1–24), and assigns one hour to each row. The EPW header specifies UTC+6 local standard time and the records carry minute 30. Month totals follow those source labels. Kazakhstan now uses UTC+5. Only the daily tank controller converts source time to the current civil clock for its operating schedule. The reader checks calendar order and coverage and rejects duplicate hours, missing values and invalid temperatures.</p>
+        <p>In the <a href="{{REGIONAL_URL}}#compare">Kazakhstan comparison</a>, each city contributes its own 8,760-hour file to the same plant calculation. The city selector gives the location and years available to the weather compiler. The 2011–2025 collection includes a shorter record at Taraz Airport (10 source years within 2011–2021) and 14 source years at Aktau. Ekibastuz, Qonaev and Taldykorgan use temperatures reconstructed by ERA5. The regional results link to the original file for each city.</p>
+        <details class="source-detail"><summary>Source months and original files</summary>
+          <p>From January through December the source years are $years. For example, the June record used below comes from 2022.</p>
+          <p>The project includes the extracted series in <code>data/astana_hourly.csv</code>. <code>data/README.md</code> gives the source archive and SHA-256 checksums for the archive, EPW and extract.</p>
+        </details>
+        <p class="doc-source">Weather compilation by Linda K. Lawrie and Drury B. Crawley. <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">Station files</a> · <a href="https://climate.onebuilding.org/sources/default.html">TMYx methodology</a> · <a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/energyplus-weather-file-epw-data-dictionary.html">EPW field definitions</a></p>
+      </section>
+      <section id="capacity">
+        <h2>Dry-cooler capacity</h2>
+        <p>The rated approach fixes one known point on the cooler’s performance curve. When the fan runs continuously and the dry cooler alone carries the design load, the coolant leaves at <i>T</i><sub>s</sub> and the entering outdoor air is <i>A</i> degrees cooler. The driving difference from entering coolant to entering air is then Δ<i>T</i> + <i>A</i> = $design_diff K.</p>
+        <div class="formula"><span>Full-fan capacity at outdoor temperature <i>T</i><sub>a</sub></span>
+          <p><i>G</i> = <i>Q</i> / (Δ<i>T</i> + <i>A</i>)</p>
+          <p><i>Q</i><sub>cap</sub> = <i>G</i> × max(0, <i>T</i><sub>r</sub> − <i>T</i><sub>a</sub>)</p></div>
+        <p>For the reference plant, <i>G</i> = $load / $design_diff = <strong>$coefficient kW/K</strong>. This is an effective coefficient fitted at one rating point. A detailed exchanger model would resolve the two streams and their heat-transfer characteristics. Full-fan capacity can exceed the IT load in cold air. Useful cooling is capped at the load.</p>
+        <p>At fixed flow, the coolant heat-capacity rate is <i>C</i><sub>w</sub> = <i>Q</i>/Δ<i>T</i> = $capacity_rate kW/K. If the dry cooler removes <i>Q</i><sub>d</sub>, its hourly mean outlet temperature is <i>T</i><sub>r</sub> − <i>Q</i><sub>d</sub>/<i>C</i><sub>w</sub>. The chiller removes the remaining heat to reach the supply setpoint. This gives a second way to check the heat split.</p>
+      </section>
+      <section id="dispatch">
+        <h2>When the fan runs</h2>
+        <p>The chiller-only plant always draws <i>P</i><sub>base</sub> = <i>P</i><sub>p</sub> + <i>Q</i>/COP = $pump + $base_chiller = <strong>$base_kw kW<sub>e</sub></strong>. The controller compares that demand with the candidate using outdoor cooling.</p>
+        <div class="formula"><span>Positive dry-cooler capacity</span>
+          <p><i>Q</i><sub>d,cand</sub> = min(<i>Q</i>, <i>Q</i><sub>cap</sub>),&ensp; <i>d</i> = <i>Q</i><sub>d,cand</sub> / <i>Q</i><sub>cap</sub></p>
+          <p><i>P</i><sub>cand</sub> = <i>P</i><sub>p</sub> + <i>dF</i> + (<i>Q</i> − <i>Q</i><sub>d,cand</sub>) / COP</p></div>
+        <p>The fan duty fraction <i>d</i> is the fraction of the hour at full fan power. In cold weather the model cycles the fan and assumes the buffered loop meets the hourly load. During assisted operation the fan runs for the whole hour. The pump runs in either case.</p>
+        <p>Whenever capacity is positive, the saving offered by the candidate is <i>d</i>(<i>Q</i><sub>cap</sub>/COP − <i>F</i>). The fan therefore runs when <i>Q</i><sub>cap</sub> &gt; COP × <i>F</i>. The controller bypasses at equality or zero capacity. On bypass, dry heat and fan power both become zero.</p>
+        <div class="boundaries"><div><h3>Full-load temperature</h3><p class="boundary-value">$full_c °C<span> outdoors</span></p>
+          <p>Set <i>Q</i><sub>cap</sub> = <i>Q</i>. The physical boundary is <i>T</i><sub>s</sub> − <i>A</i>. At that point the fan can carry the whole load continuously.</p></div>
+          <div><h3>Electrical break-even</h3><p class="boundary-value">$bypass_c °C<span> outdoors</span></p>
+          <p>Set <i>Q</i><sub>cap</sub> = COP × <i>F</i> = $break_heat kW<sub>th</sub>. The corresponding outdoor temperature is <i>T</i><sub>r</sub> − COP × <i>F</i>/<i>G</i>.</p></div></div>
+        <p>$regimes</p>
+      </section>
+      <section id="worked-hours">
+        <h2>Trace a weather record</h2>
+        <p>Select one of five hourly values from the source file. Outdoor temperature is the weather input. The heat duties, coolant outlet temperature and electrical quantities below are model outputs at $supply °C supply. Each record spans one hour.</p>
+        <div class="trace interactive-trace" hidden><div class="trace-head"><label for="example">Weather record</label><select id="example">$hour_options</select></div>
+          <h3 id="trace-title"></h3><div id="trace-steps" aria-live="polite"></div></div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Five hourly calculations, scroll horizontally if needed">
+          <table class="numbers"><caption>Dispatched values for the selected weather records</caption><thead><tr>
+            <th scope="col">Source record</th><th scope="col">Outdoor</th><th scope="col">Mode</th><th scope="col">Dry cooler<br>kW<sub>th</sub></th><th scope="col">Chiller<br>kW<sub>th</sub></th><th scope="col">Fan duty</th><th scope="col">Plant<br>kW<sub>e</sub></th>
+          </tr></thead><tbody>$example_rows</tbody></table>
+        </div>
+        <p class="marginal">The hour labels follow the EPW’s 1–24 convention. Match any row to <code>reference/hourly.csv</code> using source year, month, day and EPW hour.</p>
+      </section>
+      <section id="annual">
+        <h2>From hours to an annual result</h2>
+        <p>For a month or year, add each hourly average power times one hour and divide by 1,000 to convert kWh to MWh. Count each hourly record in exactly one operating mode. Compute each annual percentage from annual totals, which weights the months by their hours and energy.</p>
+        <div class="formula"><span>Period electricity and saving</span>
+          <p><i>E</i> [MWh] = Σ<sub>h</sub> <i>P</i><sub>h</sub> [kW] × 1 h / 1,000</p>
+          <p>Saving [%] = 100 × (<i>E</i><sub>base</sub> − <i>E</i><sub>hybrid</sub>) / <i>E</i><sub>base</sub></p></div>
+        <p><strong>July provides a monthly check.</strong> The $july_hours hours comprise $july_full chiller-off, $july_assist assisted and $july_bypass chiller-only hours. The baseline uses $july_base MWh of electricity and the hybrid uses $july_hybrid MWh, a $july_saved% saving.</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="annual-measures-caption"><table class="reconcile"><caption id="annual-measures-caption">Three annual measures at $supply °C supply</caption><thead><tr><th scope="col">Measure</th><th scope="col">Numerator and denominator</th><th scope="col">Share</th></tr></thead>
+          <tbody><tr><th scope="row">Chiller-off time</th><td>$off h / $hours h</td><td>$off_pct%</td></tr>
+          <tr><th scope="row">Heat removed by dry cooler</th><td>$dry_heat / $heat MWh<sub>th</sub></td><td>$dry_pct%</td></tr>
+          <tr><th scope="row">Cooling electricity saved</th><td>$saving_mwh / $base_mwh MWh<sub>e</sub></td><td>$saving_pct%</td></tr></tbody></table></div>
+        <p>Full outdoor cooling supplies $off_heat MWh<sub>th</sub>. The $assisted assisted hours supply another $assisted_heat MWh<sub>th</sub> through the dry cooler. The chiller supplies $chiller_heat MWh<sub>th</sub> over the year. These heat flows account for the entire IT load.</p>
+        <p>On the electrical side, the hybrid uses $chiller_mwh MWh for the chiller, $fan_mwh MWh for the dry-cooler fan and $pump_mwh MWh for the pump, totalling <strong>$hybrid_mwh MWh</strong> before rounding the components. The pump consumes the same electricity in the baseline and therefore cancels from the absolute saving. It is included in both annual totals and in the percentage denominator.</p>
+      </section>
+      <section id="limits">
+        <h2>Equipment sensitivity and site interpretation</h2>
+        <p>A smaller rated approach requires greater effective exchanger conductance at the same duty. The following calculation changes only the rated approach and repeats all $hours weather records at $supply °C supply, keeping fan and pump power and chiller COP fixed.</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Dry-cooler approach sensitivity"><table class="numbers"><thead>
+          <tr><th scope="col">Rated approach</th><th scope="col">Full-load limit outside</th><th scope="col">Chiller-off hours</th><th scope="col">Hybrid MWh<sub>e</sub></th></tr>
+        </thead><tbody>$check_rows</tbody></table></div>
+        <p><strong>Calibrating the equipment.</strong> Use a rated dry-cooler performance point at the intended coolant flow and glycol concentration, the actual fan control curve, pump measurements, and chiller COP versus ambient temperature, coolant setpoint and part load. The reference COP stays fixed, which is why the baseline is flat across the supply-temperature sweep. Varying <code>it_kw</code> in this model also resizes the dry cooler through <i>G</i>.</p>
+        <p><strong>Checking operation.</strong> Compare predicted mode hours and plant electricity with metered data for the same weather, loads and loop temperatures. Freeze-protection heaters, cycling constraints, fouling, pump heat and distribution losses can matter at a real site. Multi-year series and design extremes address year-to-year variation and equipment sizing. The typical-year result estimates operating energy under the stated assumptions.</p>
+        <p class="doc-source">The EnergyPlus engineering reference describes more detailed single- and two-speed dry fluid-cooler models using exchanger effectiveness and NTU. This reference case uses the single rated-point coefficient above. <a href="https://bigladdersoftware.com/epx/docs/24-2/engineering-reference/cooling-towers-and-evaporative-fluid-coolers.html#one-and-two-speed-fluid-coolers">EnergyPlus fluid-cooler reference</a></p>
+      </section>
+      <section id="reproduce">
+        <h2>Reproduce the calculation</h2>
+        <p>Extract the project ZIP. {{SOURCE_LINK}} From its root, run the following commands with Python 3.10 or later and the bundled weather CSV. The calculation, tests and page builder use the Python standard library.</p>
+        <pre><code>python cooling.py --supply $supply --output results_reference
+python -m unittest discover -s tests -v
+python build.py</code></pre>
+        <p>The browser studies also have a JavaScript test suite. After building the pages, run <code>node --test</code> with Node.js 18 or later. The tests compare hourly cooling to the city results and check energy balances, storage constraints and heat-pump limits.</p>
+        <p>In <code>results_reference/hourly.csv</code>, verify that <code>dry_kw_th</code> + <code>chiller_kw_th</code> equals the IT load in every row. Sum <code>hybrid_kw_e</code> and divide by 1,000 to recover annual hybrid MWh. Count rows with <code>mode</code> equal to <code>dry_only</code> to recover chiller-off hours. The supplied benchmarks are in <code>reference/monthly.csv</code> and <code>reference/annual.csv</code>.</p>
+        <p>The tests check the cold-hour fan fraction, partial-load heat balance, tie at break-even, calendar completeness and mode counts across the 49 dashboard supply settings. They verify implementation against the stated model. Physical validation would require equipment and site measurements.</p>
+        <a class="guide-link" href="$dashboard_url">Return to the cooling dashboard <span aria-hidden="true">→</span></a>
+      </section>
+    </div>
+  </div>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap">{{PROJECT_CREDIT}}</div></footer>
+<script id="trace-data" type="application/json">$trace_data</script>
+<script>$script</script>
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body></html>

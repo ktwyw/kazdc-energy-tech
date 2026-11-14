@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>制冷模型与计算方法 · 阿斯塔纳 · KazDC 能源技术</title>
+  <meta name="description" content="从阿斯塔纳一条逐时气象记录出发，查看冷却液回路在这一小时如何运行，再把典型年 8,760 个小时的结果累加，估算全年制冷耗电量。">
+<meta property="og:site_name" content="KazDC 能源技术">
+<meta property="og:type" content="website">
+<meta property="og:title" content="制冷模型与计算方法 · 阿斯塔纳 · KazDC 能源技术">
+<meta property="og:description" content="从阿斯塔纳一条逐时气象记录出发，查看冷却液回路在这一小时如何运行，再把典型年 8,760 个小时的结果累加，估算全年制冷耗电量。">
+<link rel="alternate" hreflang="en" href="methods.html">
+<link rel="alternate" hreflang="kk" href="methods-kk.html">
+<link rel="alternate" hreflang="ru" href="methods-ru.html">
+<link rel="alternate" hreflang="zh-Hans" href="methods-zh.html">
+<script>"use strict";
+
+window.SiteI18n = (() => {
+  const data = {"lang":"zh-Hans","locale":"zh-Hans","months":["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],"shortMonths":["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],"cities":{"aktau":"阿克套","aktobe":"阿克托别","almaty":"阿拉木图","astana":"阿斯塔纳","atyrau":"阿特劳","ekibastuz":"埃基巴斯图兹","karaganda":"卡拉干达","kokshetau":"科克舍套","kostanay":"科斯塔奈","kyzylorda":"克孜勒奥尔达","oral":"乌拉尔斯克","oskemen":"厄斯克门","pavlodar":"巴甫洛达尔","petropavl":"彼得罗巴甫洛夫斯克","qonaev":"库纳耶夫","semey":"塞梅伊","shymkent":"奇姆肯特","taldykorgan":"塔尔迪库尔干","taraz":"塔拉兹","turkistan":"突厥斯坦","zhezkazgan":"热兹卡兹甘"},"station":{"station":"{city}气象站","airport":"{city}机场气象站","internationalAirport":"{city}国际机场气象站","era":"{city}的 ERA5 再分析数据","qonaev":"库纳耶夫 ERA5 再分析数据（原文件地名为 Kapchagay）","origin":"{location} · {period} 年期间的 {years} 个观测或再分析年份","quality":"气象文件中几个代表月的温度低于机场实测。2024 年 6 月，文件的均温为 21.2 °C，机场实测为 24.3 °C，制冷用电量可能被低估。"}};
+  const cityName = (slug, fallback) => data.cities[slug] || fallback || slug;
+  function formatNumber(value, options) {
+    if (data.lang !== "kk") return value.toLocaleString(data.locale, options);
+    // Some browsers ship a partial Kazakh locale and silently use English punctuation.
+    return value.toLocaleString("en-US", options).replaceAll(",", "\u00a0").replace(".", ",");
+  }
+  function stationNote(station) {
+    const location = station.location_note || "";
+    let kind = "station";
+    if (location.includes("ERA5")) kind = station.slug === "qonaev" ? "qonaev" : "era";
+    else if (location.includes("International Airport")) kind = "internationalAirport";
+    else if (location.includes("Airport")) kind = "airport";
+    const place = data.lang === "en" && location ? location :
+      data.station[kind].replace("{city}", cityName(station.slug, station.name));
+    const origin = data.station.origin.replace("{location}", place)
+      .replace("{years}", station.source_years).replace("{period}", station.period);
+    const quality = station.slug === "almaty" && station.quality_note ? ". " + data.station.quality : "";
+    return origin + quality;
+  }
+  return {lang: data.lang, locale: data.locale, months: data.months, shortMonths: data.shortMonths, cityName, stationNote, formatNumber};
+})();
+</script>
+  <style>:root {
+  color-scheme: light;
+  --ink:#182e30; --muted:#52696a; --line:#d5ded9; --paper:#f1f4ef;
+  --teal:#00786f; --deep:#073e41; --ice:#b0e6cc; --slate:#7b8c98;
+  --ochre:#ba792a; --dark-slate:#445666; --white:#fff;
+  font-family:Inter,"Source Sans 3","Segoe UI",Arial,sans-serif;
+  font-variant-numeric:tabular-nums;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:18px}
+body{margin:0;background:var(--paper);color:var(--ink);font-size:16px;line-height:1.45}
+a{color:inherit;text-underline-offset:3px}
+button,input{font:inherit}
+button{cursor:pointer;color:var(--ink)}
+:focus-visible{outline:3px solid #cc8020;outline-offset:3px}
+.wrap{max-width:1440px;width:calc(100% - clamp(32px,9vw,144px));margin-inline:auto}
+.mast{border-bottom:1px solid var(--line);background:#fafbf8}
+.mast-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;font-weight:720;font-size:17px;letter-spacing:-.035em}
+.coil{display:inline-flex;gap:2px;align-items:center;justify-content:center;width:32px;height:31px;background:var(--deep);border-radius:7px}
+.coil i{width:3px;height:13px;transform:skewY(-25deg);background:var(--ice)}
+.coil i:nth-child(2){height:19px}
+nav{display:flex;gap:clamp(16px,3vw,38px)}
+nav a{font-size:13px;font-weight:600;text-decoration:none;color:#3e5959}
+nav a:hover,.sources a:hover{text-decoration:underline}
+main{padding:37px 0 52px}
+.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:25px}
+.eyebrow{font-size:11px;line-height:1.3;font-weight:750;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:0 0 8px}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(32px,3.5vw,56px);letter-spacing:-.055em;line-height:1.09;font-weight:670}
+.lead{color:var(--muted);font-size:clamp(14px,1.22vw,18px);margin-top:8px;line-height:1.5}
+.intro>div:first-child{min-width:0}
+.station{flex:0 1 auto;min-width:0;padding-left:15px;border-left:2px solid #9ab5a7;text-align:left}
+.station strong,.station span{display:block;font-size:12px;line-height:1.55}
+.station span{color:var(--muted)}
+.scenario{display:grid;grid-template-columns:minmax(270px,.95fr) minmax(0,2.15fr);gap:16px;margin-bottom:16px}
+.control-card,.panel,.results-card{border-radius:12px;border:1px solid var(--line);background:var(--white)}
+.control-card{padding:18px 22px}
+.label-line,.value-line,.result-heading,.section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.label-line label{font-weight:650;font-size:14px}
+.reset{border:0;border-radius:3px;background:none;color:var(--teal);font-size:12px;padding:3px}
+.reset:disabled{color:var(--muted);cursor:default}
+.value-line{margin:4px 0 5px}
+#supply-value{font-size:34px;line-height:1.12;font-weight:670;letter-spacing:-.055em}
+#supply-value span{font-size:19px;font-weight:570;letter-spacing:-.03em}
+.steppers{display:flex;gap:5px}
+.steppers button{width:30px;height:30px;background:#fafbf8;border:1px solid var(--line);border-radius:5px;font-weight:600;display:grid;place-content:center}
+.steppers button:disabled{opacity:.45;cursor:default}
+#supply{display:block;accent-color:var(--teal);width:100%;height:20px;margin:0;cursor:pointer}
+.range-ends{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+#threshold{margin-top:9px;font-size:12px;color:#3b5655}
+.results-card{background:var(--deep);color:var(--white);border-color:var(--deep);padding:19px 26px 22px}
+.result-heading{padding-bottom:12px;border-bottom:1px solid #3c6665;align-items:baseline}
+.result-heading h2{font-size:16px;color:#f5fbf7;letter-spacing:-.015em}
+.result-heading>span{font-size:12px;color:#c2d8d0}
+.kpi-grid{display:grid;grid-template-columns:1.08fr .9fr 1fr;gap:14px;margin-top:17px}
+.kpi-grid>div+div{border-left:1px solid #3c6665;padding-left:17px}
+.kpi-grid h3{font-size:12px;font-weight:540;color:#deeee6;line-height:1.35}
+.big{line-height:1.1;letter-spacing:-.05em;font-size:clamp(25px,2.95vw,47px);font-weight:630;white-space:nowrap;margin:4px 0}
+.big span{font-size:.55em;letter-spacing:-.025em;font-weight:550}
+.small{color:#c2d8d0;font-size:12px}
+.kpi-grid>div:first-child .big{color:#b4f1c9}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:16px}
+.panel{padding:23px 24px 18px}
+.panel h2{font-size:20px;line-height:1.22;font-weight:660;letter-spacing:-.035em}
+.unit{color:var(--muted);font-size:12px;margin-top:5px}
+.legend{display:flex;flex-wrap:wrap;gap:5px 16px;margin:15px 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:6px;color:#3c5255;font-size:12px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px}
+.base{background:var(--slate)}.hybrid,.dry{background:var(--teal)}.assist{background:var(--ochre)}.mech{background:var(--dark-slate)}
+.chart{width:100%;min-width:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart svg text{font-family:inherit;fill:#465e5e;font-size:12px}
+.chart .grid{stroke:#dce4de;stroke-width:1}
+.chart .hit{fill:transparent}
+.chart .hit:hover,.chart .hit:focus-visible{fill:#94afac;fill-opacity:.13}
+.chart .hit:focus-visible{outline:none;stroke:#32696a;stroke-width:1.25}
+.chart-note{border-top:1px solid #e0e6e0;padding-top:10px;font-size:12px;color:var(--muted);min-height:28px}
+.chart-note b{color:var(--ink);font-weight:620}
+.table-panel{padding-bottom:11px;margin-bottom:16px}
+.section-heading{align-items:flex-start;margin-bottom:16px}
+.download{border:1px solid #a5bdb2;background:#eff6f1;color:var(--deep);font-size:12px;padding:7px 12px;font-weight:650;border-radius:6px;white-space:nowrap}
+.download span{margin-left:5px}.download:hover,.steppers button:hover:enabled{background:#e3eee6}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;text-align:right;font-size:13px;white-space:nowrap}
+th,td{padding:8px 9px;border-bottom:1px solid #e1e7e2}
+th:first-child,td:first-child{text-align:left}
+thead th{font-size:12px;font-weight:650;background:#f0f4f0;vertical-align:top}
+thead em{font-style:normal;color:var(--muted);font-size:11px;font-weight:480}
+tbody th{font-weight:570}tbody tr:hover{background:#f6f9f6}
+tfoot{color:var(--deep);font-weight:700}tfoot th,tfoot td{border-top:2px solid #acc4b7;border-bottom:0}
+.method-grid{display:grid;grid-template-columns:.85fr 1.55fr;gap:clamp(22px,4vw,62px);margin-top:18px}
+.method h3{font-size:14px;margin-bottom:5px;font-weight:680}
+dl{margin:0}dl div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #e1e7e2;padding:5px 0;font-size:13px}
+dt{color:var(--muted)}dd{margin:0;font-weight:580;white-space:nowrap}
+.prose p{font-size:13px;color:#415957;margin-bottom:8px}
+.guide-link{display:inline-flex;align-items:center;gap:8px;flex-shrink:0;color:var(--deep);background:#edf5ef;border:1px solid #abc6b9;border-radius:6px;padding:7px 11px;font-size:13px;font-weight:640;text-decoration:none}
+.guide-link:hover{background:#deece3}
+.method .method-subhead{margin:18px 0 4px}
+.method-copy{color:var(--muted);font-size:13px;line-height:1.55}
+.method .sources{font-size:12px;margin-top:6px}
+.method .prose a{color:var(--teal)}
+.prose h3:not(:first-child){margin-top:15px}
+.sources{display:flex;flex-wrap:wrap;gap:8px 16px}.sources a{color:var(--teal);font-weight:580}
+.tip{position:fixed;z-index:3;background:#153e3e;color:white;padding:8px 11px;border-radius:5px;font-size:12px;white-space:pre;line-height:1.5;pointer-events:none;box-shadow:0 3px 12px #173d3626}
+.skip,.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip:focus{position:fixed;z-index:4;width:auto;height:auto;overflow:visible;clip:auto;background:white;padding:8px}
+.notice{background:#fff2d5;padding:12px}
+@media(max-width:1000px){
+ .wrap{width:calc(100% - 44px)}.scenario{grid-template-columns:minmax(230px,.9fr) minmax(0,1.9fr)}
+ .results-card{padding:18px}.kpi-grid{gap:8px}.kpi-grid>div+div{padding-left:10px}
+ .panel{padding:18px 16px 14px}.small{font-size:11px}
+}
+@media(max-width:760px){
+ .wrap{width:calc(100% - 32px)}.mast-inner{min-height:53px}.brand{font-size:15px}.coil{width:27px;height:26px}
+ nav{gap:12px}nav a{font-size:11px}
+ main{padding-top:24px}.intro{display:block;margin-bottom:17px}.station{display:flex;flex-wrap:wrap;gap:3px 10px;padding-left:0;border:0;margin-top:10px}
+ .station strong,.station span{font-size:11px}.scenario{grid-template-columns:1fr}.control-card{padding:14px 17px}
+ .results-card{padding:15px 17px}.kpi-grid{margin-top:12px}.big{font-size:clamp(24px,5.5vw,36px)}.kpi-grid h3{font-size:11px;min-height:2.7em}
+ .charts,.method-grid{grid-template-columns:1fr}.charts{gap:12px}.method-grid{gap:18px}
+ .section-heading{gap:9px}.download{font-size:11px;padding:6px 8px}
+}
+@media(max-width:375px){nav{gap:8px}.wrap{width:calc(100% - 24px)}.kpi-grid{gap:5px}.kpi-grid>div+div{padding-left:6px}.panel{padding:17px 12px}.station{gap:2px 6px}}
+@media(max-width:540px){.method .section-heading{flex-direction:column;align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{.mast nav,.steppers,#supply,.range-ends,.reset,.download,.tip{display:none}.wrap{width:100%}.panel,.control-card,.results-card{break-inside:avoid}.results-card{print-color-adjust:exact}main{padding:10px 0}}
+
+.methods-page{background:#fbfcf8}
+.method-book{max-width:1190px;padding-top:38px}
+.guide-intro{padding:5px 0 26px;border-bottom:1px solid #c9d8cc}
+.guide-intro h1{font-size:clamp(35px,4.5vw,59px);max-width:900px}
+.guide-deck{max-width:740px;font-size:clamp(16px,1.5vw,20px);color:#48605b;margin-top:11px;line-height:1.5}
+.reading-layout{display:grid;grid-template-columns:202px minmax(0,1fr);gap:clamp(30px,5vw,80px);align-items:start}
+.toc{position:sticky;top:20px;margin-top:28px;padding:0 16px 8px 0;border-right:1px solid var(--line)}
+.toc nav{display:flex;gap:0;align-items:stretch;flex-direction:column}
+.toc strong{font-size:14px;margin-bottom:8px}
+.toc a{font-size:13px;font-weight:530;line-height:1.4;padding:6px 0}
+.chapters{max-width:850px;min-width:0}
+.chapters>section{padding:29px 0 27px;border-bottom:1px solid var(--line);scroll-margin-top:15px}
+.chapters>section:last-child{border-bottom:0}
+.chapters h2{font-size:clamp(24px,2.1vw,32px);font-weight:660;line-height:1.2;letter-spacing:-.04em;margin-bottom:11px}
+.chapters p{font-size:16px;line-height:1.63;max-width:78ch;color:#304c49}
+.chapters p+p,.chapters table+p,.chapters .table-scroll+p{margin-top:10px}
+.chapters p strong{color:var(--ink);font-weight:650}
+.chapters .doc-source,.chapters .marginal{font-size:13px;color:var(--muted);line-height:1.6}
+.doc-source a,.source-detail a{color:#00665f;font-weight:590}
+.chapters sub{line-height:0;font-size:.73em}
+.loop-figure{background:#eaf2eb;margin:16px 0;border:1px solid #ceded1;border-radius:9px;padding:14px 17px}
+.loop-figure figcaption{color:#28584d;font-size:13px;font-weight:650;margin-bottom:10px}
+.loop-units{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.loop-units>div{min-width:0;flex:1}
+.loop-units strong,.loop-units span{display:block}.loop-units strong{font-size:16px}
+.loop-units span{font-size:12px;line-height:1.45;color:#48635c}
+.loop-units b{color:#447f6d;margin-right:8px}
+.loop-figure .loop-back{font-size:12px;border-top:1px solid #cbded1;padding-top:7px;margin-top:11px;color:#3f5c55}
+.chapters table{white-space:normal;margin:11px 0 12px;line-height:1.45}
+.chapters th,.chapters td{font-size:14px;padding:9px 10px}
+.chapters thead th{font-size:12px;color:#39514a}
+.chapters caption{font-size:12px;font-weight:600;text-align:left;color:#557067;margin:0 0 6px}
+.input-table,.reconcile{text-align:left}
+.input-table th:first-child{width:28%}.input-table td:nth-child(2){width:16%;white-space:nowrap}
+.chapters .table-scroll{overflow-x:auto;max-width:100%}
+.chapters .numbers td{white-space:nowrap}
+.source-detail{margin:12px 0;padding:10px 14px;background:#edf3ed;border-radius:6px}
+.source-detail summary{font-size:14px;font-weight:620;color:var(--deep);cursor:pointer}
+.source-detail p{font-size:14px;margin-top:8px}
+.chapters .formula{border-left:3px solid #268075;background:#eaf2ef;padding:12px 18px;margin:14px 0}
+.formula>span{font-size:12px;color:#416258;display:block;margin-bottom:5px}
+.chapters .formula p{font-family:"Cambria Math","STIX Two Text",Georgia,serif;font-size:19px;line-height:1.55;color:var(--deep);margin:0}
+.boundaries{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}
+.boundaries>div{border:1px solid #cadacf;border-top:3px solid var(--teal);border-radius:7px;padding:12px 15px;background:#f1f6f0}
+.boundaries>div+div{border-top-color:var(--ochre);background:#f8f4e9}
+.boundaries h3{font-size:14px;font-weight:650}
+.chapters .boundaries .boundary-value{font-size:28px;letter-spacing:-.05em;color:var(--deep);line-height:1.35;font-weight:650}
+.boundary-value span{font-size:13px;letter-spacing:0;font-weight:500}
+.boundaries p:not(.boundary-value){font-size:14px;line-height:1.5;margin-top:4px}
+.trace{border:1px solid #b9d0c0;border-radius:9px;padding:16px 18px 12px;background:#f0f5ef;margin:16px 0}
+.trace-head{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.trace label{font-size:13px;font-weight:640}
+.trace select{font:inherit;font-size:13px;padding:6px 7px;background:#fff;border:1px solid #9eb5ab;color:var(--ink);border-radius:5px;max-width:100%}
+.trace h3{margin:12px 0 9px;font-size:18px;letter-spacing:-.02em;color:var(--deep)}
+#trace-steps dl{margin:0}
+#trace-steps dl div{display:grid;grid-template-columns:minmax(120px,.6fr) 1.8fr;align-items:baseline;border-top:1px solid #d4e2d4;border-bottom:0;gap:13px;padding:6px 0}
+#trace-steps dt{font-size:12px;color:#426356;font-weight:630}
+#trace-steps dd{white-space:normal;font-size:14px;line-height:1.55;font-weight:450}
+.chapters code{font-family:"IBM Plex Mono",Consolas,monospace;font-size:.88em;overflow-wrap:anywhere}
+.chapters pre{background:#153c39;color:#ecf7ec;border-radius:6px;padding:14px 16px;line-height:1.65;overflow:auto}
+.chapters p+.guide-link{margin-top:15px}
+@media(max-width:900px){
+ .reading-layout{grid-template-columns:165px minmax(0,1fr);gap:23px}
+ .toc{padding-right:10px}.chapters th,.chapters td{padding:7px}.loop-units{gap:5px}
+}
+@media(max-width:760px){
+ .method-book{padding-top:22px}.guide-intro{padding-bottom:18px}.reading-layout{display:block}
+ .toc{position:static;margin:0;padding:12px 0;border:0;border-bottom:1px solid var(--line)}
+ .toc nav{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+ .toc strong{grid-column:1/-1;margin-bottom:3px}.toc a{padding:4px 0;font-size:12px}
+ .chapters>section{padding:20px 0}.chapters p{font-size:15px}
+ .chapters table th,.chapters table td{font-size:12px}
+ .chapters table thead th{font-size:11px}.chapters .formula p{font-size:17px}
+}
+@media(max-width:520px){
+ .loop-figure{padding:12px}.loop-units{align-items:flex-start}
+ .loop-units b{margin-right:0}.loop-units strong{font-size:13px}.loop-units span{font-size:11px}
+ .boundaries{grid-template-columns:1fr;gap:8px}.boundaries>div{padding:10px 12px}
+ .trace{padding:12px}.trace-head{align-items:flex-start;flex-direction:column;gap:4px}
+ #trace-steps dl div{display:block;padding:6px 0}#trace-steps dt{margin-bottom:2px}
+ .input-table th:first-child{width:27%}.chapters .numbers{min-width:440px}
+}
+@media print{
+ .toc,.guide-link,.trace-head{display:none}.method-book,.chapters{max-width:none}
+ .reading-layout{display:block}.chapters>section{break-inside:auto}
+ .chapters h2,.chapters h3{break-after:avoid}.formula,.trace,.boundaries,.loop-figure,table{break-inside:avoid}
+ .chapters p{font-size:10.5pt}.table-scroll{overflow:visible}
+}
+
+@media (max-width: 450px) {
+  .loop-units {flex-direction: column; align-items: flex-start; gap: 4px}
+  .loop-units b {align-self: flex-start; margin-left: .35rem; transform: rotate(90deg)}
+}
+.mast .mast-row, .mast .mast-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px clamp(12px, 1.7vw, 25px);
+}
+.mast .mast-row > nav, .mast .mast-inner > nav {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px clamp(10px, 1.35vw, 20px);
+}
+.language-menu {position: relative; justify-self: end; z-index: 3; color: #173f36}
+.language-menu summary {
+  display: flex; align-items: center; gap: 6px; min-height: 38px;
+  padding: 5px 9px; cursor: pointer; list-style: none;
+  border: 1px solid #9bb6a8; border-radius: 5px;
+  background: #fffefa; font-family: inherit; line-height: 1.35;
+  font-size: .86rem; font-weight: 600; white-space: nowrap;
+}
+.language-menu summary::-webkit-details-marker {display: none}
+.language-menu summary::after {
+  content: ""; width: 6px; height: 6px; margin: -3px 2px 0;
+  border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg);
+}
+.language-menu[open] summary::after {margin-top: 3px; transform: rotate(225deg)}
+.language-menu summary:hover, .language-menu[open] summary {background: #eaf2e9}
+.language-menu svg {width: 17px; height: 17px; flex: none}
+.language-options {
+  position: absolute; right: 0; top: calc(100% + 5px); min-width: 10rem; width: max-content;
+  max-width: min(19rem, calc(100vw - 36px)); padding: 5px;
+  background: #fffefa; border: 1px solid #aac1b5; border-radius: 6px;
+  box-shadow: 0 5px 14px #143d3429;
+}
+.language-options p {margin: 4px 6px 5px; font: inherit; font-size: .8rem; color: #405a4e}
+.language-options a, .language-options [aria-current] {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  min-height: 40px; padding: 5px 9px; color: #173f36;
+  border-radius: 3px; font-size: .92rem; text-decoration: none;
+}
+.language-options a:hover, .language-options a:focus-visible {background: #e9f2e9; text-decoration: underline}
+.language-options [aria-current] {background: #e9f2e9; font-weight: 650}
+.language-menu :focus-visible {outline: 2px solid #886020; outline-offset: 2px}
+html:lang(zh-Hans) body {font-family: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif}
+html:lang(zh-Hans) :is(h1, h2) {font-family: inherit; letter-spacing: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .hero h1 {font-size: clamp(2.25rem, 4.1vw, 3.9rem); overflow-wrap: anywhere}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line label {min-width: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line output {flex-shrink: 0}
+@media (max-width: 1050px) {
+  .mast .mast-row, .mast .mast-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand language" "nav nav"; gap: 5px 10px; padding: 8px 0;
+  }
+  .mast .brand {grid-area: brand; min-width: 0; width: fit-content; white-space: normal; line-height: 1.2}
+  .mast .brand .coil {flex: none}
+  .mast .language-menu {grid-area: language}
+  .mast .mast-row > nav, .mast .mast-inner > nav {grid-area: nav; justify-content: flex-start; padding: 0}
+}
+@media print {.mast .language-menu {display: none}}
+.project-credit {
+  scroll-margin-top: 1rem;
+  border-block: 1px solid #cbd8cc;
+  background: #e9efe7;
+  color: #203b32;
+}
+.credit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.35rem clamp(2rem, 5vw, 5rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+}
+.credit-grid h2 {
+  margin: 0 0 .45rem;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: normal;
+  color: #476054;
+}
+.credit-grid p {margin: .13rem 0 0; font-size: .93rem; line-height: 1.5; overflow-wrap: anywhere}
+.credit-grid address {font-style: normal}
+.credit-grid .credit-institute {margin: 0 0 .35rem; font-size: clamp(1.5rem, 2.1vw, 1.9rem); line-height: 1.12; font-weight: 700}
+.credit-grid .credit-name {font-size: 1.05rem; line-height: 1.4; font-weight: 600; margin-bottom: .25rem}
+.credit-grid a {color: #15594a; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .17em}
+.credit-grid a:hover {text-decoration-thickness: 2px}
+@media (max-width: 670px) {
+  .credit-grid {grid-template-columns: minmax(0, 1fr)}
+}
+@media print {
+  .project-credit {background: transparent; break-inside: avoid}
+  .credit-grid {padding-block: .8rem}
+}
+
+.credit-grid .credit-feedback {margin-top: .7rem; max-width: 49ch; color: #405b4f}
+.case-share {display: flex; align-items: center; flex-wrap: wrap; gap: 4px 9px; max-width: 100%; margin: .35rem 0}
+.case-share button {padding: 5px 10px; border: 1px solid #92ab9d; border-radius: 4px; background: transparent; color: #164e40; font: inherit; font-size: .82rem; font-weight: 630; line-height: 1.4; cursor: pointer}
+.case-share button:hover {background: #e2ece3}
+.case-share button:disabled {cursor: default; opacity: .56}
+.case-share output,.case-version-note {font-size: .81rem; line-height: 1.35; color: #3c594c}
+.case-version-note {margin: 0}
+.case-share textarea {display: block; flex: 1 0 100%; width: 100%; max-width: 100%; min-height: 6rem; box-sizing: border-box; font: inherit; font-size: .86rem}
+.case-share[hidden],.case-share [hidden],.case-share.private-readings {display: none}
+@media print {.case-share {display: none}}
+</style>
+</head>
+<body class="methods-page">
+<a class="skip" href="#content">跳至计算方法</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" href="regional-zh.html" aria-label="KazDC 能源技术 首页"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>KazDC 能源技术</a>
+  <nav aria-label="项目页面"><a href="astana-zh.html">← 制冷计算</a><a href="snow-zh.html">储雪供冷</a><a href="technologies-zh.html">技术模型</a><a href="references-zh.html">参考资料</a><a href="research-priorities-zh.html">研究重点</a><a href="#project-contact">联系方式</a></nav>
+<details class="language-menu"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>语言</summary><div class="language-options"><a lang="en" hreflang="en" href="methods.html" data-language-section>English</a><a lang="kk" hreflang="kk" href="methods-kk.html" data-language-section>Қазақша</a><a lang="ru" hreflang="ru" href="methods-ru.html" data-language-section>Русский</a><span lang="zh-Hans" aria-current="page">简体中文<b aria-hidden="true">✓</b></span></div></details>
+</div></header>
+<main id="content" class="wrap method-book">
+  <div class="guide-intro">
+    <p class="eyebrow">阿斯塔纳数据中心制冷</p>
+    <h1>制冷模型与计算方法</h1>
+    <p class="guide-deck">从阿斯塔纳一条逐时气象记录出发，查看冷却液回路在这一小时如何运行，再把典型年 8,760 个小时的结果累加，估算全年制冷耗电量。</p>
+  </div>
+  <div class="reading-layout">
+    <aside class="toc"><nav aria-label="目录"><strong>本页目录</strong>
+      <a href="#plant">系统与输入参数</a><a href="#weather">气象年数据</a>
+      <a href="#capacity">干冷器的排热能力</a><a href="#dispatch">风机何时运行</a>
+      <a href="#worked-hours">逐时计算示例</a><a href="#annual">从逐时计算到全年结果</a>
+      <a href="#limits">设备参数敏感性</a><a href="#reproduce">复现计算</a>
+    </nav></aside>
+    <div class="chapters">
+      <section id="plant">
+        <h2>系统与输入参数</h2>
+        <p>两种方案都以相同的供液温度 <i>T</i><sub>s</sub> 向 IT 设备供给冷却液。设备持续释放恒定的显热负荷 <i>Q</i>。冷却液吸热后以回液温度 <i>T</i><sub>r</sub> 返回制冷系统。基准方案由冷水机组承担全部冷负荷。在另一种方案中，回液先进入室外干冷器，再由冷水机组承担剩余负荷。</p>
+        <figure class="loop-figure"><figcaption>基准供液温度下的闭式冷却液回路</figcaption>
+          <div class="loop-units"><div><strong>IT 设备</strong><span>向回路传入 1,000 kW 热量</span></div><b aria-hidden="true">→</b>
+            <div><strong>干冷器</strong><span>接收 24 °C 的回液</span></div><b aria-hidden="true">→</b>
+            <div><strong>冷水机组</strong><span>按需将冷却液进一步冷却至 18 °C</span></div></div>
+          <p class="loop-back">两种方案都使用循环泵，将冷却后的液体送回 IT 设备。</p>
+        </figure>
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="plant-parameters-caption"><table class="input-table"><caption id="plant-parameters-caption">基准系统参数。温度指冷却液温度或室外空气温度。</caption>
+          <thead><tr><th scope="col">输入参数</th><th scope="col">数值</th><th scope="col">在计算中的作用</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">IT 热负荷 <i>Q</i></th><td>1,000 kW<sub>th</sub></td><td>持续传入回路的热功率。</td></tr>
+            <tr><th scope="row">供液温度 <i>T</i><sub>s</sub></th><td>18 °C</td><td>冷却液离开制冷系统时的温度，可在计算页面调整。</td></tr>
+            <tr><th scope="row">回路温升 Δ<i>T</i></th><td>6 K</td><td>冷却液流过 IT 设备的温升，故 <i>T</i><sub>r</sub> = <i>T</i><sub>s</sub> + Δ<i>T</i>。</td></tr>
+            <tr><th scope="row">额定接近温差 <i>A</i></th><td>5 K</td><td>满负荷、设计风量下，干冷器出口液温与入口气温之差。</td></tr>
+            <tr><th scope="row">冷水机组性能系数 COP</th><td>4</td><td>制冷功率与机组输入电功率之比，后者包括冷凝侧辅助设备。</td></tr>
+            <tr><th scope="row">风机功率 <i>F</i></th><td>25 kW<sub>e</sub></td><td>干冷器的定速风机开启时消耗的电功率。</td></tr>
+            <tr><th scope="row">泵功率 <i>P</i><sub>p</sub></th><td>15 kW<sub>e</sub></td><td>两种方案的泵功率相同且恒定，冷水机组停机时泵仍然运行。</td></tr>
+          </tbody></table></div>
+        <p>下标 <em>th</em> 表示热功率或热量，<em>e</em> 表示电功率或电能。回路热平衡只计入 IT 设备的散热。电耗比较的范围为制冷系统；机架用电、机房空气处理机组、UPS 损耗及其他建筑用能另计。</p>
+      </section>
+      <section id="weather">
+        <h2>气象年数据</h2>
+        <p><a href="references-zh.html#weather">气象参考资料</a>说明了文件及其来源标识。输入采用 Climate.OneBuilding 发布的哈萨克斯坦阿斯塔纳站（站号 <strong>351880</strong>）的 TMYx 气象文件。典型气象年由 2011–2025 年间选出的代表月份组成。文件中的室外干球温度范围为 -36 至 38 °C。干盘管通过显热交换将热量传给空气，因而使用干球温度。</p>
+        <p>读取程序从每条 EnergyPlus 气象（EPW）记录中提取干球温度，并保留原始年份、月份、日期和小时编号（1–24）。每行代表一小时。EPW 文件头规定当地标准时间为 UTC+6，记录中的分钟字段为 30。月度汇总沿用原始时间标签。哈萨克斯坦现采用 UTC+5，只有按日蓄冷的水箱模型会将原始时间转换为当前民用时间，以执行其控制时段。程序检查日期顺序及全年覆盖情况，遇到重复小时、缺失值或无效温度即报错。</p>
+        <p>在<a href="regional-zh.html#compare">哈萨克斯坦城市比较</a>中，每座城市分别用自己的 8,760 小时气象文件计算同一套设备。城市选择器显示气象站位置及编制典型年时可用的年份。2011–2025 数据集中的塔拉兹机场仅有 2011–2021 年间的 10 个来源年，阿克套有 14 个来源年。埃基巴斯图兹、科纳耶夫和塔尔迪库尔干采用 ERA5 再分析重建的温度。各城市结果均附原始文件链接。</p>
+        <details class="source-detail"><summary>各月来源年份与原始文件</summary>
+          <p>从一月到十二月，各月依次取自以下年份：2015、2021、2014、2017、2017、2022、2018、2019、2013、2020、2015、2014。下文使用的六月记录取自 2022 年。</p>
+          <p>项目中的 <code>data/astana_hourly.csv</code> 包含提取出的逐时温度。<code>data/README.md</code> 给出了源压缩包及压缩包、EPW 文件和提取数据的 SHA-256 校验值。</p>
+        </details>
+        <p class="doc-source">气象资料由 Linda K. Lawrie 与 Drury B. Crawley 编制。<a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">气象站文件</a> · <a href="https://climate.onebuilding.org/sources/default.html">TMYx 编制方法</a> · <a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/energyplus-weather-file-epw-data-dictionary.html">EPW 字段定义</a></p>
+      </section>
+      <section id="capacity">
+        <h2>干冷器的排热能力</h2>
+        <p>额定接近温差确定了干冷器性能曲线上的一个已知点。当风机连续运行，干冷器独立承担设计负荷时，冷却液出口温度为 <i>T</i><sub>s</sub>，室外进风温度比出口液温低 <i>A</i> 度。此时入口冷却液与入口空气之间的传热温差为 Δ<i>T</i> + <i>A</i> = 11 K。</p>
+        <div class="formula"><span>室外温度为 <i>T</i><sub>a</sub> 时，风机满速运行下的排热能力</span>
+          <p><i>G</i> = <i>Q</i> / (Δ<i>T</i> + <i>A</i>)</p>
+          <p><i>Q</i><sub>cap</sub> = <i>G</i> × max(0, <i>T</i><sub>r</sub> − <i>T</i><sub>a</sub>)</p></div>
+        <p>对基准系统，<i>G</i> = 1,000 / 11 = <strong>90.91 kW/K</strong>。这一有效传热系数由一个额定工况拟合得到。更详细的换热器模型需分别求解两股流体及其换热特性。低温天气下，满速风机对应的排热能力可超过 IT 热负荷，实际利用的冷量以上述负荷为限。</p>
+        <p>在流量恒定时，冷却液的热容量流率为 <i>C</i><sub>w</sub> = <i>Q</i>/Δ<i>T</i> = 166.67 kW/K。若干冷器排走的热功率为 <i>Q</i><sub>d</sub>，其小时平均出口液温为 <i>T</i><sub>r</sub> − <i>Q</i><sub>d</sub>/<i>C</i><sub>w</sub>。冷水机组再移除剩余热量，使冷却液达到供液设定温度。由此可独立核对两台设备分担的热负荷。</p>
+      </section>
+      <section id="dispatch">
+        <h2>风机何时运行</h2>
+        <p>单独使用冷水机组时，系统始终消耗 <i>P</i><sub>base</sub> = <i>P</i><sub>p</sub> + <i>Q</i>/COP = 15 + 250 = <strong>265 kW<sub>e</sub></strong>。控制器将该功率与利用室外空气供冷的候选方案所需功率进行比较。</p>
+        <div class="formula"><span>干冷器可用排热能力大于零时</span>
+          <p><i>Q</i><sub>d,cand</sub> = min(<i>Q</i>, <i>Q</i><sub>cap</sub>),&ensp; <i>d</i> = <i>Q</i><sub>d,cand</sub> / <i>Q</i><sub>cap</sub></p>
+          <p><i>P</i><sub>cand</sub> = <i>P</i><sub>p</sub> + <i>dF</i> + (<i>Q</i> − <i>Q</i><sub>d,cand</sub>) / COP</p></div>
+        <p>风机占空比 <i>d</i> 是风机以额定功率运行的时间占该小时的比例。在寒冷天气下，模型让风机间歇运行，并假定回路具有足够的热缓冲能力来满足小时负荷。干冷器和冷水机组联合运行时，风机整小时开启。两种情况下循环泵都运行。</p>
+        <p>只要排热能力为正，候选方案可节省的功率就是 <i>d</i>(<i>Q</i><sub>cap</sub>/COP − <i>F</i>)。因此，仅当 <i>Q</i><sub>cap</sub> &gt; COP × <i>F</i> 时才开启风机。当两者相等或排热能力为零时，控制器让冷却液旁通干冷器。此时干冷器排热量和风机功率均为零。</p>
+        <div class="boundaries"><div><h3>干冷器承担全部负荷的温度界限</h3><p class="boundary-value">13 °C<span> 室外</span></p>
+          <p>令 <i>Q</i><sub>cap</sub> = <i>Q</i>，得到物理界限 <i>T</i><sub>s</sub> − <i>A</i>。在此温度下，风机连续运行即可承担全部负荷。</p></div>
+          <div><h3>耗电持平点</h3><p class="boundary-value">22.9 °C<span> 室外</span></p>
+          <p>令 <i>Q</i><sub>cap</sub> = COP × <i>F</i> = 100 kW<sub>th</sub>，相应室外温度为 <i>T</i><sub>r</sub> − COP × <i>F</i>/<i>G</i>。</p></div></div>
+        <p>当室外温度为 13 °C 或更低时，冷水机组停机。当温度高于 13 °C、低于 22.9 °C 时，干冷器和冷水机组分担负荷。达到或超过 22.9 °C 时，控制器让冷却液旁通干冷器。对这套设备，供液设定温度每提高 1 °C，两个界限均提高 1 °C。</p>
+      </section>
+      <section id="worked-hours">
+        <h2>逐时计算示例</h2>
+        <p>从原始文件的五条逐时记录中任选一条。室外气温是气象输入，下列热负荷、出口液温和电功率是供液温度为 18 °C 时的模型输出。每条记录覆盖一小时。</p>
+        <div class="trace interactive-trace" hidden><div class="trace-head"><label for="example">气象记录</label><select id="example"><option value="0">2015年1月8日 · EPW 第14小时 · 2 °C</option>
+<option value="1">2017年4月13日 · EPW 第16小时 · 13 °C</option>
+<option value="2" selected>2022年6月12日 · EPW 第3小时 · 18.5 °C</option>
+<option value="3">2017年5月21日 · EPW 第12小时 · 22.9 °C</option>
+<option value="4">2017年4月25日 · EPW 第19小时 · 23 °C</option></select></div>
+          <h3 id="trace-title"></h3><div id="trace-steps" aria-live="polite"></div></div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="五条逐时计算结果，必要时可横向滚动">
+          <table class="numbers"><caption>所选气象记录对应的运行结果</caption><thead><tr>
+            <th scope="col">原始记录</th><th scope="col">室外气温</th><th scope="col">模式</th><th scope="col">干冷器<br>kW<sub>th</sub></th><th scope="col">冷水机组<br>kW<sub>th</sub></th><th scope="col">风机占空比</th><th scope="col">系统用电<br>kW<sub>e</sub></th>
+          </tr></thead><tbody><tr><th scope="row">2015年1月8日 · EPW 第14小时</th><td>2 °C</td><td>冷水机组停机</td><td>1,000</td><td>0</td><td>50%</td><td>27.5</td></tr>
+<tr><th scope="row">2017年4月13日 · EPW 第16小时</th><td>13 °C</td><td>冷水机组停机</td><td>1,000</td><td>0</td><td>100%</td><td>40</td></tr>
+<tr><th scope="row">2022年6月12日 · EPW 第3小时</th><td>18.5 °C</td><td>联合运行</td><td>500</td><td>500</td><td>100%</td><td>165</td></tr>
+<tr><th scope="row">2017年5月21日 · EPW 第12小时</th><td>22.9 °C</td><td>仅冷水机组</td><td>0</td><td>1,000</td><td>0%</td><td>265</td></tr>
+<tr><th scope="row">2017年4月25日 · EPW 第19小时</th><td>23 °C</td><td>仅冷水机组</td><td>0</td><td>1,000</td><td>0%</td><td>265</td></tr></tbody></table>
+        </div>
+        <p class="marginal">小时编号遵循 EPW 的 1–24 约定。按来源年份、月份、日期及 EPW 小时编号，即可在 <code>reference/hourly.csv</code> 中找到相应记录。</p>
+      </section>
+      <section id="annual">
+        <h2>从逐时计算到全年结果</h2>
+        <p>计算月度或年度电耗时，将各小时的平均功率乘以一小时后相加，再除以 1,000，把 kWh 换算为 MWh。每条逐时记录只计入一种运行模式。各项年度百分比均由年度总量计算，使各月按实际小时数和能耗加权。</p>
+        <div class="formula"><span>期间耗电量及节电率</span>
+          <p><i>E</i> [MWh] = Σ<sub>h</sub> <i>P</i><sub>h</sub> [kW] × 1 h / 1,000</p>
+          <p>节电率 [%] = 100 × (<i>E</i><sub>base</sub> − <i>E</i><sub>hybrid</sub>) / <i>E</i><sub>base</sub></p></div>
+        <p><strong>以七月为例核对月度结果。</strong>共 744 小时，其中冷水机组停机 74 小时、联合运行 365 小时、单独使用冷水机组 305 小时。基准方案耗电 197.16 MWh，联合系统耗电 140.68 MWh，节电率为 28.6%。</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="annual-measures-caption"><table class="reconcile"><caption id="annual-measures-caption">供液温度为 18 °C 时的三项年度指标</caption><thead><tr><th scope="col">指标</th><th scope="col">分子与分母</th><th scope="col">占比</th></tr></thead>
+          <tbody><tr><th scope="row">冷水机组停机时间</th><td>5,888 h / 8,760 h</td><td>67.2%</td></tr>
+          <tr><th scope="row">干冷器排走的热量</th><td>6,986.87 / 8,760 MWh<sub>th</sub></td><td>79.8%</td></tr>
+          <tr><th scope="row">节省的制冷用电量</th><td>1,630.55 / 2,321.40 MWh<sub>e</sub></td><td>70.2%</td></tr></tbody></table></div>
+        <p>干冷器单独运行时供冷 5,888 MWh<sub>th</sub>；在 1,893 个联合运行小时中，干冷器又供冷 1,098.87 MWh<sub>th</sub>。冷水机组全年供冷 1,773.13 MWh<sub>th</sub>。这几项之和等于 IT 设备全年释放的热量。</p>
+        <p>在电耗方面，联合系统中冷水机组耗电 443.28 MWh，干冷器风机耗电 116.16 MWh，循环泵耗电 131.40 MWh。由各项未舍入值相加得到总电耗 <strong>690.85 MWh</strong>。两种方案的泵耗电量相同，计算节电量之差时这部分相互抵消。两种方案的年度总电耗以及节电率的分母都包含泵耗电。</p>
+      </section>
+      <section id="limits">
+        <h2>设备参数敏感性与现场解读</h2>
+        <p>在相同排热量下，较小的额定接近温差需要较大的有效传热能力。下表仅改变额定接近温差，在 18 °C 的供液温度下重新计算全部 8,760 条逐时记录。风机功率、泵功率及冷水机组 COP 均保持恒定。</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="干冷器额定接近温差的敏感性"><table class="numbers"><thead>
+          <tr><th scope="col">额定接近温差</th><th scope="col">满负荷室外温度界限</th><th scope="col">冷水机组停机小时数</th><th scope="col">联合系统耗电 MWh<sub>e</sub></th></tr>
+        </thead><tbody><tr><th scope="row">3 K</th><td>15 °C</td><td>6,367</td><td>625.2</td></tr>
+<tr><th scope="row">5 K（基准）</th><td>13 °C</td><td>5,888</td><td>690.8</td></tr>
+<tr><th scope="row">7 K</th><td>11 °C</td><td>5,461</td><td>755.4</td></tr></tbody></table></div>
+        <p><strong>设备标定。</strong>应采用目标冷却液流量及乙二醇浓度下干冷器的额定性能点、实际风机控制曲线、实测泵功率，以及随环境温度、供液设定值和部分负荷变化的冷水机组 COP。基准模型采用恒定 COP，因此在改变供液温度时，基准电耗保持不变。改变 <code>it_kw</code> 还会通过 <i>G</i> 改变模型中干冷器的设计容量。</p>
+        <p><strong>现场运行核对。</strong>在相同天气、负荷和回路温度下，将预测的各模式运行小时数和系统电耗与计量数据比较。在实际工程中，防冻加热、启停限制、结垢、泵发热及输配损耗均可能影响结果。评估年际变化需采用多年气象序列，设备选型还需考虑设计极端工况。典型年结果用于估算给定假设下的运行能耗。</p>
+        <p class="doc-source">EnergyPlus 工程参考手册给出了更详细的单速和双速干冷器模型，采用换热器有效度及传热单元数（NTU）。本算例采用上文由单个额定点得到的系数。<a href="https://bigladdersoftware.com/epx/docs/24-2/engineering-reference/cooling-towers-and-evaporative-fluid-coolers.html#one-and-two-speed-fluid-coolers">EnergyPlus 干冷器模型</a></p>
+      </section>
+      <section id="reproduce">
+        <h2>复现计算</h2>
+        <p>下载并解压项目 ZIP。<a href="source.zip" data-source-download download>下载项目压缩包（ZIP）</a> 在项目根目录中，使用 Python 3.10 或更高版本及随附的气象 CSV 文件运行以下命令。计算、测试及页面构建均使用 Python 标准库。</p>
+        <pre><code>python cooling.py --supply 18 --output results_reference
+python -m unittest discover -s tests -v
+python build.py</code></pre>
+        <p>浏览器中的算例另有一套 JavaScript 测试。构建页面后，使用 Node.js 18 或更高版本运行 <code>node --test</code>。测试将逐时制冷计算与城市汇总结果比较，并核对能量平衡、储能约束和热泵运行限制。</p>
+        <p>在 <code>results_reference/hourly.csv</code> 中，检查每行的 <code>dry_kw_th</code> + <code>chiller_kw_th</code> 是否等于 IT 热负荷。将 <code>hybrid_kw_e</code> 列求和并除以 1,000，得到联合系统年度电耗（MWh）。统计 <code>mode</code> 为 <code>dry_only</code> 的行数，可得到冷水机组停机小时数。可供核对的结果见 <code>reference/monthly.csv</code> 和 <code>reference/annual.csv</code>。</p>
+        <p>测试涵盖寒冷时段的风机占空比、部分负荷时的热平衡、耗电相等时的控制选择、全年气象记录完整性，以及 49 个供液温度设定值下各运行模式的小时数。这些测试用于检查代码是否实现了所述模型；验证设备现场表现还需要设备与现场测量数据。</p>
+        <a class="guide-link" href="astana-zh.html">返回制冷计算 <span aria-hidden="true">→</span></a>
+      </section>
+    </div>
+  </div>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap"><div class="credit-grid">
+  <div>
+    <h2>项目所属机构</h2>
+    <p class="credit-institute"><a href="https://inmet.nu.edu.kz/" aria-label="INMET — 新材料与能源技术研究院">INMET</a></p>
+    <p>新材料与能源技术研究院</p>
+    <p>纳扎尔巴耶夫大学</p>
+  </div>
+  <div>
+    <h2>项目联系人</h2>
+    <address>
+      <p class="credit-name"><a href="https://research.nu.edu.kz/en/persons/yanwei-wang/">Yanwei Wang 博士</a></p>
+      <p><a href="mailto:yanwei.wang@nu.edu.kz">yanwei.wang@nu.edu.kz</a></p>
+    </address>
+    <p class="credit-feedback"><a href="mailto:yanwei.wang@nu.edu.kz?subject=KazDC%20%E8%83%BD%E6%BA%90%E6%8A%80%E6%9C%AF%E5%8F%82%E8%80%83%E6%A1%88%E4%BE%8B">与 INMET 探讨参考案例</a></p>
+  </div>
+</div>
+</div></footer>
+<script id="trace-data" type="application/json">{"examples":[{"label":"2015年1月8日 · EPW 第14小时","outdoor":2.0,"return_c":24.0,"capacity":2000.0,"after_dry":18.0,"mode_label":"冷水机组停机","mode":"dry_only","dry_kw_th":1000.0,"chiller_kw_th":0.0,"fan_duty":0.5,"dry_fan_kw_e":12.5,"chiller_kw_e":0.0,"pump_kw_e":15.0,"baseline_kw_e":265.0,"hybrid_kw_e":27.5},{"label":"2017年4月13日 · EPW 第16小时","outdoor":13.0,"return_c":24.0,"capacity":1000.0,"after_dry":18.0,"mode_label":"冷水机组停机","mode":"dry_only","dry_kw_th":1000.0,"chiller_kw_th":0.0,"fan_duty":1.0,"dry_fan_kw_e":25.0,"chiller_kw_e":0.0,"pump_kw_e":15.0,"baseline_kw_e":265.0,"hybrid_kw_e":40.0},{"label":"2022年6月12日 · EPW 第3小时","outdoor":18.5,"return_c":24.0,"capacity":500.0,"after_dry":21.0,"mode_label":"联合运行","mode":"assisted","dry_kw_th":500.0,"chiller_kw_th":500.0,"fan_duty":1.0,"dry_fan_kw_e":25.0,"chiller_kw_e":125.0,"pump_kw_e":15.0,"baseline_kw_e":265.0,"hybrid_kw_e":165.0},{"label":"2017年5月21日 · EPW 第12小时","outdoor":22.9,"return_c":24.0,"capacity":100.00000000000013,"after_dry":24.0,"mode_label":"仅冷水机组","mode":"chiller_only","dry_kw_th":0.0,"chiller_kw_th":1000.0,"fan_duty":0.0,"dry_fan_kw_e":0.0,"chiller_kw_e":250.0,"pump_kw_e":15.0,"baseline_kw_e":265.0,"hybrid_kw_e":265.0},{"label":"2017年4月25日 · EPW 第19小时","outdoor":23.0,"return_c":24.0,"capacity":90.9090909090909,"after_dry":24.0,"mode_label":"仅冷水机组","mode":"chiller_only","dry_kw_th":0.0,"chiller_kw_th":1000.0,"fan_duty":0.0,"dry_fan_kw_e":0.0,"chiller_kw_e":250.0,"pump_kw_e":15.0,"baseline_kw_e":265.0,"hybrid_kw_e":265.0}],"conductance":90.9090909090909,"cop":4.0,"break_even":100.0,"text":{"months":["1","2","3","4","5","6","7","8","9","10","11","12"],"date":"{year}年{month}月{day}日 · EPW 第{hour}小时","modes":{"dry_only":"冷水机组停机","assisted":"联合运行","chiller_only":"仅冷水机组"},"reference":"{value} K（基准）","approach":"{value} K","years_separator":"、","pct":"{value}%","regimes":"当室外温度为 {full} °C 或更低时，冷水机组停机。当温度高于 {full} °C、低于 {bypass} °C 时，干冷器和冷水机组分担负荷。达到或超过 {bypass} °C 时，控制器让冷却液旁通干冷器。对这套设备，供液设定温度每提高 1 °C，两个界限均提高 1 °C。","no_assist":"这组设备参数下，耗电持平点对应的温度低于或等于满负荷温度界限。低于 {bypass} °C 时，室外供冷足以承担全部负荷；达到或超过此温度时，控制器选择冷水机组。联合运行小时数为零。","trace_title":"室外 {outdoor} °C，{mode}","terms":["风机满速时的排热能力","运行模式选择","热平衡","风机与冷水机组","本小时耗电量"],"capacity":"{conductance} kW/K × max(0, {return_c} − ({outdoor})) K ≈ {capacity} kW，为干冷器的可用排热能力。","dispatch_bypass":"可用排热能力低于或等于耗电持平点对应的 {break_even} kW 热功率，因此旁通干冷器。","dispatch_assisted":"可用排热能力高于耗电持平点对应的 {break_even} kW 热功率。冷水机组承担剩余负荷。","dispatch_full":"可用排热能力高于耗电持平点对应的 {break_even} kW 热功率，干冷器可单独承担全部负荷。","balance":"干冷器排热 {dry_kw_th} kW，加上冷水机组的 {chiller_kw_th} kW，共计 {load} kW。经过干冷器后冷却液的小时平均温度为 {after_dry} °C。","fan":"风机运行时间占本小时的 {duty}%，开启时耗电功率为 {fan} kW。冷水机组的输入电功率为 {chiller_kw_th} / {cop} = {chiller_kw_e} kW。","electric":"泵耗电 {pump_kw_e} kW，风机平均耗电 {dry_fan_kw_e} kW，冷水机组耗电 {chiller_kw_e} kW，整套系统的平均电功率为 {hybrid_kw_e} kW。本小时耗电 {hybrid_kw_e} kWh，比单独使用冷水机组节省 {saved} kWh。"},"load":1000.0,"fan":25.0}</script>
+<script>"use strict";
+
+(() => {
+  const trace = JSON.parse(document.getElementById("trace-data").textContent);
+  const text = trace.text;
+  const select = document.getElementById("example");
+  const format = value => window.SiteI18n.formatNumber(value, {maximumFractionDigits: 2});
+
+  function showHour() {
+    const e = trace.examples[Number(select.value)];
+    const values = {...trace, ...e, mode: e.mode_label, duty: 100 * e.fan_duty,
+      saved: e.baseline_kw_e - e.hybrid_kw_e};
+    function line(template) {
+      return template.replace(/\{(\w+)\}/g, (_, key) => {
+        const value = values[key];
+        return typeof value === "number" ? format(value) : value;
+      });
+    }
+    document.getElementById("trace-title").textContent = line(text.trace_title);
+    const dispatchText = {chiller_only: text.dispatch_bypass, assisted: text.dispatch_assisted, dry_only: text.dispatch_full};
+    const descriptions = [text.capacity, dispatchText[e.mode], text.balance, text.fan, text.electric];
+    const list = document.createElement("dl");
+    for (const [index, description] of descriptions.entries()) {
+      const row = document.createElement("div");
+      const dt = document.createElement("dt"), dd = document.createElement("dd");
+      dt.textContent = text.terms[index];
+      dd.textContent = line(description);
+      row.append(dt, dd);
+      list.append(row);
+    }
+    document.getElementById("trace-steps").replaceChildren(list);
+  }
+
+  function updateLinks() {
+    for (const link of document.querySelectorAll(".language-menu a[hreflang]")) {
+      const url = new URL(link.href);
+      url.searchParams.set("example", select.value);
+      link.href = url.href;
+    }
+  }
+
+  const query = new URLSearchParams(location.search);
+  if ([...select.options].some(option => option.value === query.get("example"))) {
+    select.value = query.get("example");
+    updateLinks();
+  }
+  select.addEventListener("change", () => {
+    if (/^https?:$/.test(location.protocol)) {
+      const url = new URL(location.href);
+      url.searchParams.set("example", select.value);
+      history.replaceState(null, "", url);
+    }
+    updateLinks();
+    showHour();
+  });
+  document.querySelector(".interactive-trace").hidden = false;
+  showHour();
+})();
+</script>
+<script>// Native disclosure and links also work without JavaScript.
+(() => {
+  const menu = document.querySelector(".language-menu");
+  const summary = menu.querySelector("summary");
+  document.addEventListener("click", event => {
+    if (menu.open && !menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && menu.open) {
+      menu.open = false;
+      summary.focus();
+    }
+  });
+  function syncLanguageLinks() {
+    for (const link of menu.querySelectorAll("a[hreflang]")) {
+      const destination = new URL(link.href);
+      // Offline studies set their target queries directly because file URLs cannot be rewritten with history.
+      if (location.protocol !== "file:") destination.search = location.search;
+      destination.hash = location.hash;
+      link.href = destination.href;
+    }
+  }
+  syncLanguageLinks();
+  menu.addEventListener("toggle", syncLanguageLinks);
+  menu.addEventListener("click", syncLanguageLinks, true);
+  window.addEventListener("hashchange", syncLanguageLinks);
+  window.addEventListener("popstate", syncLanguageLinks);
+})();
+</script>
+</body></html>
+

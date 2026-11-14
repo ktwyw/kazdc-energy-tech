@@ -1,0 +1,16 @@
+<section class="page-intro"><p class="kicker">技术研究 · 供配电</p><h1>电能转换损失<span>。</span></h1>
+<p class="deck">不间断电源（UPS）从电网取得的电量多于它向服务器输出的电量。在向 IT 设备持续提供相同功率的条件下，比较两种运行效率。</p></section>
+<section class="workspace"><div class="heading"><h2>比较 UPS 转换损失</h2><button class="quiet" id="reset">恢复默认设置</button></div>
+<div class="compare-grid"><form id="power-form" class="controls"><h3>运行工况</h3>
+<label for="load">供给 IT 设备的功率（kW）</label><input required id="load" type="number" min="1" max="20000" step="any" value="{{IT_KW}}">
+<label for="reference-eff">基准 UPS 效率（%）</label><input required id="reference-eff" type="number" min="75" max="100" step="0.1" value="94">
+<label for="alternative-eff">备选 UPS 效率（%）</label><input required id="alternative-eff" type="number" min="75" max="100" step="0.1" value="97">
+<p class="fine">请输入相同输出负载下的效率。两台 UPS 均按全年 8,760 小时向 IT 设备供电计算。</p></form>
+<div class="result-panel"><div class="result-title"><h3>UPS 全年转换损失</h3></div><div class="metrics"><div><span>基准方案损失</span><strong id="power-before">—</strong><small>MWh 电量</small></div><div><span>备选方案损失</span><strong id="power-after">—</strong><small>MWh 电量</small></div><div><span>节省的电量</span><strong id="power-saving">—</strong><small>MWh/年</small></div></div>
+<div id="power-bars" class="city-bars"></div><p class="interpretation" id="power-note" role="status"></p>{{COPY_CASE}}<button id="download-power" class="action">下载比较结果</button></div></div><p class="error" id="power-error" role="status" hidden></p></section>
+<section class="reading"><div><p class="kicker">计算方法</p><h2>同时测量 UPS 输入与输出</h2></div><div>
+<p class="equation">损耗功率（kW）= IT 输出功率（kW）×（1 / 效率 − 1）</p>
+<p>代入公式时，效率用小数表示。损耗功率乘以 8,760 小时，即得全年损失的电量（kWh）。由于两个方案向 IT 设备提供的功率相同，输入电量之差就等于损失电量之差。若节电量为负值，说明备选方案耗电更多。</p>
+<p>当输出功率为 1 MW 时，效率从 94% 提升至 97%，损耗功率约降低 33 kW。这部分损耗转化为热量，其中有多少进入空调房间，取决于 UPS 的安装位置。计算器仅核算 UPS 输入端与输出端之间的电能损失。若要计算蓄电池充放电、冗余设备切换以及额外制冷的影响，还需相应的运行数据。</p>
+<h3>用负载和电表检验</h3><p>使两台 UPS 分别在相同的稳定输出功率下运行，同时测量各自的输入和输出功率。效率等于输出功率除以输入功率。如果两台设备的测试负载不同，应先从各自的实测效率曲线上读取同一输出功率下的效率，再比较全年损失。部分负载工况下的实际功率可能与铭牌额定值不同。</p>
+<p class="sources"><a href="{{REFERENCES_URL}}#power">供电与储能参考资料</a> · <a href="https://www.energystar.gov/products/uninterruptible_power_supplies/key_product_criteria">ENERGY STAR 对 UPS 在规定负载点的效率要求</a></p></div></section>

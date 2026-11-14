@@ -1,0 +1,332 @@
+{
+  "ui": {
+    "readingSource": "读数来源",
+    "example": "示例数据",
+    "enterMeasured": "输入实测读数",
+    "userMeasured": "用户输入的实测读数",
+    "weatherFile": "站点原始气象文件",
+    "sources": "数据来源与模型假设",
+    "solarTiming": "本文件的部分辐射量出现在当地白昼之外。逐时数据的时间对齐会影响电池调度和电网输入峰值。",
+    "testReadings": "试验读数",
+    "modelInputs": "模型输入",
+    "chartDescription": "{title}（{unit}）。精确数值见月度结果表。",
+    "padWater": "湿帘使用了夏季 {budget} m³ 补水限额中的 {used} m³。每用 1 m³ 水可节省系统用电 {rate} kWh。",
+    "padDry": "本工况下系统仅采用干式运行。增加补水限额、改变启用阈值或冷却液温度，都可能改变可启用湿帘的小时数。",
+    "airLess": "空气换热方案比基准干冷器方案少用电 {change} MWh（{actual} 对 {base} MWh）。两者均计入风机和压缩机用电。换热器因防霜保护停用 {hours} 小时。",
+    "airMore": "空气换热方案比基准干冷器方案多用电 {change} MWh（{actual} 对 {base} MWh）。两者均计入风机和压缩机用电。换热器因防霜保护停用 {hours} 小时。",
+    "tankResult": "基准峰值为 {peak} kW。水罐蓄入 {charged} MWh 冷量，损失 {loss} MWh，年末剩余 {stock} MWh。",
+    "solarResult": "额定直流功率为 {capacity} kW 的光伏阵列直接供电 {direct} MWh。场站 IT 设备和制冷系统共需 {load} MWh。因剩余电量无法利用而限发 {spill} MWh。",
+    "glycolLess": "设计温升为 {rise} K、热负荷同为 {duty} MW 时，水的泵输入功率为 {water} kW，所选流体为 {fluid} kW。在使用同一所选流体的条件下，与全年维持 {rise} K 温升相比，采用调整后的运行策略可使泵的年用电量减少 {change} MWh。",
+    "glycolMore": "设计温升为 {rise} K、热负荷同为 {duty} MW 时，水的泵输入功率为 {water} kW，所选流体为 {fluid} kW。在使用同一所选流体的条件下，与全年维持 {rise} K 温升相比，采用调整后的运行策略会使泵的年用电量增加 {change} MWh。",
+    "coldResult": "带符号的热平衡残差（加热器输入功率减去水带走的热功率）为 {balance} W。冷板表面至进水的热阻为 {resistance} K/W。",
+    "probeWarning": "解读数据前，请检查探头位置、输入功率及系统是否达到稳态。",
+    "invalidCold": "请在规定范围内输入全部七项读数，以计算热平衡。",
+    "invalidInput": "请在各自允许的范围内填写全部输入项。",
+    "coldBalance": "冷板热平衡",
+    "loopResult": "回路性能",
+    "annualResult": "年度结果",
+    "duty": "{power} MW 热负荷",
+    "hours": "{count} 小时",
+    "additionalUse": "额外用电量",
+    "period": "时段",
+    "year": "全年",
+    "quantity": "物理量",
+    "result": "结果",
+    "run": "本次试验",
+    "modelled": "模型计算",
+    "study": "研究",
+    "scenario": "工况",
+    "city": "城市",
+    "stationId": "气象站编号",
+    "epwSource": "EPW 数据源",
+    "sourcePeriod": "气象资料时段",
+    "sourceYears": "气象资料年数",
+    "weatherArchive": "气象文件链接",
+    "epwOffset": "EPW 的 UTC 时差",
+    "stationNote": "气象站说明",
+    "csvPeriod": "时段"
+  },
+  "units": {
+    "°C": "°C",
+    "m³": "m³",
+    "%": "%",
+    "MWh electric": "MWh（电）",
+    "h": "h",
+    "MWh e": "MWh（电）",
+    "W": "W",
+    "kg/s": "kg/s",
+    "kPa": "kPa",
+    "K": "K",
+    "K/W": "K/W",
+    "kW": "kW",
+    "m": "m",
+    "MWh electric/year": "MWh（电）/年",
+    "L/s": "L/s",
+    "kg/m³": "kg/m³",
+    "kJ/(kg·K)": "kJ/(kg·K)",
+    "mPa·s": "mPa·s",
+    "–": "–",
+    "MWh e/year": "MWh（电）/年",
+    "kW thermal": "kW（热）",
+    "kW electric": "kW（电）",
+    "MWh thermal": "MWh（热）",
+    "MWh th": "MWh（热）",
+    "kW e": "kW（电）",
+    "m²": "m²",
+    "kWh": "kWh",
+    "kW AC": "kW（交流）",
+    "MWh/year": "MWh/年"
+  },
+  "labels": {
+    "coolantSupply": "冷却液供液温度",
+    "budget": "夏季补水限额",
+    "padEffectiveness": "湿帘效率",
+    "trigger": "启用湿帘的最低室外温度",
+    "padMetricSaved": "节省的制冷用电",
+    "padMetricWater": "补水量",
+    "padMetricExtraoff": "冷水机组额外停机的完整小时数",
+    "padColumnReference": "干冷器＋冷水机组",
+    "padColumnPlant": "本方案",
+    "padColumnSaved": "节电量",
+    "padColumnWethours": "喷淋泵运行时间",
+    "padColumnOff": "冷水机组停机时间",
+    "padColumnExtraoff": "额外停机时间",
+    "padChartTitle": "逐月制冷用电",
+    "heater": "加热器输入功率",
+    "flow": "水的质量流量",
+    "inlet": "进水温度",
+    "outlet": "出水温度",
+    "plate": "冷板表面温度",
+    "drop": "冷板进出口压差",
+    "efficiency": "水泵效率",
+    "coldMetricLiquid": "水带走的热功率",
+    "coldMetricCapture": "水带走的输入功率占比",
+    "coldMetricPump": "克服冷板压降的泵输入功率",
+    "coldColumnCapture": "热捕获率",
+    "coldColumnBalance": "加热器输入功率减去水带走的热功率",
+    "coldColumnDelta": "水温升",
+    "coldColumnPump": "克服冷板压降的泵输入功率",
+    "coldColumnResistance": "冷板表面至进水的热阻",
+    "referenceCoolantSupply": "基准冷却液供液温度",
+    "airSupply": "服务器送风温度",
+    "airRise": "流经机架的空气温升",
+    "exchangerEffectiveness": "换热器效率",
+    "fan": "满风量时的附加风机功率",
+    "frost": "防霜停用温度下限",
+    "airMetricOff": "冷水机组停机小时数",
+    "airMetricFans": "换热器风机",
+    "airColumnCompressor": "压缩机",
+    "airColumnFrosthours": "防霜停用时间",
+    "mix": "丙二醇体积分数",
+    "fluid": "流体主体温度",
+    "diameter": "管道内径",
+    "length": "管道总长",
+    "rise": "调整后的回路温升",
+    "duration": "采用调整温升的时间占比",
+    "glycolMetricVariable": "变速泵耗电量",
+    "glycolMetricIce": "初始结冰温度",
+    "glycolMetricExposure": "室外温度低于初始结冰温度的小时数",
+    "glycolColumnFlow": "温升 {{LOOP_RISE}} K 时所需流量",
+    "glycolColumnAdjustedflow": "调整温升后所需流量",
+    "glycolColumnDrop": "温升 {{LOOP_RISE}} K 时的回路压降",
+    "glycolColumnRho": "流体密度",
+    "glycolColumnCp": "比热容",
+    "glycolColumnMu": "动力黏度",
+    "glycolColumnReynolds": "温升 {{LOOP_RISE}} K 时的雷诺数",
+    "glycolColumnWaterpump": "温升 {{LOOP_RISE}} K 时水泵输入功率",
+    "glycolColumnPump": "温升 {{LOOP_RISE}} K 时所选流体的泵输入功率",
+    "glycolColumnAdjustedpump": "调整温升后所选流体的泵输入功率",
+    "glycolColumnConstant": "所选流体，设计流量恒定",
+    "glycolColumnVariable": "所选流体，变流量",
+    "glycolColumnSaved": "变流量节电量",
+    "glycolColumnWaterenergy": "水，相同变流量调度",
+    "volume": "水罐水量",
+    "rate": "蓄冷/放冷功率上限",
+    "loss": "每日静置损失率",
+    "tankMetricSaved": "系统节电量",
+    "tankMetricPeakafter": "使用水罐时的峰值功率",
+    "tankMetricReleased": "水罐提供的冷量",
+    "tankColumnCharged": "蓄入冷量",
+    "tankColumnReleased": "释放冷量",
+    "tankColumnLoss": "静置损失",
+    "tankColumnStock": "期末储量",
+    "tankColumnPeakbefore": "基准峰值",
+    "tankChartTitle": "逐月制冷用电峰值",
+    "tankLegendPeakafter": "使用水罐",
+    "area": "光伏组件面积",
+    "battery": "电池储能容量",
+    "inverter": "电池充放电功率上限",
+    "reserve": "电池备用比例",
+    "solarMetricGrid": "向电网购入的电量",
+    "solarMetricPeakafter": "电网输入峰值功率",
+    "solarMetricDischarge": "电池向负荷供电",
+    "solarColumnLoad": "场站负荷",
+    "solarColumnPv": "光伏发电量",
+    "solarColumnDirect": "直接使用的光伏电量",
+    "solarColumnCharge": "电池充电量（交流侧）",
+    "solarColumnDischarge": "电池输出电量（交流侧）",
+    "solarColumnLoss": "电池损耗",
+    "solarColumnGrid": "购电量",
+    "solarColumnSpill": "限发电量",
+    "solarColumnPeakbefore": "无光伏时的峰值功率",
+    "solarChartTitle": "逐月场站用电与购电量",
+    "solarLegendLoad": "场站需电量",
+    "solarLegendGrid": "电网购电量"
+  },
+  "studies": {
+    "pad": {
+      "nav": "蒸发预冷",
+      "category": "散热",
+      "title": "绝热预冷辅助的干式冷却",
+      "question": "夏季让冷水机组少运行一小时，需要用多少水？",
+      "assumptions": "6、7、8 月可润湿干冷器盘管进风侧的湿帘。机房送风保持不变。",
+      "method": [
+        [
+          "水耗与功率",
+          "根据逐时室外干球温度、相对湿度和站点气压计算湿球温度。若湿帘效率为 ε，进入干式盘管的空气温度为 Tdry − ε × (Tdry − Twet)。干冷器容量、风机启停、冷水机组 COP 和 {{IT_MW}} MW 热负荷均与区域基准模型一致。"
+        ],
+        [
+          "运行调度",
+          "夏季，当室外温度达到设定阈值且基准系统的冷水机组正在运行时，可启用湿帘。控制器按时间顺序分配用水，只在湿帘辅助系统总用电较低时运行；满风量时计入 2 kW 喷淋泵功率。喷淋时长按风机与喷淋泵同时运行的实际小时分数累计。剩余水量可能只够运行不足一小时。只有冷水机组整小时停机，才计为一个额外停机小时。"
+        ],
+        [
+          "水量平衡",
+          "假设风机全速时的空气质量流量为 100 kg/s。取空气比热容 1.006 kJ/(kg·K)，蒸发水量等于空气显热减少量除以 2,450 kJ/kg。风机运行占比同时决定平均风量和喷淋时长。补水量在蒸发量上加计 10%。模型忽略湿帘压降和停机时的水损失。可测量风量、湿帘进出口空气状态、用水量和电功率，对模型进行校准。"
+        ]
+      ],
+      "sources": [
+        "EnergyPlus 蒸发湿帘模型",
+        "美国能源部数据中心设计指南"
+      ]
+    },
+    "cold": {
+      "nav": "冷板",
+      "category": "液冷 · 台架实验",
+      "title": "芯片直冷冷板测试",
+      "question": "加热器输入电功率中有多少由液体带走？维持该流量需要多大压差？",
+      "assumptions": "请在冷板温度稳定后读数。使用流量计和两支经过匹配校准的水温探头，求出水带走的热功率。",
+      "method": [
+        [
+          "可重复的测试",
+          "将电加热块与冷板接触。在加热功率稳定时，于同一时间段记录质量流量、进出水温、冷板表面温度、冷板压差和加热器功率。保持加热功率不变，换一个流量再做一次。"
+        ],
+        [
+          "热捕获率与热阻",
+          "水带走的热功率 Qwater = ṁ × 4,180 × (Tout − Tin)，单位为 W。热捕获率为 Qwater / Pheater，带符号的残差为 Pheater − Qwater。以加热器输入功率和冷板表面探头的读数为基准，冷板表面至进水的热阻为 (Tplate − Tin) / Pheater。开放计算项目（OCP）定义的元件外壳至进水热阻需要在元件外壳上布置探头。探头偏差、升温过程中的蓄热以及加热块散热都会影响结果。"
+        ],
+        [
+          "水泵功率的计算范围",
+          "泵输入功率按 Δp × 体积流量 / 泵效率估算，水密度取 1,000 kg/m³。这里仅计入实测冷板压降。估算整个回路的泵功率时，还需计入软管、集管和其他部件的压降。把元件的热捕获率乘以其功率占机架功率的比例，可求它对机架液冷热量的贡献。例如，使用冷板的元件占机架功率的 60%，冷板带走其发热量的 83.6%，则液体带走机架总热量的 50.2%。其他液冷元件的贡献须单独加入。下方的链接假设被测元件代表整个机架。"
+        ]
+      ],
+      "sources": [
+        "开放计算项目（OCP）冷板鉴定规范",
+        "美国能源部直接液冷系统资料"
+      ]
+    },
+    "air": {
+      "nav": "室外空气冷却",
+      "category": "空气侧散热",
+      "title": "室外空气间接冷却",
+      "question": "室内外空气不混合时，空气换热器在什么条件下能为机房供冷？",
+      "assumptions": "两种系统承担相同的 IT 热负荷。基准系统采用选定的供水温度，空气换热方案采用选定的服务器送风温度。",
+      "method": [
+        [
+          "换热过程",
+          "机房回风温度等于送风温度加上选定的机架温升。假设两个气流的热容量流率相同，C = IT 热负荷 / 机架温升。满风量时的显热换热功率为 ε × C × max(0, Treturn − Toutdoor)，实际供冷量不超过 IT 热负荷。两股气流始终彼此隔离。"
+        ],
+        [
+          "风机、冷水机组与低温天气",
+          "若满风量风机所需功率不低于可省去的压缩机功率，系统旁通换热器。可用换热量超过负荷时，风机以全速间歇运行。室外温度低于选定的防霜下限时，换热器停用，冷水机组承担全部负荷。可用实测的结霜或除霜性能曲线替换这一简化控制策略。"
+        ],
+        [
+          "比较范围",
+          "基准干冷器与空气换热方案分别在各自的供水和送风设定温度下承担相同的 IT 热负荷。两者采用相同的固定循环泵功率和冷水机组 COP。两种方案共用的室内循环风机不计入比较。这里的风机输入功率计入新增风机和克服换热器压降的耗电。模型未计湿量传递、霜层形成细节及部分负荷 COP。"
+        ]
+      ],
+      "sources": [
+        "ASHRAE 数据中心自然冷却系统指南",
+        "EnergyPlus 换热器方程"
+      ]
+    },
+    "glycol": {
+      "nav": "丙二醇与水泵",
+      "category": "水力系统 · 防冻保护",
+      "title": "丙二醇回路与变速泵",
+      "question": "防冻会增加多少泵送能耗？若增大回路供回液温差，又能节省多少？",
+      "assumptions": "热负荷固定为 {{IT_MW}} MW。基准回路温升为 {{LOOP_RISE}} K。在允许采用较大温升的时段，变速泵可降低流量。",
+      "method": [
+        [
+          "流体物性",
+          "选择水或表列的丙二醇体积分数。在 0、10、20 和 30 °C 的表列数据之间，密度和比热容采用线性插值，黏度采用对数插值。丙二醇溶液物性与近似初始结冰温度取自 DOWFROST 工程指南的表 3、10、14 和 22。计算时流体主体温度固定。对于示例中的 20% 浓度，制造商提示缓蚀剂浓度可能不足以提供充分的腐蚀防护。"
+        ],
+        [
+          "水力计算与控制",
+          "各温升下的体积流量为 Q / (ρ cp ΔT)。管道沿程压降按达西–魏斯巴赫公式计算，局部阻力系数取 10，管壁粗糙度取 0.045 mm。达西摩擦系数在层流时取 64/Re，在湍流时采用 Swamee–Jain 公式，Re 为 2,300 至 4,000 时线性插值。水泵用电功率等于体积流量 × 压降 / 泵效率。两种控制策略均满足 {{IT_MW}} MW 热负荷。变速方案在选定的全年时间比例内允许更大温升，并相应调整流量。"
+        ],
+        [
+          "解读冬季低温小时数",
+          "逐时筛选室外温度低于流体初始结冰温度的时段。室外停运管道的实际温度取决于保温、热惯性和停运时长。这里的小时数反映低温暴露程度。防冻设计还需当地极端气温、系统细节和规定的安全裕度。盘管性能和设备最小流量应另行核查。"
+        ]
+      ],
+      "sources": [
+        "DOWFROST 工程与运行指南",
+        "NIST 水物性数据",
+        "美国环保署管道水头损失计算方法"
+      ]
+    },
+    "tank": {
+      "nav": "冷水蓄冷",
+      "category": "日内蓄冷",
+      "title": "夜间冷水蓄冷",
+      "question": "干冷器夜间的富余冷量能否覆盖午后高峰？全年用电会怎样变化？",
+      "assumptions": "水罐初始蓄冷量为零。按哈萨克斯坦现行民用时间（UTC+5），22:00 至次日 06:00 蓄冷，12:00 至 20:00 放冷。",
+      "method": [
+        [
+          "容量与蓄冷",
+          "假定理想分层水罐在基准回路温差下运行。容量按体积 × 1,000 kg/m³ × 4.18 kJ/(kg·K) × 回路温差 / 3,600 计算，单位为 kWh（热）。夜间干冷器先承担 IT 热负荷，只有风机全速时剩余的制冷能力可用于蓄冷，且受水罐容量和蓄冷功率限制。"
+        ],
+        [
+          "按时间顺序计算的能量平衡",
+          "每小时按当时蓄冷量扣除静置损失。从中午到 20:00，水罐可在放冷功率上限内替代冷水机组承担的剩余负荷。额外风机用电和输送泵用电（所输送热功率的 1%）均计入耗电。初始蓄冷量为零，表中列出期末储量。控制器将每条气象记录的时间换算为 UTC+5，气象数据的顺序和月度归属仍按原始 EPW 日历。标为 UTC+6 的源文件的钟表读数比调度时钟快一小时（如文件 13:00 对应调度 12:00）。"
+        ],
+        [
+          "解读峰值",
+          "峰值为当月或全年制冷系统逐小时平均用电功率的最大值。若最大用电功率出现在其他时段，将冷量转移到午后使用可能不改变全年峰值。模型对水温分层、换热器接近温差以及水罐在两设定温度之间的运行作了理想化处理。"
+        ]
+      ],
+      "sources": [
+        "ASHRAE 显热蓄能资料",
+        "哈萨克斯坦民用时间"
+      ]
+    },
+    "solar": {
+      "nav": "光伏与电池",
+      "category": "现场供电",
+      "title": "光伏发电与电池储能",
+      "question": "在电池保留停电备用电量的条件下，水平光伏阵列能满足多少逐时用电需求？",
+      "assumptions": "逐时用电负荷为 IT 设备与基准制冷系统用电之和。光伏余电用于为电池充电，仍有剩余则限发。",
+      "method": [
+        [
+          "水平光伏阵列",
+          "气象文件发布方对所有城市的太阳辐射均采用 ERA5 再分析数据。EPW 中逐时水平面总辐照量给出无遮挡水平阵列接收的太阳能。每平方米额定直流功率为 0.20 kW。以 G 表示小时平均辐照度（W/m²），电池片温度估算为 Tout + (45 − 20) G / 800。相对 25 °C 采用 −0.4%/K 的功率温度系数，另计 10% 系统损失和 96% 逆变器效率。交流侧功率上限取阵列额定功率。"
+        ],
+        [
+          "电池调度",
+          "光伏优先向场站供电。若有余电，则在交流侧功率和电池容量允许的范围内充电。发电不足时，电池放电供给负荷，直至备用电量下限。充电和放电效率均为 95%。电池初始电量等于备用电量，模型报告期末电量。场景不含电网充电、上网电价收益或需量电费。"
+        ],
+        [
+          "解读结果",
+          "电网购电满足 {{IT_MW}} MW 的 IT 负荷及干冷器与冷水机组的用电需求。直接使用的光伏电量和电池放电均可替代电网供电。即使阵列面积很大，傍晚或冬季的峰值仍可能保留。逐时模型假定组件无积雪，未考虑遮挡、屋面面积限制、衰减及其他场站负荷。倾斜安装需要阵列平面辐照数据或辐照量转置模型。在阿克套、阿特劳、科斯塔奈、乌拉尔斯克、突厥斯坦和热兹卡兹甘，部分逐时辐射出现在当地白昼以外。模型保留原文件时序。评估电池调度或电网输入峰值时，请与当地辐照度进行核对。"
+        ]
+      ],
+      "sources": [
+        "PVWatts v5 直流输出公式（8）",
+        "SAM 光伏系统设计",
+        "SAM 用户侧电池调度",
+        "TMYx 太阳辐射数据来源",
+        "NOAA 太阳位置方程"
+      ]
+    }
+  }
+}

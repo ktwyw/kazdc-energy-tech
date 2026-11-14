@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>Охлаждение дата-центра в Астане · {{SITE_TITLE}}</title>
+  {{SITE_METADATA}}
+  <style>{{STYLE}}{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body>
+<a class="skip" href="#controls">К настройке температуры подачи</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" data-snow-link href="{{REGIONAL_URL}}" aria-label="{{SITE_TITLE}} — главная страница"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>{{SITE_TITLE}}</a>
+  <nav aria-label="Разделы расчёта"><a href="#charts">Сравнение</a><a href="#monthly">Данные по месяцам</a><a href="{{METHODS_URL}}">Методика</a><a href="{{SNOW_URL}}" data-snow-link>Охлаждение снегом</a><a href="{{REFERENCES_URL}}">Источники</a><a href="{{RESEARCH_URL}}">{{RESEARCH_NAV_LABEL}}</a><a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main class="wrap" id="top">
+  <div class="intro"><div><p class="eyebrow">Базовая модель дата-центра</p>
+    <h1>Охлаждение дата-центра в Астане</h1>
+    <p class="lead">Какую часть тепла от постоянной ИТ-нагрузки <span data-val="load-mw">1</span> МВт может отвести наружный воздух через сухой охладитель?</p>
+  </div><div class="station"><strong>Астана, Казахстан</strong><span>Станция EPW № 351880 · типичный год TMYx за 2011–2025 гг.</span><span>8 760 почасовых значений температуры по сухому термометру</span></div></div>
+  <noscript><p class="notice">Включите JavaScript для работы с расчётом или откройте CSV-файлы с базовыми результатами в архиве проекта.</p></noscript>
+  <section class="scenario" aria-label="Температура подачи и годовые результаты">
+    <div class="control-card" id="controls"><div class="label-line"><label for="supply">Температура подачи теплоносителя</label><button id="reset" class="reset" type="button">Сбросить</button></div>
+      <div class="value-line"><output id="supply-value" for="supply">18<span> °C</span></output>
+        <div class="steppers"><button id="down" aria-label="Уменьшить температуру подачи на 0,5 градуса">−</button><button id="up" aria-label="Увеличить температуру подачи на 0,5 градуса">+</button></div>
+      </div>
+      <input id="supply" type="range" min="8" max="32" step="0.5" value="18" aria-describedby="threshold">
+      <div class="range-ends" aria-hidden="true"><span>8 °C</span><span>20 °C</span><span>32 °C</span></div>
+      <p id="threshold"></p>
+    </div>
+    <div class="results-card"><div class="result-heading"><h2>Годовые результаты</h2><span>Сухой охладитель и чиллер</span></div>
+      <div class="kpi-grid">
+        <div><h3>Экономия электроэнергии на охлаждение</h3><p class="big" id="savings"></p><p class="small" id="saved-energy"></p></div>
+        <div><h3>Чиллер отключён</h3><p class="big" id="off"></p><p class="small" id="off-share"></p></div>
+        <div><h3>Доля тепла, отведённого сухим охладителем</h3><p class="big" id="dry-share"></p><p class="small" id="dry-energy"></p></div>
+      </div>
+    </div>
+  </section>
+  {{COPY_CASE@controls}}
+  <section id="charts" class="charts" aria-label="Графики сравнения по месяцам">
+    <article class="panel">
+      <h2>Электроэнергия на охлаждение</h2><p class="unit">Потребление установки за месяц, МВт·ч</p>
+      <div class="legend"><span><i class="base"></i>Только чиллер</span><span><i class="hybrid"></i>Сухой охладитель и чиллер</span></div>
+      <div id="power-chart" class="chart"></div>
+      <p id="power-note" class="chart-note"></p>
+    </article>
+    <article class="panel">
+      <h2>Часы по режимам работы чиллера</h2><p class="unit">Часы за месяц в системе с сухим охладителем и чиллером</p>
+      <div class="legend"><span><i class="dry"></i>Чиллер отключён</span><span><i class="assist"></i>Совместная работа</span><span><i class="mech"></i>Только чиллер</span></div>
+      <div id="mode-chart" class="chart"></div>
+      <p id="mode-note" class="chart-note"></p>
+    </article>
+  </section>
+  <section id="monthly" class="panel table-panel"><div class="section-heading"><div><h2>Результаты по месяцам</h2>
+    <p class="unit">Учтена электроэнергия чиллерной установки, вентилятора сухого охладителя во время работы и общего циркуляционного насоса.</p></div>
+    <button class="download" id="download" type="button">Скачать CSV <span aria-hidden="true">↓</span></button></div>
+    <div class="scroll" role="region" aria-label="Таблица результатов по месяцам. На узком экране доступна горизонтальная прокрутка" tabindex="0"><table>
+      <caption class="sr-only">Сравнение вариантов по месяцам с итогом за год</caption>
+      <thead><tr><th scope="col">Период</th><th scope="col">Только чиллер<br><em>МВт·ч эл.</em></th><th scope="col">Сухой охладитель и чиллер<br><em>МВт·ч эл.</em></th><th scope="col">Экономия электроэнергии<br><em>%</em></th><th scope="col">Чиллер отключён<br><em>ч</em></th><th scope="col">Совместная работа<br><em>ч</em></th><th scope="col">Только чиллер<br><em>ч</em></th></tr></thead>
+      <tbody id="table-body"></tbody><tfoot id="table-foot"></tfoot>
+    </table></div>
+  </section>
+  <section id="method" class="panel method"><div class="section-heading"><div><h2>Как рассчитывается охлаждение</h2>
+    <p class="unit">Варианты сравниваются каждый час при одинаковой ИТ-нагрузке и температуре подачи теплоносителя.</p></div>
+    <a class="guide-link" href="{{METHODS_URL}}">Подробная методика <span aria-hidden="true">→</span></a></div>
+    <div class="method-grid"><div><h3>Исходные параметры установки</h3><dl id="assumptions"></dl>
+      <h3 class="method-subhead">Метеоданные</h3><p class="method-copy">Модель использует 8 760 почасовых значений наружной температуры по сухому термометру для типичного года в Астане. Контроллер выбирает режим для каждого часа, поэтому холодные ночи и тёплые дневные часы учитываются отдельно.</p>
+      <p class="sources"><a href="{{REFERENCES_URL}}#cooling">Источники и допущения модели охлаждения</a> · <a href="data/astana_hourly.csv" download>Почасовые метеоданные Астаны (CSV)</a></p></div>
+      <div class="prose"><h3>Как тепло отводится в наружный воздух</h3>
+      <p>ИТ-оборудование нагревает циркулирующий теплоноситель. Обратный поток сначала поступает в наружный сухой охладитель. Чиллер отводит оставшееся тепло, а насос возвращает теплоноситель к ИТ-оборудованию.</p>
+      <h3>Границы режимов при температуре подачи <span id="method-supply"></span></h3>
+      <p id="method-thresholds"></p>
+      <h3>Что означают три процента в расчёте</h3><p>Доля часов с отключённым чиллером учитывает полные часы, когда наружный воздух покрывает всю нагрузку. В долю тепла, отведённого сухим охладителем, входит и тепло, отведённое им в часы совместной работы. Для расчёта экономии сравнивают потребление электроэнергии чиллером, вентилятором и насосом в двух системах.</p>
+      <p>В <a href="{{METHODS_URL}}#worked-hours">примерах почасового расчёта</a> показано, как одно и то же оборудование работает при низкой, умеренной и высокой наружной температуре.</p>
+      <p>Посмотрите, какую часть летней нагрузки чиллера может покрыть ограниченный запас зимнего снега при такой температуре подачи. <a href="{{SNOW_URL}}" data-snow-link>Расчёт сезонного запаса снега</a></p>
+    </div></div>
+  </section>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap">{{PROJECT_CREDIT}}</div></footer>
+<div id="live" class="sr-only" role="status" aria-live="polite"></div>
+<div id="tip" class="tip" hidden></div>
+<script id="case-data" type="application/json">{{DATA}}</script>
+<script id="dashboard-text" type="application/json">{{DASHBOARD_TEXT}}</script>
+<script>{{SCRIPT}}</script>
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body>
+</html>

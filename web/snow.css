@@ -1,0 +1,116 @@
+.snow-page {background:#f5f7f2}
+.snow-book {max-width:1240px}
+.snow-title {padding:4px 0 25px;max-width:850px}
+.snow-title h1 {max-width:800px;font-size:clamp(36px,4.45vw,66px)}
+.snow-title>p:last-child {max-width:730px;margin-top:13px;font-size:clamp(16px,1.45vw,20px);color:#425e5a}
+.view-links {display:flex;flex-wrap:wrap;gap:8px 25px;border-block:1px solid #cddbcf;padding:12px 0}
+.view-links a {color:#135e58;font-size:13px;font-weight:650;text-decoration:underline;text-underline-offset:4px}
+.snow-section {padding:30px 0 4px;scroll-margin-top:12px}
+.snow-section+.snow-section {margin-top:20px;border-top:1px solid #cddbcf}
+.snow-section h2 {font-size:clamp(25px,2.5vw,36px);font-weight:670;line-height:1.19;letter-spacing:-.042em}
+.snow-section h3 {font-size:19px;line-height:1.3;font-weight:650;letter-spacing:-.025em}
+.snow-section h4 {margin:0;font-weight:620;font-size:15px}
+.snow-section p {color:#415b57;line-height:1.52}
+.block-title {display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:17px}
+.block-title p,.campus-card>p,.source-line {font-size:14px;margin-top:5px;max-width:80ch}
+.facility-grid {display:grid;grid-template-columns:minmax(300px,0.85fr) minmax(0,1.65fr);gap:16px}
+.control-surface,.stock-figure,.target-panel,.month-card,.campus-card,.replay-card,.equipment-grid details {
+  background:#fff;border:1px solid #cddbd1;border-radius:9px}
+.control-surface,.stock-figure,.month-card,.campus-card,.replay-card {padding:18px 20px}
+.control-surface h3 {margin:0 0 11px}
+.fields {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.snow-section label {display:block;font-size:13px;line-height:1.35;font-weight:620;color:#274d47}
+.snow-section label span {display:inline-block;color:#526b64;font-size:11px;font-weight:480}
+.fields label span {display:block;min-height:15px}
+.snow-section input:not([type=range]),.snow-section select {
+  display:block;width:100%;border:1px solid #9db3ab;border-radius:5px;min-height:35px;margin-top:4px;
+  padding:6px 9px;font:inherit;font-weight:550;color:#193c39;background:#fcfdfa}
+.snow-section input:user-invalid {border-color:#a54328}
+.fields .wide {grid-column:1/-1}
+[hidden] {display:none!important}
+.small-detail,.math-note {background:#ecf3ed;padding:11px 13px;border-radius:6px;margin-top:15px}
+.snow-section summary {cursor:pointer;color:#24574e;font-size:13px;font-weight:650}
+.small-detail label,.small-detail p,.math-note p {margin-top:10px}
+.small-detail p,.math-note p,.snow-section .fine,.source-line {font-size:13px}
+.snow-section .validation {margin-top:10px;color:#883a25;font-size:13px}
+.facility-results {display:grid;align-content:start;gap:12px}
+.savings-hero {background:#0c4344;color:#f6fff8;border-radius:9px;padding:18px 23px}
+.savings-hero p {color:#d4e8dd;font-size:13px}
+.savings-hero p:first-child {font-size:15px;color:#f0f9f3;font-weight:580}
+.savings-number {font-weight:650;letter-spacing:-.045em;color:#c1f0d1;font-size:clamp(30px,3.2vw,48px);margin:2px 0;line-height:1.22}
+.snow-kpis,.replay-metrics {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;padding:5px 0}
+.snow-kpis>div+div,.replay-metrics>div+div {border-left:1px solid #bfd0c6;padding-left:15px}
+.snow-kpis h3,.replay-metrics h4 {font-size:12px;letter-spacing:0;font-weight:650}
+.snow-kpis strong,.replay-metrics strong {display:block;font-size:clamp(21px,2vw,31px);line-height:1.4;letter-spacing:-.035em}
+.snow-kpis p {font-size:12px}
+.stock-figure,.replay-plots figure {margin:0}
+.stock-figure {padding-top:14px;padding-bottom:12px}
+.stock-figure figcaption,.replay-plots figcaption {display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.stock-figure figcaption span,.replay-plots figcaption span {font-size:11px;font-weight:480;color:#4b655e}
+.stock-figure p,.replay-readout {font-size:13px}
+.snow-chart svg {display:block;width:100%;height:auto}
+.snow-chart svg text {font-family:inherit;font-size:11px;fill:#49635d}
+.target-panel {display:grid;align-items:center;grid-template-columns:1.4fr minmax(80px,.32fr) 1fr;gap:22px;padding:18px 20px;margin:16px 0;background:#e8f1e8}
+.target-panel p {font-size:13px;max-width:63ch;margin-top:4px}
+.target-answer strong {font-size:23px;letter-spacing:-.03em}
+.target-answer button {margin-top:8px}
+.plain-button {border:1px solid #9ab5a7;background:#f9fcf8;border-radius:5px;padding:7px 11px;font-size:12px;font-weight:650;white-space:nowrap}
+.plain-button:hover:enabled {background:#daebdf}
+.plain-button:disabled {cursor:default;opacity:.55}
+.month-card table {font-size:13px}
+.month-card .scroll {max-width:100%}
+.table-actions {display:flex;flex-wrap:wrap;gap:9px;align-items:flex-end;min-width:0;max-width:100%}
+.table-actions label {font-size:12px}.table-actions select {min-height:31px}
+.math-note {padding:13px 17px}
+.math-note p {max-width:100ch}
+.snow-section a {color:#00655f}
+.campus-card {margin-bottom:16px}
+.campus-density {width:min(100%,240px);margin:14px 0}
+.store-grid,.replay-plots,.equipment-grid {display:grid;gap:12px}
+.store-grid {grid-template-columns:repeat(3,minmax(0,1fr))}
+.store-grid article {background:#f1f5ef;border-top:3px solid #7c9a86;padding:12px 14px;border-radius:3px}
+.store-grid article:first-child {border-color:#08776c}
+.store-grid p {font-size:13px;margin:5px 0}
+.store-grid label {margin:14px 0 7px}
+.store-grid strong {display:block;font-size:15px;color:#174b43}
+.campus-card #campus-note {margin-top:12px}
+.replay-card .block-title label {min-width:160px}
+.replay-metrics {padding:13px 0;border-block:1px solid #d4e0d7}
+.replay-plots,.equipment-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+.replay-plots {margin:18px 0 5px}
+.replay-plots figcaption {font-size:13px;font-weight:650;flex-wrap:wrap}
+.replay-slider {max-width:530px}
+.replay-slider output {font-weight:700}
+.replay-slider input {display:block;width:100%;accent-color:#00786f;margin:4px 0}
+.replay-readout {padding:8px 12px;margin:6px 0 10px;background:#eef4ec}
+.equipment-grid details {padding:13px 15px;align-self:start}
+.equipment-grid p {font-size:13px;margin-top:8px}
+.source-line {margin:18px 0 7px}
+@media(max-width:850px){
+ .facility-grid {grid-template-columns:minmax(250px,0.85fr) minmax(0,1.4fr)}
+ .fields {gap:9px}.control-surface,.month-card,.replay-card,.campus-card,.stock-figure {padding:14px}
+ .stock-figure figcaption {display:block}
+ .snow-kpis,.replay-metrics {gap:8px}
+ .snow-kpis>div+div,.replay-metrics>div+div {padding-left:8px}
+ .target-panel {gap:12px}
+}
+@media(max-width:680px){
+ .facility-grid,.target-panel,.store-grid,.replay-plots {grid-template-columns:1fr}
+ .snow-title {padding-bottom:15px}.view-links {gap:7px 14px}.view-links a {font-size:12px}
+ .snow-section {padding-top:21px}.snow-section+.snow-section {margin-top:12px}
+ .target-panel {grid-template-columns:85px 1fr;gap:12px 20px}.target-panel>div:first-child {grid-column:1/-1}
+ .plain-button {white-space:normal}.block-title {flex-wrap:wrap;gap:8px}
+ .equipment-grid {grid-template-columns:1fr}
+ .snow-kpis strong,.replay-metrics strong {font-size:19px}
+ .replay-plots {gap:12px}.fields {gap:10px 14px}.savings-hero {padding:13px 16px}
+}
+@media(max-width:430px){
+ .snow-title h1 {font-size:37px}.block-title>button {font-size:11px}
+}
+@media print {
+ .view-links,.plain-button {display:none}.snow-page {background:#fff}
+ .facility-grid,.store-grid,.replay-plots {display:block}
+ .savings-hero {print-color-adjust:exact}
+ .stock-figure,.replay-plots figure,.store-grid article {break-inside:avoid}
+ .month-card table {white-space:normal;font-size:9pt}.month-card th,.month-card td {padding:3px}
+}

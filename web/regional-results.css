@@ -1,0 +1,102 @@
+.cooling-result {
+  margin: 0; min-width: 0; padding: clamp(20px, 2.4vw, 32px);
+  background: #143f3a; color: #f6faf2; border-radius: 8px;
+}
+.case-context {margin: 0 0 12px; color: #d2e9db; font-size: .82rem; font-weight: 610}
+.cooling-result h2 {display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; line-height: 1.08}
+.cooling-result h2 strong {color: #b0ebc7; font-size: clamp(3rem, 4.8vw, 4.75rem); letter-spacing: -.06em; font-weight: 650}
+.cooling-result h2 span {max-width: 21ch; font-size: clamp(1.15rem, 1.6vw, 1.55rem); font-weight: 550; letter-spacing: -.025em; line-height: 1.2}
+.cooling-result:lang(zh-Hans) h2 span {letter-spacing: 0}
+.energy-unit {margin: 21px 0 9px; color: #cbded2; font-size: .79rem}
+.energy-comparison {margin: 0; padding: 0}
+.energy-comparison > div {display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: baseline; margin: 0 0 11px}
+.energy-comparison dt {grid-area: 1 / 1; font-size: .89rem; font-weight: 550; padding-right: 8px}
+.energy-comparison dd {display: contents}
+.energy-comparison dd strong {grid-area: 1 / 2; font-size: 1.02rem; line-height: 1.2; text-align: right}
+.energy-track {grid-column: 1 / -1; margin-top: 4px; height: 8px; background: #315a51; border-radius: 1px}
+.energy-track i {display: block; height: 100%; border-radius: inherit; background: #96aca0}
+#case-hybrid-bar {background: #ade8c4}
+.chiller-time {margin: 16px 0 8px; padding-top: 11px; border-top: 1px solid #527468; font-size: .96rem; line-height: 1.4}
+.case-adjust {color: #d7efdc; font-size: .82rem; font-weight: 600}
+.study-results {padding: 23px 0 28px; border-bottom: 1px solid var(--rule)}
+.study-results > h2 {font-size: 1.1rem; font-weight: 650; margin-bottom: 13px; letter-spacing: -.02em}
+.study-result-grid {display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: clamp(16px, 3vw, 42px)}
+.study-result-grid article {display: flex; flex-direction: column; align-items: flex-start; min-width: 0}
+.study-result-grid article + article {border-left: 1px solid var(--rule); padding-left: clamp(15px, 2.6vw, 36px)}
+.study-result-grid h3 {color: var(--secondary); font-size: .85rem; font-weight: 650; line-height: 1.3}
+.study-value {display: flex; flex-wrap: wrap; align-items: baseline; gap: 1px 7px; margin: 5px 0 6px; line-height: 1.12}
+.study-value strong {font-size: clamp(1.85rem, 2.6vw, 2.4rem); font-weight: 625; letter-spacing: -.045em; color: var(--forest)}
+.study-value span {font-size: .82rem; color: var(--forest); line-height: 1.3}
+.study-description {font-size: .85rem; line-height: 1.45; max-width: 46ch; color: var(--secondary); margin: 0 0 9px}
+.study-result-grid a {margin-top: auto; font-size: .83rem; font-weight: 600}
+.selected-cooling {margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid var(--rule); font-size: .9rem; font-weight: 625; color: var(--forest)}
+#compare .result-title {margin-bottom: 15px}
+@media (max-width: 670px) {
+  .cooling-result {padding: 19px}
+  .energy-unit {margin-top: 16px}
+  .study-results {padding: 21px 0}
+  .study-result-grid {grid-template-columns: 1fr; gap: 13px}
+  .study-result-grid article + article {border-left: 0; border-top: 1px solid var(--rule); padding: 12px 0 0}
+  .study-description {max-width: none}
+}
+@media print {.cooling-result {print-color-adjust: exact; break-inside: avoid} .study-results {break-inside: avoid}}
+
+/* Keep link arrows legible when the selected text font lacks diagonal arrows. */
+.link-arrow {
+  display: inline-block; width: .75em; height: .75em; background: currentColor;
+  clip-path: polygon(18% 4%, 96% 4%, 96% 82%, 82% 82%, 82% 28%, 12% 98%, 2% 88%, 72% 18%, 18% 18%);
+}
+.study-rows .link-arrow {justify-self: center}
+
+.equipment-note {margin-top: 23px; max-width: 56ch; padding-left: 13px; border-left: 3px solid #9db6a7}
+.hero .equipment-note h2 {margin: 0 0 3px; font-family: inherit; font-weight: 650; font-size: .9rem; line-height: 1.35; letter-spacing: 0}
+.equipment-note p {margin: 0; font-size: .86rem; color: var(--secondary); line-height: 1.45}
+.equipment-note a {font-weight: 600}
+.july-result {margin: 3px 0 12px; color: #eef6ef; font-size: .92rem}
+.july-experiment {display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 10px 13px; background: #234f46; border-radius: 5px}
+.july-experiment p {margin: 0; font-size: .86rem; line-height: 1.4}
+.july-experiment button {flex: 0 0 auto; color: #123d31; background: #c2eaca; padding: 6px 10px; border: 0; border-radius: 4px; font: inherit; font-size: .82rem; font-weight: 650; cursor: pointer}
+.hero-case-actions,.pair-actions {display: flex; gap: 10px 18px; align-items: center; flex-wrap: wrap}
+.hero-case-actions {margin-top: 13px}
+.research-result-link {border-top:1px solid #658d81;margin-top:12px;padding-top:10px}
+.research-result-link a {color:#c3f0d2;font-size:.9rem;font-weight:650}
+.cooling-result .case-share button {color: #edfff3; border-color: #80aa97}
+.cooling-result .case-share button:hover {background: #2c594e}
+.cooling-result .case-share output,.cooling-result .case-version-note {color: #e4f5e9}
+.cooling-result :focus-visible {outline: 2px solid #f6ce82; outline-offset: 3px}
+.pair-jump {display: inline-block; margin: 10px 0 0; font-size: .9rem; font-weight: 600}
+.city-comparison {border-bottom: 1px solid var(--rule)}
+.city-comparison .heading {margin-bottom: 6px}
+.pair-intro {max-width: 78ch; margin: 0 0 18px; color: var(--secondary)}
+.pair-settings {display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px 22px; max-width: 920px}
+.pair-settings label {display: flex; flex-direction: column; justify-content: flex-end; gap: 5px; font-size: .86rem; font-weight: 620; line-height: 1.3}
+.pair-settings select {width: 100%; min-width: 0; min-height: 38px; padding: 5px 9px; border: 1px solid #94a99a; border-radius: 4px; background: #fffefa; color: #193e33; font: inherit}
+.pair-metric {display: flex; flex-wrap: wrap; gap: 4px; border: 0; margin: 19px 0 7px; padding: 0}
+.pair-metric label {display: inline-flex; align-items: center; gap: 6px; border-radius: 4px; border: 1px solid #aec1b4; padding: 6px 10px; font-size: .85rem; cursor: pointer}
+.pair-metric input {accent-color: #076655; margin: 0}
+.pair-metric label:has(:checked) {background: #dfece2; border-color: #51907b; color: #123e33; font-weight: 650}
+.pair-figure {background: #fdfefa; margin: 9px 0 10px; border: 1px solid var(--rule); border-radius: 6px; padding: 12px 16px 6px}
+.pair-figure figcaption,.pair-legend,.pair-legend>span {display: flex; align-items: center; flex-wrap: wrap}
+.pair-figure figcaption {justify-content: space-between; gap: 5px 12px; font-size: .84rem; color: var(--secondary)}
+.pair-legend {gap: 6px 15px}
+.pair-legend>span {gap: 5px}
+.pair-legend i {width: 22px; border-top: 3px solid #087563}
+.pair-legend i.dashed {border-top: 2px dashed #98571f}
+.pair-legend b {font-weight: 600}
+.pair-difference {margin: 8px 0; color: #214f40; font-size: .92rem; font-weight: 550}
+#pair-chart svg {width: 100%; display: block}
+#pair-values {margin: 9px 0 13px}
+#pair-table thead th[colspan] {text-align: center; border-bottom: 1px solid var(--rule)}
+#pair-table td {font-variant-numeric: tabular-nums}
+#pair-values .table-wrap {padding: 0 12px 10px}
+.city-comparison .visually-hidden {position: absolute; width: 1px; height: 1px; margin: -1px; clip-path: inset(50%); overflow: hidden; white-space: nowrap}
+#experiment[hidden],#experiment [hidden] {display: none}
+@media (max-width: 670px) {
+  .equipment-note {margin-top: 15px}
+  .pair-settings {grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px 10px}
+  .pair-settings label:last-child {grid-column: 1 / -1}
+  .city-comparison .heading {align-items: flex-start; flex-wrap: wrap; gap: 7px}
+  .july-experiment {align-items: flex-start; flex-wrap: wrap}
+  .pair-figure {padding: 10px 6px 4px}
+  .pair-figure figcaption {padding-inline: 4px}
+}

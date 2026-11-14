@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123c3a"><title>References · KazDC Energy Tech</title>
+<meta name="description" content="Where the weather comes from, which equations drive each study, and which numbers you can change.">
+<meta property="og:site_name" content="KazDC Energy Tech">
+<meta property="og:type" content="website">
+<meta property="og:title" content="References · KazDC Energy Tech">
+<meta property="og:description" content="Where the weather comes from, which equations drive each study, and which numbers you can change.">
+<link rel="alternate" hreflang="en" href="references.html">
+<link rel="alternate" hreflang="kk" href="references-kk.html">
+<link rel="alternate" hreflang="ru" href="references-ru.html">
+<link rel="alternate" hreflang="zh-Hans" href="references-zh.html">
+<script>"use strict";
+
+window.SiteI18n = (() => {
+  const data = {"lang":"en","locale":"en-US","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"cities":{},"station":{"station":"{city} station","airport":"{city} Airport station","internationalAirport":"{city} International Airport station","era":"ERA5 reanalysis at the {city} location","qonaev":"ERA5 reanalysis for Qonaev (listed as Kapchagay)","origin":"{location} · {years} source years within {period}","quality":"The airport weather file is cooler than local observations in several representative months. June 2024 averages 21.2 °C in the file and 24.3 °C in airport observations. Cooling electricity may be understated."}};
+  const cityName = (slug, fallback) => data.cities[slug] || fallback || slug;
+  function formatNumber(value, options) {
+    if (data.lang !== "kk") return value.toLocaleString(data.locale, options);
+    // Some browsers ship a partial Kazakh locale and silently use English punctuation.
+    return value.toLocaleString("en-US", options).replaceAll(",", "\u00a0").replace(".", ",");
+  }
+  function stationNote(station) {
+    const location = station.location_note || "";
+    let kind = "station";
+    if (location.includes("ERA5")) kind = station.slug === "qonaev" ? "qonaev" : "era";
+    else if (location.includes("International Airport")) kind = "internationalAirport";
+    else if (location.includes("Airport")) kind = "airport";
+    const place = data.lang === "en" && location ? location :
+      data.station[kind].replace("{city}", cityName(station.slug, station.name));
+    const origin = data.station.origin.replace("{location}", place)
+      .replace("{years}", station.source_years).replace("{period}", station.period);
+    const quality = station.slug === "almaty" && station.quality_note ? ". " + data.station.quality : "";
+    return origin + quality;
+  }
+  return {lang: data.lang, locale: data.locale, months: data.months, shortMonths: data.shortMonths, cityName, stationNote, formatNumber};
+})();
+</script>
+<style>:root{--paper:#f6f5ef;--panel:#fffefa;--ink:#203630;--secondary:#4b6158;--rule:#d0d8cb;--forest:#143f3a;--teal:#087b69;--light:#d7e6d9;--mint:#a9dfbf;--ochre:#986026;font-family:"Inter","Arial",sans-serif;color:var(--ink);background:var(--paper);font-variant-numeric:tabular-nums}
+*{box-sizing:border-box}body{margin:0;line-height:1.52}a{color:#126452;text-underline-offset:.18em}a:hover{text-decoration:underline}button,input,select{font:inherit}button,a,input,select,summary{touch-action:manipulation}button{cursor:pointer}h1,h2,h3,h4,p,figure{margin:0}h1,h2,.brand,.chart-head h2{letter-spacing:-.045em}h1,h2{font-family:"DM Sans","Inter","Arial",sans-serif}h3{letter-spacing:-.025em}b,strong{font-weight:700}a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #bd7b36;outline-offset:3px}
+.inner{width:min(1190px,calc(100% - 80px));margin-inline:auto}.mast{border-bottom:1px solid var(--rule);background:var(--panel)}.mast-row{display:flex;align-items:center;justify-content:space-between;min-height:74px;gap:28px}.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-size:22px;font-weight:750;white-space:nowrap}.brand b{font-weight:480}.coil{position:relative;display:grid;gap:3px;padding:6px 5px;background:var(--forest);border-radius:4px;width:28px}.coil i{display:block;height:3px;background:#a8debc;transform:skew(-22deg)}.mast nav,.foot nav{display:flex;align-items:center;gap:23px}.mast nav a,.foot nav a{font-size:.86rem;font-weight:600;text-decoration:none;color:var(--secondary);white-space:nowrap}.mast nav a:hover,.foot nav a:hover{text-decoration:underline}.mast nav a[aria-current]{color:var(--teal);box-shadow:0 2px var(--teal)}.skip{position:absolute;left:-300px;top:0;background:white;padding:.8em;z-index:10}.skip:focus{left:6px}
+.hero{display:grid;grid-template-columns:.93fr 1.07fr;gap:5vw;align-items:center;padding:56px 0 50px;border-bottom:1px solid var(--rule)}.kicker{color:var(--teal);font-size:.7rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}.hero h1{font-size:clamp(54px,5.6vw,82px);line-height:.96;font-weight:660}.hero h1 span,.page-intro h1 span{color:var(--teal)}.deck{font-size:clamp(1rem,1.35vw,1.22rem);line-height:1.48;color:var(--secondary);margin:20px 0 0;max-width:43rem}.text-links,.tools{display:flex;gap:18px;flex-wrap:wrap;align-items:center}.text-links{margin-top:23px}.text-links a,.details-body>a,.sources a{font-weight:650;font-size:.91rem}.climate-card{background:var(--forest);color:#fcfff9;padding:25px 27px 17px;border-radius:8px;min-width:0}.chart-head,.result-title,.heading,.range-line,.cities-head,.ends,.foot,.legend{display:flex;align-items:center;justify-content:space-between;gap:12px}.chart-head h2,.chart-head h3{font-family:inherit;font-size:1.05rem;font-weight:680;letter-spacing:-.02em}.chart-head>span,.result-title>span,.cities-head>span,.fine,.details-body,.climate-card figcaption,.control-note,.ends{font-size:.84rem}.chart-head>span,.result-title>span,.cities-head>span,.fine,.control-note,.ends{color:var(--secondary)}.climate-card .chart-head span,.climate-card figcaption{color:#d4e6d7}.graphic{width:100%;min-width:0;line-height:1}.graphic svg{display:block;width:100%;height:auto;overflow:visible}.climate-card figcaption{line-height:1.4;margin-top:4px}.climate-card figcaption span{display:inline-flex;align-items:center;margin:3px 14px 2px 0;gap:5px;font-weight:600}.chart-head{margin-bottom:10px}
+.workspace,.studies,.reading{padding:39px 0 43px;border-bottom:1px solid var(--rule);scroll-margin-top:14px}.heading{margin-bottom:23px;flex-wrap:wrap}.heading h2,.reading h2{font-size:clamp(27px,3vw,40px);line-height:1.1;font-weight:635}.heading .kicker{margin-bottom:7px}.quiet,.action{border:1px solid #a6bcac;border-radius:5px;padding:.54em .86em;font-weight:620;font-size:.88rem;line-height:1.4;display:inline-flex;align-items:center;justify-content:center}.quiet{background:transparent;color:var(--forest)}.quiet:hover{background:#e1e9de}.action{background:var(--forest);color:white;border-color:var(--forest)}.action:hover{background:#20584d}.action:disabled{opacity:.42;cursor:default}.compare-grid{display:grid;grid-template-columns:minmax(220px,.79fr) minmax(0,1.9fr);gap:20px;align-items:stretch}.controls,.result-panel{border:1px solid var(--rule);border-radius:7px;padding:23px 26px;min-width:0}.controls{background:#e8eee4;align-self:start}.result-panel{background:var(--panel)}.controls h3,.result-title h3{font-size:1.2rem;line-height:1.35}.controls h3{margin-bottom:17px}.controls label{display:block;margin:12px 0 4px;font-size:.86rem;font-weight:640}.controls select,.controls input:not([type=range]){width:100%;min-width:0;border:1px solid #9aafa0;border-radius:4px;background:#fffffa;color:var(--ink);padding:7px 9px;min-height:39px}.range-line{margin-top:18px;align-items:baseline}.range-line label{margin:0}.range-line output{font-size:1.24rem;color:var(--forest);font-weight:700}.controls input[type=range]{display:block;width:100%;accent-color:var(--teal);margin:10px 0 0}.ends{font-size:.72rem}.control-note,.controls .fine{margin-top:13px;line-height:1.45}.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:18px 0 24px}.metrics>div+div{border-left:1px solid var(--rule);padding-left:16px}.metrics span,.metrics small{display:block;color:var(--secondary);font-size:.79rem;line-height:1.3}.metrics strong{display:block;color:var(--forest);font-size:clamp(24px,3vw,43px);letter-spacing:-.05em;line-height:1.22;font-weight:650}.cities-head{font-size:.89rem;margin:0 0 8px}.city-bars{display:grid;gap:7px}.bar-row{display:grid;grid-template-columns:minmax(65px,.7fr) 2fr minmax(65px,.4fr);gap:12px;align-items:center;font-size:.87rem}.bar-row>span:first-child{color:var(--secondary)}.bar-row.active>span:first-child{font-weight:750;color:var(--ink)}.bar-track{height:9px;background:#edf1e9;border-radius:1px;overflow:hidden}.bar-track i{display:block;height:100%;background:#8ba89a}.active .bar-track i{background:var(--teal)}.bar-row>strong{text-align:right;font-weight:650}.fine{line-height:1.46}.result-panel>.fine{margin-top:14px}
+.details{border-top:1px solid var(--rule);margin-top:13px}.details+.details{margin-top:0}.details summary{padding:12px 1px;font-weight:650;font-size:.92rem;cursor:pointer;color:var(--forest)}.details-body{padding:4px 0 13px;font-size:.95rem;line-height:1.55}.details-body p+p,.reading p+p{margin-top:12px}.details-body button{margin:10px 9px 0 0}.table-wrap{min-width:0;overflow-x:auto}.table-wrap table{border-collapse:collapse;width:100%;margin:12px 0 7px;font-size:.82rem;line-height:1.35}.table-wrap th,.table-wrap td{text-align:right;border-bottom:1px solid var(--rule);padding:8px 9px}.table-wrap th:first-child,.table-wrap td:first-child{text-align:left}.table-wrap thead th{color:var(--secondary);background:#ecf0e8;font-weight:650}.table-wrap tfoot{font-weight:700}.study-rows{border-top:1px solid var(--rule)}.study-rows a{display:grid;grid-template-columns:minmax(110px,.55fr) 2fr 30px;gap:20px;align-items:center;padding:16px 6px;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none}.study-rows a:hover{background:#ebefe6}.study-rows b,.study-rows small{display:block}.study-rows b{font-size:1.13rem}.study-rows small{font-size:.88rem;color:var(--secondary);margin-top:2px}.study-tag{color:var(--teal);font-weight:650;font-size:.78rem}.study-rows i{color:var(--teal);font-size:1.45rem;font-style:normal;text-align:center}
+.page-intro{padding:47px 0 32px;border-bottom:1px solid var(--rule)}.page-intro h1{overflow-wrap:anywhere;hyphens:auto;font-size:clamp(42px,5.4vw,74px);line-height:1.02;font-weight:650}.page-intro .deck{max-width:56rem;margin-top:14px}.reading{display:grid;grid-template-columns:.78fr 1.7fr;gap:45px}.reading h3{font-size:1.16rem;margin:20px 0 7px}.reading h3:first-child{margin-top:0}.reading p{color:#364b42;font-size:.97rem}.reading .sources{margin:18px 0 3px}.equation,.interpretation{background:#eaf1e8;border-left:3px solid var(--teal);padding:12px 15px;color:var(--forest);font-size:.95rem;line-height:1.5}.interpretation{margin:18px 0}.equation{font-weight:620;margin:15px 0}.legend{justify-content:flex-start;color:var(--secondary);gap:6px;font-size:.8rem}.dot{width:9px;height:9px;border-radius:50%;display:inline-block}.dot.teal{background:var(--teal)}.dot.muted{background:#b0c0b6;margin-left:12px}.error,.notice{padding:11px 13px;margin:12px 0;background:#fcf1e4;border-left:3px solid var(--ochre);color:#693f1f}.foot{padding:28px 0 33px;flex-wrap:wrap}.foot>div{display:flex;gap:15px;align-items:baseline}.foot>div span{font-size:.85rem;color:var(--secondary)}.foot strong{letter-spacing:-.02em}.foot nav{gap:19px}.error[hidden]{display:none}button:disabled,.controls input:disabled{opacity:.54}
+@media(max-width:900px){.inner{width:calc(100% - 42px)}.mast-row{align-items:flex-start;justify-content:flex-start;gap:13px;flex-wrap:wrap;padding:11px 0}.mast nav{flex-wrap:wrap;gap:6px 19px}.hero{gap:28px;padding:38px 0}.climate-card{padding:16px 19px}.controls,.result-panel{padding:18px}.compare-grid{grid-template-columns:minmax(200px,.8fr) minmax(0,1.7fr)}.metrics{gap:10px}.metrics>div+div{padding-left:11px}.mast nav a{font-size:.8rem}.range-line{gap:5px}}
+@media(max-width:670px){.inner{width:calc(100% - 32px)}.mast-row{display:block}.mast nav{padding-top:7px;gap:4px 14px}.hero{grid-template-columns:1fr;padding:32px 0 27px;gap:24px}.hero h1 br{display:none}.hero h1{font-size:clamp(44px,10vw,63px)}.deck{margin-top:13px}.text-links{gap:8px 16px;margin-top:14px}.climate-card{padding:15px 19px}.compare-grid,.reading{grid-template-columns:1fr;gap:14px}.workspace,.studies,.reading{padding:25px 0}.heading{margin-bottom:14px}.controls h3{margin-bottom:8px}.range-line{margin-top:12px}.metrics span,.metrics small{font-size:.73rem}.metrics strong{font-size:clamp(23px,6.8vw,34px)}.metrics{gap:6px}.metrics>div+div{padding-left:8px}.page-intro{padding:31px 0 25px}.study-rows a{grid-template-columns:1fr 28px;gap:2px 10px;padding:12px 1px}.study-tag{grid-row:1;grid-column:1}.study-rows a>span:nth-child(2){grid-row:2;grid-column:1}.study-rows i{grid-column:2;grid-row:1/3}.foot>div{flex-wrap:wrap;gap:2px 12px}.foot nav{gap:6px 15px;flex-wrap:wrap}.foot{gap:10px}.table-wrap th,.table-wrap td{padding:7px 5px}.reading h2{max-width:25ch}.tools{gap:7px}}
+@media print{.mast nav,.foot,.tools,button,.text-links{display:none}.inner{width:100%}.controls,.result-panel,.climate-card{break-inside:avoid}.hero{padding:10px 0}.workspace,.reading{padding:15px 0}}
+
+.climate-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;padding-top:8px;border-top:1px solid #507168}
+.climate-pair label{min-width:0}
+.climate-card .climate-pair span{display:flex;gap:7px;margin:0 0 4px;font-size:.78rem}
+.climate-pair i{width:19px;border-top:3px solid #a5e5bd}
+.climate-pair .peer-line{border-top:2px dashed #ebc888}
+.climate-pair select{display:block;width:100%;min-height:34px;padding:4px 7px;border:1px solid #75958b;border-radius:4px;color:#f6fff8;background:#234d44;font-weight:600}
+.city-export{margin-top:12px}
+#city-bars{display:block}
+#city-bars .bar-row{break-inside:avoid;grid-template-columns:minmax(5.7rem,.92fr) 1.3fr 3.8rem;gap:8px;padding:3px 0}
+@media(min-width:950px){
+  #city-bars{column-count:2;column-gap:24px;column-rule:1px solid var(--rule)}
+  #city-bars .bar-row{font-size:.80rem}
+}
+@media(max-width:370px){.climate-pair{gap:9px}.climate-card .climate-pair span{gap:4px;font-size:.71rem}}
+
+
+@media (max-width: 500px) {
+  .result-panel .metrics {grid-template-columns: 1fr; gap: 0}
+  .result-panel .metrics > div {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center; column-gap: 12px; padding-block: 8px;
+  }
+  .result-panel .metrics > div + div {border-left: 0; border-top: 1px solid var(--rule); padding-left: 0}
+  .result-panel .metrics span {grid-row: 1 / 3; font-size: .85rem}
+  .result-panel .metrics strong, .result-panel .metrics small {grid-column: 2; text-align: right}
+  .result-panel .metrics small {max-width: 15ch; overflow-wrap: anywhere}
+  .bar-row > span:first-child {overflow-wrap: anywhere; hyphens: auto}
+  #power-bars .bar-row {grid-template-columns: minmax(8rem, 1.6fr) minmax(0, 1fr) auto}
+}
+
+.ref-hero {display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:clamp(24px,6vw,90px);padding:50px 0 40px;border-bottom:1px solid var(--rule)}
+.ref-hero h1 {font-size:clamp(3.1rem,6.8vw,6.15rem);line-height:1;font-weight:650;letter-spacing:-.055em}
+.ref-hero .deck {max-width:35rem;margin-top:16px}
+.ref-feature {background:var(--forest);color:#f5f8ee;border-radius:7px;padding:23px 28px}
+.ref-feature-label {color:#b9dfc8;font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.ref-feature h2 {font-size:clamp(1.3rem,2.15vw,1.9rem);line-height:1.14;letter-spacing:-.03em;margin:8px 0}
+.ref-feature p:not(.ref-feature-label) {color:#dbeade;font-size:.91rem;line-height:1.48}
+.ref-feature a {display:inline-block;margin-top:12px;color:#e0f7dc;font-size:.87rem;font-weight:650}
+.ref-layout {display:grid;grid-template-columns:minmax(180px,.45fr) minmax(0,1.55fr);gap:clamp(30px,6vw,82px);align-items:start}
+.ref-index {position:sticky;top:18px;margin-top:35px;padding:0 16px 4px 0}
+.ref-index h2 {font-family:inherit;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--secondary);margin:0 0 11px}
+.ref-index a {display:block;padding:5px 0;text-decoration:none;font-size:.92rem;font-weight:560}
+.ref-index a:hover,.ref-index a:focus-visible {text-decoration:underline}
+.ref-content {min-width:0}
+.ref-section {padding:32px 0;border-bottom:1px solid var(--rule);scroll-margin-top:18px}
+.ref-section:last-child {border:0}
+.ref-section h2 {font-size:clamp(1.6rem,2.8vw,2.45rem);line-height:1.12;letter-spacing:-.035em;font-weight:650;margin-bottom:14px}
+.ref-section>p,.ref-list dd {max-width:79ch;color:#334a40;font-size:.96rem;line-height:1.58}
+.ref-list {margin:17px 0 0}
+.ref-list dt {font-size:1.05rem;font-weight:690;color:var(--ink);margin:20px 0 4px;line-height:1.35}
+.ref-list dt:first-child {margin-top:0}
+.ref-list dd {margin:0 0 9px}
+.ref-list dd:last-child {margin-bottom:0}
+.ref-list dd span {display:block;margin:6px 0 0;color:#6b7a6f;font-size:.86rem}
+.ref-list a,.ref-action a,.ref-files a {font-weight:560}
+.ref-directory {margin:17px 0 9px;background:var(--panel);border:1px solid var(--rule);border-radius:5px}
+.ref-directory summary {padding:12px 15px;color:var(--forest);font-weight:650;cursor:pointer}
+.ref-directory summary span {font-size:.82rem;font-weight:450;color:var(--secondary);margin-left:10px}
+.ref-table-wrap {overflow-x:auto;padding:0 12px 11px}
+.ref-table-wrap table {width:100%;border-collapse:collapse;font-size:.78rem;line-height:1.4}
+.ref-table-wrap caption {text-align:left;margin:0 0 6px;color:var(--secondary)}
+.ref-table-wrap th,.ref-table-wrap td {text-align:left;padding:6px 7px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.ref-table-wrap thead {background:#eaf0e6}
+.ref-section>p.ref-action,.ref-section>p.ref-date {font-size:.84rem}
+.ref-files {list-style:none;margin:16px 0;padding:0;border-top:1px solid var(--rule)}
+.ref-files li {display:grid;grid-template-columns:9rem 1fr;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:.9rem}
+.ref-section>p.ref-date {color:var(--secondary)}
+@media(max-width:900px) {.ref-hero{gap:26px}.ref-layout{grid-template-columns:175px minmax(0,1fr);gap:24px}}
+@media(max-width:670px) {
+  .ref-hero {grid-template-columns:1fr;gap:18px;padding:30px 0 24px}
+  .ref-feature {padding:17px 20px}.ref-layout {display:block}
+  .ref-index {position:static;display:grid;grid-template-columns:1fr 1fr;gap:0 12px;margin:0;padding:20px 0;border-bottom:1px solid var(--rule)}
+  .ref-index h2 {grid-column:1/-1;margin-bottom:4px}.ref-index a {font-size:.84rem;padding:4px 0}
+  .ref-section {padding:23px 0}.ref-directory summary span {display:block;margin:2px 0 0 16px}
+  .ref-files li {grid-template-columns:1fr;gap:2px}
+}
+@media print {
+  .ref-hero,.ref-layout {display:block}.ref-hero {padding:12px 0}.ref-index,.ref-feature {display:none}
+  .ref-section {padding:14px 0}.ref-section h2,.ref-list dt {break-after:avoid}.ref-list dd {break-inside:avoid}
+  .ref-table-wrap {overflow:visible}.ref-table-wrap table {font-size:8pt}
+}
+
+.ref-heading-row {display:flex;align-items:center;flex-wrap:wrap;gap:8px 20px;margin-bottom:12px}
+.ref-heading-row .kicker {margin:0}
+html:lang(zh-Hans) {font-family:Inter,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",sans-serif}
+html:lang(zh-Hans) h1,html:lang(zh-Hans) h2 {font-family:inherit;letter-spacing:0}
+html:lang(zh-Hans) .ref-hero h1 {line-height:1.16}
+html:lang(zh-Hans) .ref-feature h2,html:lang(zh-Hans) .ref-section h2 {line-height:1.36}
+html:lang(zh-Hans) .ref-list dd,html:lang(zh-Hans) .ref-section>p {line-height:1.83}
+html:lang(zh-Hans) .ref-feature p:not(.ref-feature-label) {line-height:1.65}
+.station-alias {display:block;color:var(--secondary);font-weight:450;font-size:.77rem}
+@media(min-width:901px) and (max-width:1200px) {
+  html:lang(ru) .mast nav {flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}
+}
+@media(min-width:901px) {
+  html:lang(kk) .mast nav {flex-wrap:wrap;justify-content:flex-end;gap:6px 18px}
+}
+@media(max-width:440px) {html:lang(kk) .brand {white-space:normal}}
+@media(max-width:360px) {
+  html:lang(ru) .brand,html:lang(kk) .brand {font-size:1.15rem}
+  html:lang(kk) .ref-hero h1 {font-size:2.55rem}
+}
+@media(max-width:670px) {.ref-heading-row {margin-bottom:8px}}
+
+#weather-comparison {margin: 20px 0 8px; scroll-margin-top: 18px}
+#weather-comparison .chart-head h3 {margin: 0; color: #f7fff8}
+@media print {#weather-comparison {max-width: 40rem; print-color-adjust: exact}}
+.mast .mast-row, .mast .mast-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px clamp(12px, 1.7vw, 25px);
+}
+.mast .mast-row > nav, .mast .mast-inner > nav {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px clamp(10px, 1.35vw, 20px);
+}
+.language-menu {position: relative; justify-self: end; z-index: 3; color: #173f36}
+.language-menu summary {
+  display: flex; align-items: center; gap: 6px; min-height: 38px;
+  padding: 5px 9px; cursor: pointer; list-style: none;
+  border: 1px solid #9bb6a8; border-radius: 5px;
+  background: #fffefa; font-family: inherit; line-height: 1.35;
+  font-size: .86rem; font-weight: 600; white-space: nowrap;
+}
+.language-menu summary::-webkit-details-marker {display: none}
+.language-menu summary::after {
+  content: ""; width: 6px; height: 6px; margin: -3px 2px 0;
+  border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg);
+}
+.language-menu[open] summary::after {margin-top: 3px; transform: rotate(225deg)}
+.language-menu summary:hover, .language-menu[open] summary {background: #eaf2e9}
+.language-menu svg {width: 17px; height: 17px; flex: none}
+.language-options {
+  position: absolute; right: 0; top: calc(100% + 5px); min-width: 10rem; width: max-content;
+  max-width: min(19rem, calc(100vw - 36px)); padding: 5px;
+  background: #fffefa; border: 1px solid #aac1b5; border-radius: 6px;
+  box-shadow: 0 5px 14px #143d3429;
+}
+.language-options p {margin: 4px 6px 5px; font: inherit; font-size: .8rem; color: #405a4e}
+.language-options a, .language-options [aria-current] {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  min-height: 40px; padding: 5px 9px; color: #173f36;
+  border-radius: 3px; font-size: .92rem; text-decoration: none;
+}
+.language-options a:hover, .language-options a:focus-visible {background: #e9f2e9; text-decoration: underline}
+.language-options [aria-current] {background: #e9f2e9; font-weight: 650}
+.language-menu :focus-visible {outline: 2px solid #886020; outline-offset: 2px}
+html:lang(zh-Hans) body {font-family: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif}
+html:lang(zh-Hans) :is(h1, h2) {font-family: inherit; letter-spacing: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .hero h1 {font-size: clamp(2.25rem, 4.1vw, 3.9rem); overflow-wrap: anywhere}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line label {min-width: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line output {flex-shrink: 0}
+@media (max-width: 1050px) {
+  .mast .mast-row, .mast .mast-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand language" "nav nav"; gap: 5px 10px; padding: 8px 0;
+  }
+  .mast .brand {grid-area: brand; min-width: 0; width: fit-content; white-space: normal; line-height: 1.2}
+  .mast .brand .coil {flex: none}
+  .mast .language-menu {grid-area: language}
+  .mast .mast-row > nav, .mast .mast-inner > nav {grid-area: nav; justify-content: flex-start; padding: 0}
+}
+@media print {.mast .language-menu {display: none}}
+.project-credit {
+  scroll-margin-top: 1rem;
+  border-block: 1px solid #cbd8cc;
+  background: #e9efe7;
+  color: #203b32;
+}
+.credit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.35rem clamp(2rem, 5vw, 5rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+}
+.credit-grid h2 {
+  margin: 0 0 .45rem;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: normal;
+  color: #476054;
+}
+.credit-grid p {margin: .13rem 0 0; font-size: .93rem; line-height: 1.5; overflow-wrap: anywhere}
+.credit-grid address {font-style: normal}
+.credit-grid .credit-institute {margin: 0 0 .35rem; font-size: clamp(1.5rem, 2.1vw, 1.9rem); line-height: 1.12; font-weight: 700}
+.credit-grid .credit-name {font-size: 1.05rem; line-height: 1.4; font-weight: 600; margin-bottom: .25rem}
+.credit-grid a {color: #15594a; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .17em}
+.credit-grid a:hover {text-decoration-thickness: 2px}
+@media (max-width: 670px) {
+  .credit-grid {grid-template-columns: minmax(0, 1fr)}
+}
+@media print {
+  .project-credit {background: transparent; break-inside: avoid}
+  .credit-grid {padding-block: .8rem}
+}
+
+.credit-grid .credit-feedback {margin-top: .7rem; max-width: 49ch; color: #405b4f}
+.case-share {display: flex; align-items: center; flex-wrap: wrap; gap: 4px 9px; max-width: 100%; margin: .35rem 0}
+.case-share button {padding: 5px 10px; border: 1px solid #92ab9d; border-radius: 4px; background: transparent; color: #164e40; font: inherit; font-size: .82rem; font-weight: 630; line-height: 1.4; cursor: pointer}
+.case-share button:hover {background: #e2ece3}
+.case-share button:disabled {cursor: default; opacity: .56}
+.case-share output,.case-version-note {font-size: .81rem; line-height: 1.35; color: #3c594c}
+.case-version-note {margin: 0}
+.case-share textarea {display: block; flex: 1 0 100%; width: 100%; max-width: 100%; min-height: 6rem; box-sizing: border-box; font: inherit; font-size: .86rem}
+.case-share[hidden],.case-share [hidden],.case-share.private-readings {display: none}
+@media print {.case-share {display: none}}
+</style>
+</head>
+<body data-page="references">
+<a href="#main" class="skip">Skip to main content</a>
+<header class="mast"><div class="inner mast-row">
+<a class="brand" href="index.html" data-study-link="regional"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span><span>KazDC <b>Energy Tech</b></span></a>
+<nav aria-label="Models and experiments"><a href="index.html" data-study-link="regional">Regional cooling</a><a href="technologies.html" data-study-link="tech">Technologies</a><a href="snow.html" data-study-link="snow">Snow storage</a><a href="heat.html" data-study-link="heat">Heat reuse</a><a href="power.html" data-study-link="power">Power delivery</a><a href="bench.html" data-study-link="bench">Experiment bench</a><a href="references.html" data-study-link="references" aria-current="page">References</a><a href="research-priorities.html" data-study-link="research">Research priorities</a><a href="#project-contact">Contact</a></nav>
+<details class="language-menu"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>Language</summary><div class="language-options"><span lang="en" aria-current="page">English<b aria-hidden="true">✓</b></span><a lang="kk" hreflang="kk" href="references-kk.html" data-language-section data-reference-language>Қазақша</a><a lang="ru" hreflang="ru" href="references-ru.html" data-language-section data-reference-language>Русский</a><a lang="zh-Hans" hreflang="zh-Hans" href="references-zh.html" data-language-section data-reference-language>简体中文</a></div></details>
+</div></header>
+<main class="inner" id="main">
+<header class="ref-hero">
+  <div>
+    <div class="ref-heading-row"><p class="kicker">KazDC-BIM · Methods and data</p></div>
+    <h1>References</h1>
+    <p class="deck">Where the weather comes from, which equations drive each study, and which numbers you can change.</p>
+  </div>
+  <aside class="ref-feature" aria-labelledby="ref-feature-title">
+    <p class="ref-feature-label">Astana reference case</p>
+    <h2 id="ref-feature-title">Follow one hour from weather to electricity.</h2>
+    <p>Start with an outdoor temperature, follow the cooling load through the plant, then check the result against the hourly output.</p>
+    <a href="methods.html#worked-hours">Trace a worked hour <span aria-hidden="true">→</span></a>
+  </aside>
+</header>
+
+<div class="ref-layout">
+  <nav class="ref-index" aria-label="Reference topics">
+    <h2>On this page</h2>
+    <a href="#weather">Weather and time</a><a href="#stations">Station archives</a>
+    <a href="#cooling">Cooling plant and air</a><a href="#liquid">Liquid loops and metering</a>
+    <a href="#heat">Heat recovery</a><a href="#storage">Chilled-water storage</a>
+    <a href="#snow">Seasonal snow</a><a href="#power">UPS, solar and batteries</a>
+    <a href="#reproduce">Reproduce a result</a>
+  </nav>
+
+  <div class="ref-content">
+    <section id="weather" class="ref-section"><h2>Weather and time</h2>
+      <p>Each city contributes 8,760 one-hour intervals from a typical meteorological year (TMYx). Its twelve months may come from different years. The files support seasonal comparisons. A design extreme or a prediction for a particular year needs a different weather series.</p>
+      <dl class="ref-list">
+        <dt>Climate.OneBuilding · Development of Global Typical Meteorological Years</dt>
+        <dd>Linda K. Lawrie and Drury B. Crawley compiled the TMYx series. The 2011–2025 Kazakhstan collection supplies outdoor dry-bulb temperature, relative humidity, station pressure and global horizontal solar radiation. The publisher derives solar radiation from ERA5. <span><a href="https://climate.onebuilding.org/contact/default.html">Publisher and attribution</a> · <a href="https://climate.onebuilding.org/sources/default.html">TMYx construction</a> · <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">Kazakhstan catalogue</a></span></dd>
+        <dt>EnergyPlus · EPW Data Dictionary and source flags</dt>
+        <dd>The four input fields carry the source/uncertainty pair <code>?9</code> throughout these files. Individual values cannot be identified as direct observations from those flags. Hour indices run from 1 to 24 and the supplied minute field is 30. Radiation is energy over the interval in Wh/m². Dividing by one hour gives the mean irradiance in W/m² used by the PV model. <span><a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/energyplus-weather-file-epw-data-dictionary.html">EPW fields and units</a> · <a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/data-sources-uncertainty.html">Source and uncertainty codes</a></span></dd>
+        <dt>NOAA and Kazakhstan · Independent checks and time conventions</dt>
+        <dd>NOAA’s daily and hourly station records provide the comparison for Almaty. Its airport file averages 21.2 °C in the selected June 2024, versus 24.3 °C in the airport observations. This can lower modeled cooling electricity. Sixteen EPWs use UTC+6 and five use UTC+5. Monthly results follow each source calendar. The tank converts to Kazakhstan’s current UTC+5 clock for its dispatch windows. <span><a href="https://www.ncei.noaa.gov/products/land-based-station/integrated-surface-database">NOAA hourly archive</a> · <a href="https://registry.opendata.aws/noaa-gsod/">NOAA daily summaries</a> · <a href="index.html#almaty-source">Almaty station comparison</a> · <a href="https://www.gov.kz/org/vko-shemonaiha-volchan/press/news/details/720058?lang=en">Kazakhstan time change</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="stations" class="ref-section"><h2>Station archives</h2>
+      <p>Use the EPW identifier to match a city to its source. Ekibastuz, Qonaev and Taldykorgan use gridded ERA5 reanalysis. The other files identify NCEI station data and ERA5. Aktau has 14 source years and Taraz has 10. Each of the other files has 15.</p>
+      <figure id="weather-comparison" class="climate-card" aria-labelledby="weather-figure-title">
+  <div class="chart-head"><h3 id="weather-figure-title">Monthly outdoor temperatures</h3><span>Monthly mean · °C</span></div>
+  <div id="weather-chart" class="graphic"></div>
+  <figcaption class="climate-pair">
+    <label><span><i class="model-line" aria-hidden="true"></i>Modelled city</span><select id="climate-city"></select></label>
+    <label><span><i class="peer-line" aria-hidden="true"></i>Compare weather with</span><select id="climate-peer"></select></label>
+  </figcaption>
+</figure>
+<details id="weather-values" class="ref-directory" hidden>
+  <summary>Monthly mean temperature table</summary>
+  <div class="ref-table-wrap" tabindex="0" role="region" aria-labelledby="weather-caption">
+    <table>
+      <caption id="weather-caption"></caption>
+      <thead><tr>
+        <th scope="col">Month</th>
+        <th scope="col"><span id="weather-first"></span> (°C)</th>
+        <th scope="col"><span id="weather-second"></span> (°C)</th>
+      </tr></thead>
+      <tbody id="weather-rows"></tbody>
+    </table>
+  </div>
+</details>
+<p class="ref-action"><a data-weather-return href="index.html#compare">Return to regional cooling</a></p>
+
+      <details class="ref-directory"><summary>Browse 21 weather files <span>City, source period and original ZIP</span></summary>
+        <div class="ref-table-wrap" tabindex="0" role="region" aria-label="Scrollable station archive table">
+          <table><caption>Station names and identifiers as distributed in the EPW files</caption>
+            <thead><tr><th scope="col">City</th><th scope="col">EPW location</th><th scope="col">EPW ID</th><th scope="col">Source</th><th scope="col">Years (period)</th><th scope="col">File time</th><th scope="col">Archive</th></tr></thead>
+            <tbody><tr><th scope="row">Aktau</th><td>Aktau</td><td>381110</td><td>NCEI ISD / ERA5</td><td>14 (2011–2025)</td><td>UTC+5</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/MAN_Mangystau/KAZ_MAN_Aktau.381110_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Aktau">ZIP</a></td></tr>
+<tr><th scope="row">Aktobe</th><td>Aktobe.Intl.AP</td><td>352290</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+5</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/AKT_Aktobe/KAZ_AKT_Aktobe.Intl.AP.352290_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Aktobe">ZIP</a></td></tr>
+<tr><th scope="row">Almaty</th><td>Almaty.Intl.AP</td><td>368720</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ALM_Almaty/KAZ_ALM_Almaty.Intl.AP.368720_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Almaty">ZIP</a></td></tr>
+<tr><th scope="row">Astana</th><td>Astana</td><td>351880</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/AKM_Akmola/KAZ_AKM_Astana.351880_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Astana">ZIP</a></td></tr>
+<tr><th scope="row">Atyrau</th><td>Atyrau</td><td>357000</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+5</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ATY_Atyrau/KAZ_ATY_Atyrau.357000_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Atyrau">ZIP</a></td></tr>
+<tr><th scope="row">Ekibastuz</th><td>Ekibastuz</td><td>360010</td><td>ERA5 reanalysis</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/PAV_Pavlodar/KAZ_PAV_Ekibastuz.360010_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Ekibastuz">ZIP</a></td></tr>
+<tr><th scope="row">Karaganda</th><td>Karagandy.Intl.AP</td><td>353940</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/KAR_Karaganda/KAZ_KAR_Karagandy.Intl.AP.353940_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Karaganda">ZIP</a></td></tr>
+<tr><th scope="row">Kokshetau</th><td>Kokshetau</td><td>288790</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/AKM_Akmola/KAZ_AKM_Kokshetau.288790_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Kokshetau">ZIP</a></td></tr>
+<tr><th scope="row">Kostanay</th><td>Kostanay</td><td>289520</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/KUS_Kostanay/KAZ_KUS_Kostanay.289520_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Kostanay">ZIP</a></td></tr>
+<tr><th scope="row">Kyzylorda</th><td>Kyzylorda</td><td>380620</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+5</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/KZY_Kyzylorda/KAZ_KZY_Kyzylorda.380620_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Kyzylorda">ZIP</a></td></tr>
+<tr><th scope="row">Oral</th><td>Uralsk.AP</td><td>351080</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+5</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ZAP_West_Kazakhstan/KAZ_ZAP_Uralsk.AP.351080_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Oral">ZIP</a></td></tr>
+<tr><th scope="row">Oskemen</th><td>Ust.Kamenogorsk.AP</td><td>350675</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/VOS_East_Kazakhstan/KAZ_VOS_Ust.Kamenogorsk.AP.350675_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Oskemen">ZIP</a></td></tr>
+<tr><th scope="row">Pavlodar</th><td>Pavlodar.AP</td><td>360030</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/PAV_Pavlodar/KAZ_PAV_Pavlodar.AP.360030_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Pavlodar">ZIP</a></td></tr>
+<tr><th scope="row">Petropavl</th><td>Petropavl</td><td>286760</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/SEV_North_Kazakhstan/KAZ_SEV_Petropavl.286760_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Petropavl">ZIP</a></td></tr>
+<tr><th scope="row">Qonaev</th><td>Kapchagay</td><td>368810</td><td>ERA5 reanalysis</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ALM_Almaty/KAZ_ALM_Kapchagay.368810_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Qonaev">ZIP</a></td></tr>
+<tr><th scope="row">Semey</th><td>Semey</td><td>361770</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/VOS_East_Kazakhstan/KAZ_VOS_Semey.361770_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Semey">ZIP</a></td></tr>
+<tr><th scope="row">Shymkent</th><td>Shymkent</td><td>383280</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/SYM_Shymkent/KAZ_SYM_Shymkent.383280_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Shymkent">ZIP</a></td></tr>
+<tr><th scope="row">Taldykorgan</th><td>Taldykorgan</td><td>367780</td><td>ERA5 reanalysis</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ALM_Almaty/KAZ_ALM_Taldykorgan.367780_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Taldykorgan">ZIP</a></td></tr>
+<tr><th scope="row">Taraz</th><td>Taraz.AP</td><td>383410</td><td>NCEI ISD / ERA5</td><td>10 (2011–2021)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/ZHA_Jambyl/KAZ_ZHA_Taraz.AP.383410_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Taraz">ZIP</a></td></tr>
+<tr><th scope="row">Turkistan</th><td>Turkistan</td><td>381980</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/SYM_Shymkent/KAZ_SYM_Turkistan.381980_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Turkistan">ZIP</a></td></tr>
+<tr><th scope="row">Zhezkazgan</th><td>Zhezkazgan</td><td>356710</td><td>NCEI ISD / ERA5</td><td>15 (2011–2025)</td><td>UTC+6</td><td><a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/KAR_Karaganda/KAZ_KAR_Zhezkazgan.356710_TMYx.2011-2025.zip" aria-label="Original weather ZIP for Zhezkazgan">ZIP</a></td></tr></tbody>
+          </table>
+        </div>
+      </details>
+      <p class="ref-action"><a href="data/regions/stations.json" download>Download station metadata and SHA-256 checksums (JSON)</a></p>
+    </section>
+
+    <section id="cooling" class="ref-section"><h2>Cooling plant and air</h2>
+      <dl class="ref-list">
+        <dt>Dry cooler and backup chiller</dt>
+        <dd>The U.S. Department of Energy’s <cite>EnergyPlus Engineering Reference</cite>, version 24.2, explains sensible heat rejection in single- and two-speed fluid coolers. KazDC uses a simplified capacity curve fitted to one assumed rating. The reference case assumes 1 MW of IT heat, a 6 K loop rise, 5 K rated approach, chiller COP 4, a 25 kW full-speed fan and a 15 kW pump. “Chiller off” counts a complete hour with zero compressor cooling duty. <span><a href="https://bigladdersoftware.com/epx/docs/24-2/engineering-reference/cooling-towers-and-evaporative-fluid-coolers.html#one-and-two-speed-fluid-coolers">EnergyPlus fluid coolers</a> · <a href="methods.html#dispatch">KazDC dispatch equations</a> · <a href="case.json" download>Plant inputs (JSON)</a></span></dd>
+        <dt>Adiabatic pad and wet-bulb temperature</dt>
+        <dd>ASHRAE <cite>Fundamentals</cite> (2017), ch. 1, supplies the psychrometric relations. The rounded wet-bulb series was checked against Meyer and Thevenard’s PsychroLib (2019). EnergyPlus 26.2, §16.3, gives the pad saturation-effectiveness relation. The air mass flow, 2 kW spray pump, 10% make-up allowance, summer trigger and water budget belong to the KazDC case. <span><a href="https://handbook.ashrae.org/Handbooks/F17/SI/f17_ch01/f17_ch01_si.aspx">ASHRAE psychrometrics</a> · <a href="https://joss.theoj.org/papers/10.21105/joss.01137">PsychroLib paper</a> · <a href="https://energyplus.readthedocs.io/en/v26.2.0/guides/engineering-reference/16.3-evaporative-coolers.html">EnergyPlus pad equation</a> · <a href="technologies.html?study=pad">Pad study</a></span></dd>
+        <dt>Indirect air-to-air heat exchanger</dt>
+        <dd>EnergyPlus 26.2, §16.8, relates sensible duty to effectiveness, the smaller heat-capacity rate and the inlet temperature difference. ASHRAE <cite>HVAC Applications</cite> (2015), ch. 19, discusses data-centre economizers. KazDC assumes equal stream heat-capacity rates, a selectable additional fan input and a simple cold-weather lockout. <span><a href="https://energyplus.readthedocs.io/en/v26.2.0/guides/engineering-reference/16.8-heat-exchangers.html">EnergyPlus heat exchangers</a> · <a href="https://handbook.ashrae.org/Handbooks/A15/IP/A15_CH19/a15_ch19_ip.aspx">ASHRAE data centres</a> · <a href="technologies.html?study=air">Indirect air study</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="liquid" class="ref-section"><h2>Liquid loops and metering</h2>
+      <dl class="ref-list">
+        <dt>Measuring heat carried by water</dt>
+        <dd>ASHRAE <cite>HVAC Systems and Equipment</cite> (2024), ch. 12, “Flow and Energy Metering,” describes the flow and temperature measurements needed for thermal energy. Sickinger, Van Geet and Ravenscroft (2014) give a measured rack example in NREL/TP-2C00-62905, §2.4. The worksheet uses 4.18 kJ/(kg·K) and assumes steady readings across the entered interval. It reports the signed difference between heater input and water heat. <span><a href="https://handbook.ashrae.org/Handbooks/S24/IP/s24_ch12/s24_ch12_ip.aspx">ASHRAE metering</a> · <a href="https://www.nlr.gov/docs/fy15osti/62905.pdf#page=23">NREL rack experiment</a> · <a href="bench.html">Water-loop worksheet</a></span></dd>
+        <dt>Cold-plate measurement boundaries</dt>
+        <dd>The Open Compute Project’s <cite>Cold Plate Development and Qualification</cite> (2022), §§1.3.2.1–2, defines case-to-inlet thermal resistance and plate pressure drop. The KazDC input locates the probe on the plate surface, so its output is plate-surface-to-inlet resistance per watt of heater input. Determining case-to-inlet resistance requires a component-case temperature. The pump estimate covers the pressure drop across the plate. <span><a href="https://www.opencompute.org/documents/ocp-cold-plate-development-and-qualification-with-integrated-comments-pdf">OCP qualification guide</a> · <a href="https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-federal-data-centers">DOE liquid cooling guidance</a> · <a href="technologies.html?study=cold">Cold-plate worksheet</a></span></dd>
+        <dt>Glycol, first ice and pumping power</dt>
+        <dd>Dow’s <cite>DOWFROST Engineering and Operating Guide</cite> (2001), tables 3, 10, 14 and 22, supplies freezing and liquid-property data. Pátek et al. (2009) give water properties at 0.1 MPa. The EPA’s <cite>EPANET 2.2 User Manual</cite> (2020), chs. 3 and 12, describes Darcy–Weisbach head loss. KazDC specifies pipe roughness and minor losses and interpolates the friction factor linearly between Reynolds numbers 2,300 and 4,000. The exposure count compares outdoor air to first ice. A pipe’s actual temperature also depends on its flow and insulation. <span><a href="https://ingredi.com/content/pdfs/DOWFROST_Manual.pdf">Dow property tables</a> · <a href="https://www.nist.gov/publications/reference-correlations-thermophysical-properties-liquid-water-01-mpa">Water correlations</a> · <a href="https://nepis.epa.gov/Exe/ZyPURL.cgi?Dockey=P10113EM.TXT">EPA pipe hydraulics</a> · <a href="technologies.html?study=glycol">Glycol study</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="heat" class="ref-section"><h2>Heat recovery</h2>
+      <dl class="ref-list">
+        <dt>Capturing rack heat and matching a user</dt>
+        <dd>Van Geet and Sickinger’s <cite>Best Practices Guide for Energy-Efficient Data Center Design</cite> (U.S. DOE, 2024), §§5.6 and 7.1, discusses direct liquid cooling and waste heat use. The local building’s hourly demand curve, capture fraction, 3 K minimum direct-exchange approach and 10 K user-side temperature drop are scenario inputs. <span><a href="https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf">DOE design guide</a> · <a href="heat.html">Heat recovery study</a></span></dd>
+        <dt>Checking a heating coefficient of performance (COP)</dt>
+        <dd>OpenStax, <cite>University Physics, Volume 2</cite>, §4.5, gives the reversible heat-pump limit using absolute temperatures. KazDC assumes a single evaporating and condensing temperature and a 6 K water temperature drop on the source side. Using the cooled source outlet and the requested hot-water supply gives an optimistic upper bound. A real operating COP requires a performance map at the specified conditions. <span><a href="https://openstax.org/books/university-physics-volume-2/pages/4-5-the-carnot-cycle">OpenStax reversible cycle</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="storage" class="ref-section"><h2>Chilled-water storage</h2>
+      <dl class="ref-list">
+        <dt>Tank capacity, loss and dispatch</dt>
+        <dd>ASHRAE <cite>HVAC Systems and Equipment</cite> (2024), ch. 50, describes sensible thermal storage and stratified chilled-water tanks. The model calculates usable capacity from water volume, density, specific heat and temperature rise. It tracks charge, discharge, standing loss and closing stock hour by hour. The overnight charging window, afternoon discharge window and transfer-pump allowance are operating assumptions. <span><a href="https://handbook.ashrae.org/handbooks/S24/SI/s24_ch50/s24_ch50_si.aspx">ASHRAE thermal storage</a> · <a href="technologies.html?study=tank">Tank study</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="snow" class="ref-section"><h2>Seasonal snow</h2>
+      <dl class="ref-list">
+        <dt>Ice energy and three Astana scenarios</dt>
+        <dd>Feistel (2003), <cite>Progress in Oceanography</cite> 58, p. 83, eq. 60, gives approximately 333.5 kJ/kg for freshwater ice melting near 0 °C at atmospheric pressure. The facility model uses this value, an assumed recoverable snow inventory and hourly residual chiller duty. The storage comparison uses example volumes of 55, 60 and 50 m³ and applies an assumed mean heat gain to each store for 91 days. The default 550 kg/m³ and 200 W are comparison inputs.</dd>
+        <dd>The separate <cite>Astana SnowCool</cite> model replay (v1.1, 16 September 2026) retains its own 334 kJ/kg, 120-day hold and 168-hour, 5 kW test load. The export contains computed contact scenarios. Hour zero is the initial state and the 168 later rows report interval results. <span><a href="https://www.teos-10.org/pubs/Feistel_2003.pdf#page=41">Feistel, ice fusion enthalpy</a> · <a href="data/snowcool_replay.csv" download>SnowCool replay (CSV)</a> · <a href="snow.html">Astana snow studies</a></span></dd>
+        <dt>Operating precedents in Sweden and Japan</dt>
+        <dd>Skogsberg and Nordell (2001) describe the Sundsvall hospital store in <cite>Cold Regions Science and Technology</cite> 32, 63–70. Skogsberg (2002) reports the first operating season in vol. 34, 135–142. Bibai City’s White Data Center account describes a server-cooling trial using snow in Hokkaido. These sites show how snow has been used in practice. The Astana estimates use their own assumed collection, storage and heat-exchanger performance. <span><a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=86">Sundsvall design</a> · <a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=96">Sundsvall operating results</a> · <a href="https://www.city.bibai.hokkaido.jp/soshiki/13/417.html">Bibai City account (Japanese)</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="power" class="ref-section"><h2>UPS, solar and batteries</h2>
+      <dl class="ref-list">
+        <dt>UPS efficiency at a common output</dt>
+        <dd>U.S. EPA ENERGY STAR’s <cite>Uninterruptible Power Supplies Key Product Criteria</cite>, table 1, documents the use of defined load points. The worksheet takes operating-point efficiency as output power divided by input power. The 94% and 97% examples assume identical, constant output for the full year. <span><a href="https://www.energystar.gov/products/uninterruptible_power_supplies/key_product_criteria">ENERGY STAR criteria</a> · <a href="power.html">UPS comparison</a></span></dd>
+        <dt>PV generation and battery dispatch</dt>
+        <dd>Dobos (2014), <cite>PVWatts Version 5 Manual</cite>, NREL/TP-6A20-62641, §10, eq. 8, gives the irradiance and temperature correction for DC power. The System Advisor Model documents PV design and behind-the-meter dispatch. KazDC uses horizontal, snow-free modules, a simplified cell temperature, fixed losses, a protected energy reserve and 95% efficiency each way. The battery serves local load and surplus generation is curtailed. <span><a href="https://research-hub.nlr.gov/en/publications/pvwatts-version-5-manual/">PVWatts manual</a> · <a href="https://samrepo.nlr.gov/help/pvwatts_system_design.html">SAM PV design</a> · <a href="https://samrepo.nlr.gov/help/battery_dispatch_btm.html">SAM battery dispatch</a> · <a href="technologies.html?study=solar">PV and battery study</a></span></dd>
+        <dt>Solar timing in six files</dt>
+        <dd>Checking interval times against NOAA solar-position equations identifies some radiation outside local daylight in Aktau, Atyrau, Kostanay, Oral, Turkistan and Zhezkazgan. The model preserves the source timing and flags these six locations in the PV results and CSV. A local irradiance series is especially important for interpreting battery dispatch and peak import there. <span><a href="https://gml.noaa.gov/grad/solcalc/solareqns.PDF">NOAA solar-position equations</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="reproduce" class="ref-section ref-reproduce"><h2>Reproduce a result</h2>
+      <p>For Astana at 18 °C supply, use the weather and plant inputs to calculate each one-hour interval. Add the hourly cooling-plant electricity and count the rows labelled <code>dry_only</code> to check the annual chiller-off hours.</p>
+      <ul class="ref-files">
+        <li><strong>Inputs</strong><span><a href="case.json" download>Plant assumptions (JSON)</a> · <a href="data/astana_hourly.csv" download>Astana weather (CSV)</a></span></li>
+        <li><strong>Calculation</strong><span><a href="methods.html#reproduce">Equations, worked examples and rebuild commands</a></span></li>
+        <li><strong>Reference outputs</strong><span><a href="reference/hourly.csv" download>Hourly CSV</a> · <a href="reference/monthly.csv" download>Monthly CSV</a> · <a href="reference/annual.csv" download>Annual CSV</a></span></li>
+      </ul>
+      <p class="ref-date">Sources and calculations reviewed 14 November 2026.</p>
+    </section>
+  </div>
+</div>
+
+
+</main>
+<footer><div class="project-credit" id="project-contact" tabindex="-1"><div class="inner"><div class="credit-grid">
+  <div>
+    <h2>Project affiliation</h2>
+    <p class="credit-institute"><a href="https://inmet.nu.edu.kz/" aria-label="INMET — Institute of New Materials and Energy Technologies">INMET</a></p>
+    <p>Institute of New Materials and Energy Technologies</p>
+    <p>Nazarbayev University</p>
+  </div>
+  <div>
+    <h2>Project contact</h2>
+    <address>
+      <p class="credit-name"><a href="https://research.nu.edu.kz/en/persons/yanwei-wang/">Dr. Yanwei Wang</a></p>
+      <p><a href="mailto:yanwei.wang@nu.edu.kz">yanwei.wang@nu.edu.kz</a></p>
+    </address>
+    <p class="credit-feedback"><a href="mailto:yanwei.wang@nu.edu.kz?subject=KazDC%20Energy%20Tech%20reference%20case">Discuss a reference case with INMET</a></p>
+  </div>
+</div>
+</div></div>
+<div class="inner foot"><div><strong>KazDC-BIM</strong><span>Kazakhstan data-centre energy studies</span></div>
+<nav aria-label="Resources"><a href="methods.html">Astana methods</a><a href="references.html" data-reference-link>References</a><a href="bench.html">Experiment bench</a><a href="source.zip" data-source-download download>Download project ZIP</a></nav></div></footer>
+<script type="application/json" id="weather-data">{"cities": [{"slug": "astana", "name": "Astana", "means": [-14.447446, -12.720387, -4.627419, 6.459306, 14.908065, 20.130278, 20.708602, 19.888038, 12.319722, 4.296909, -6.627222, -12.046371]}, {"slug": "almaty", "name": "Almaty", "means": [-6.479167, -3.925149, 2.518011, 9.704583, 15.457258, 21.220833, 24.767742, 22.558871, 16.841111, 7.754839, -0.351528, -3.699866]}, {"slug": "shymkent", "name": "Shymkent", "means": [-0.406452, 1.748661, 8.591398, 15.5, 21.02836, 25.757778, 29.816398, 27.430914, 20.737222, 13.403226, 7.35875, 1.741129]}, {"slug": "atyrau", "name": "Atyrau", "means": [-5.21371, -3.102232, 3.414785, 12.138056, 21.102823, 25.674722, 28.125672, 25.876478, 18.643472, 11.409543, 2.258611, -3.408737]}, {"slug": "ekibastuz", "name": "Ekibastuz", "means": [-13.754704, -13.719643, -3.584812, 7.771806, 15.123522, 21.210833, 21.964382, 20.295833, 12.577639, 4.867339, -4.977639, -11.677016]}, {"slug": "oskemen", "name": "Oskemen", "means": [-15.670565, -15.086756, -2.515323, 7.93875, 13.616263, 19.581944, 20.790995, 19.243683, 13.057222, 5.801747, -4.1625, -13.638844]}, {"slug": "aktau", "name": "Aktau", "means": [2.8375, 1.297917, 6.631855, 12.626944, 19.420027, 24.851528, 26.845296, 27.046774, 20.497083, 14.581855, 6.891806, 3.261962]}, {"slug": "aktobe", "name": "Aktobe", "means": [-12.647581, -12.139583, -2.247715, 7.946944, 16.86586, 22.606944, 24.539651, 22.081586, 14.995, 6.693952, -3.15875, -8.805108]}, {"slug": "karaganda", "name": "Karaganda", "means": [-13.686559, -13.389435, -3.618548, 7.892222, 13.893011, 19.426944, 20.219355, 18.692876, 11.766667, 2.754839, -6.121806, -11.076613]}, {"slug": "kokshetau", "name": "Kokshetau", "means": [-13.692473, -14.102381, -5.843011, 5.6625, 13.652957, 18.518472, 20.326613, 18.188306, 10.945139, 4.142473, -4.597778, -10.072177]}, {"slug": "kostanay", "name": "Kostanay", "means": [-16.404704, -13.206994, -6.590054, 6.891667, 14.154167, 19.060278, 21.299866, 20.327688, 12.475694, 4.008065, -4.741667, -10.336022]}, {"slug": "kyzylorda", "name": "Kyzylorda", "means": [-4.722446, -3.485863, 5.982258, 15.160972, 21.947984, 26.655972, 28.88629, 26.449462, 20.254722, 10.178763, 2.2425, -5.975]}, {"slug": "oral", "name": "Oral", "means": [-9.710215, -10.349107, -2.316129, 9.747361, 16.463978, 20.900833, 23.799597, 22.81707, 14.559444, 7.122581, 0.412917, -6.428495]}, {"slug": "pavlodar", "name": "Pavlodar", "means": [-15.375403, -13.684375, -4.842876, 6.987083, 14.799597, 20.468472, 21.558065, 19.353226, 12.005, 5.152285, -5.448472, -13.51371]}, {"slug": "petropavl", "name": "Petropavl", "means": [-14.973118, -12.82128, -6.334274, 5.464444, 13.422849, 17.977222, 20.421237, 17.503495, 11.051111, 5.186828, -5.031944, -12.083468]}, {"slug": "qonaev", "name": "Qonaev", "means": [-3.83172, -2.662351, 5.784409, 14.505833, 20.043414, 24.702083, 26.545833, 25.628629, 18.950278, 10.849194, 4.910556, -2.850672]}, {"slug": "semey", "name": "Semey", "means": [-13.410887, -13.857292, -2.353629, 8.689444, 14.715726, 21.042361, 21.872177, 19.821102, 12.615833, 5.472984, -2.073889, -12.114382]}, {"slug": "taldykorgan", "name": "Taldykorgan", "means": [-8.976747, -6.548512, 2.934677, 10.645694, 16.70121, 21.147917, 23.47621, 20.93078, 15.718889, 7.745565, -1.321528, -4.026882]}, {"slug": "taraz", "name": "Taraz", "means": [-2.828898, -1.348214, 4.890591, 13.638056, 18.520565, 23.595, 26.474731, 24.054435, 17.8175, 10.339113, 1.544306, -1.872849]}, {"slug": "turkistan", "name": "Turkistan", "means": [-1.038172, 1.593452, 9.711425, 16.92625, 22.996102, 27.406667, 30.680914, 28.139247, 21.965417, 12.673656, 4.981944, -0.732124]}, {"slug": "zhezkazgan", "name": "Zhezkazgan", "means": [-12.903629, -12.73497, -1.910618, 10.566389, 17.045296, 23.576806, 25.538306, 22.61371, 15.617778, 6.62043, -1.128472, -8.448253]}], "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "chart": "Monthly mean dry-bulb temperature in °C for {first} and {second}."}</script>
+<script>"use strict";
+
+const MonthlyChart = (() => {
+  function svgNode(tag, attrs, label) {
+    const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+    if (label !== undefined) node.textContent = label;
+    return node;
+  }
+
+  function draw(id, series, months, label, climate = false) {
+    const holder = document.getElementById(id);
+    const width = Math.max(250, Math.round(holder.getBoundingClientRect().width));
+    const height = climate ? Math.min(215, width * .46) : Math.min(208, width * .45);
+    const left = climate ? 32 : 45, right = 15, top = 12, bottom = height - 27;
+    const values = series.flatMap(s => s.values);
+    const low = climate ? Math.min(-20, Math.floor(Math.min(...values) / 10) * 10) : 0;
+    const hiValue = Math.max(1, ...values);
+    const tickStep = climate ? 10 : Math.max(.25, Math.ceil(hiValue / 4 / 10) * 10);
+    const high = climate ? Math.max(30, Math.ceil(hiValue / 10) * 10) : Math.ceil(hiValue / tickStep) * tickStep;
+    const x = i => left + i * (width - left - right) / 11;
+    const y = value => bottom - (value - low) * (bottom - top) / (high - low);
+    const ink = climate ? "#cfe3d4" : "#50655a";
+    const svg = svgNode("svg", {viewBox: "0 0 " + width + " " + height, role:"img", "aria-label":label});
+    for (let v = low; v <= high; v += tickStep) {
+      svg.append(svgNode("line", {x1:left,y1:y(v),x2:width-right,y2:y(v),stroke:climate?"#53766a":"#d9dfd6",
+        "stroke-width": v === 0 ? 1.2 : .7, "stroke-dasharray":v === 0 ? "none":"3 4"}));
+      svg.append(svgNode("text", {x:left-6,y:y(v)+3,"text-anchor":"end",fill:ink,"font-size":10},window.SiteI18n.formatNumber(v)));
+    }
+    for (const [i, month] of months.entries()) {
+      if (width < 425 && i % 2) continue;
+      svg.append(svgNode("text", {x:x(i),y:height-5,"text-anchor":"middle",fill:ink,"font-size":10},month));
+    }
+    for (const s of series) {
+      const points = s.values.map((val, i) => x(i) + "," + y(val)).join(" ");
+      const line = svgNode("polyline", {points,fill:"none",stroke:s.color,"stroke-width":s.weight||2,
+        "stroke-linejoin":"round","stroke-linecap":"round","stroke-dasharray":s.dash||"none"});
+      line.append(svgNode("title", {}, s.name));
+      svg.append(line);
+      if (s.mark) s.values.forEach((v, i) => svg.append(svgNode("circle",
+        {cx:x(i),cy:y(v),r:2.7,fill:s.color})));
+    }
+    holder.replaceChildren(svg);
+  }
+
+  return {draw};
+})();
+
+"use strict";
+
+(() => {
+  const data = JSON.parse(document.getElementById("weather-data").textContent);
+  const city = document.getElementById("climate-city");
+  const peer = document.getElementById("climate-peer");
+  const byId = new Map(data.cities.map(row => [row.slug, row]));
+  const sorted = [...data.cities].sort((a, b) => a.name.localeCompare(b.name, document.documentElement.lang));
+  for (const select of [city, peer]) {
+    for (const row of sorted) select.add(new Option(row.name, row.slug));
+  }
+  const query = new URLSearchParams(location.search);
+  city.value = byId.has(query.get("city")) ? query.get("city") : "astana";
+  peer.value = byId.has(query.get("peer")) ? query.get("peer") : "shymkent";
+  let previousCity = "";
+  function draw(withTable = false) {
+    const first = byId.get(city.value), second = byId.get(peer.value);
+    const label = data.chart.replace("{first}", first.name).replace("{second}", second.name);
+    MonthlyChart.draw("weather-chart", [
+      {name:second.name, values:second.means, color:"#ebc888", weight:2, dash:"5 4"},
+      {name:first.name, values:first.means, color:"#a5e5bd", weight:3, mark:true}
+    ], data.months, label, true);
+    if (withTable) {
+      document.getElementById("weather-caption").textContent = label;
+      document.getElementById("weather-first").textContent = first.name;
+      document.getElementById("weather-second").textContent = second.name;
+      const rows = window.SiteI18n.months.map((month, index) => {
+        const row = document.createElement("tr");
+        const header = document.createElement("th");
+        header.scope = "row";
+        header.textContent = month;
+        row.append(header);
+        for (const city of [first, second]) {
+          row.insertCell().textContent = window.SiteI18n.formatNumber(city.means[index],
+            {minimumFractionDigits:1, maximumFractionDigits:1});
+        }
+        return row;
+      });
+      document.getElementById("weather-rows").replaceChildren(...rows);
+      document.getElementById("weather-values").hidden = false;
+    }
+  }
+  function update(changed = false) {
+    if (city.value === peer.value) {
+      peer.value = previousCity && previousCity !== city.value ? previousCity : (city.value === "astana" ? "shymkent" : "astana");
+    }
+    previousCity = city.value;
+    for (const option of peer.options) option.disabled = option.value === city.value;
+    const address = new URL(location.href);
+    if (changed || query.has("city") || query.has("peer")) {
+      address.searchParams.set("city", city.value);
+      address.searchParams.set("peer", peer.value);
+    }
+    if (changed && /^https?:$/.test(location.protocol)) history.replaceState(null, "", address);
+    for (const link of document.querySelectorAll('[data-reference-language], [data-weather-return], [data-study-link="regional"]')) {
+      const target = new URL(link.href);
+      target.search = address.search;
+      link.href = target.href;
+    }
+    draw(true);
+  }
+  city.addEventListener("change", () => update(true));
+  peer.addEventListener("change", () => update(true));
+  window.addEventListener("resize", () => draw());
+  update();
+})();
+</script>
+<script>// Native disclosure and links also work without JavaScript.
+(() => {
+  const menu = document.querySelector(".language-menu");
+  const summary = menu.querySelector("summary");
+  document.addEventListener("click", event => {
+    if (menu.open && !menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && menu.open) {
+      menu.open = false;
+      summary.focus();
+    }
+  });
+  function syncLanguageLinks() {
+    for (const link of menu.querySelectorAll("a[hreflang]")) {
+      const destination = new URL(link.href);
+      // Offline studies set their target queries directly because file URLs cannot be rewritten with history.
+      if (location.protocol !== "file:") destination.search = location.search;
+      destination.hash = location.hash;
+      link.href = destination.href;
+    }
+  }
+  syncLanguageLinks();
+  menu.addEventListener("toggle", syncLanguageLinks);
+  menu.addEventListener("click", syncLanguageLinks, true);
+  window.addEventListener("hashchange", syncLanguageLinks);
+  window.addEventListener("popstate", syncLanguageLinks);
+})();
+</script>
+</body></html>

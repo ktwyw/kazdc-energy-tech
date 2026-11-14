@@ -1,0 +1,40 @@
+<header class="research-intro">
+  <div class="research-intro-text">
+    <p class="kicker">INMET · KazDC-BIM</p>
+    <h1>{{TITLE}}</h1>
+    <p class="deck">{{Q_intro}}</p>
+    <a class="brief-download" href="{{BRIEF_FILE}}" download>{{Q_briefLink}}</a>
+  </div>
+  <figure class="research-case" aria-labelledby="july-title">
+    <figcaption><h2 id="july-title">{{Q_caseTitle}}</h2><p>{{Q_caseContext}}</p></figcaption>
+    <p class="july-metric" id="july-metric">{{Q_caseMetric}}</p>
+    <dl id="july-comparison" aria-labelledby="july-metric" data-it-mw="{{IT_MW}}" data-hours="{{JULY_HOURS}}">
+      {{JULY_ROWS}}
+    </dl>
+    <p class="case-meaning">{{Q_caseNote}}</p>
+  </figure>
+</header>
+
+<section class="research-questions" id="questions" aria-labelledby="research-questions-title">
+  <h2 id="research-questions-title">{{Q_prioritiesTitle}}</h2>
+  {{PRIORITY_ROWS}}
+</section>
+
+<section class="research-pilot" id="first-study" aria-labelledby="research-pilot-title">
+  <header><h2 id="research-pilot-title">{{Q_pilotTitle}}</h2><p>{{Q_pilotIntro}}</p>
+    <a class="brief-download" href="{{BRIEF_FILE}}" download>{{Q_briefLink}}</a>
+  </header>
+  <dl class="research-plan">
+    <div><dt>{{Q_partnerLabel}}</dt><dd>{{Q_partner}}</dd></div>
+    <div><dt>{{Q_recordsLabel}}</dt><dd>{{Q_records}}</dd></div>
+    <div><dt>{{Q_timeLabel}}</dt><dd>{{Q_time}}</dd></div>
+    <div><dt>{{Q_staffLabel}}</dt><dd>{{Q_staff}}</dd></div>
+    <div><dt>{{Q_costLabel}}</dt><dd>{{Q_cost}}</dd></div>
+    <div><dt>{{Q_deliverableLabel}}</dt><dd>{{Q_deliverable}}</dd></div>
+  </dl>
+</section>
+<section class="research-close" aria-labelledby="partner-question">
+  <h2 id="partner-question">{{Q_closing}}</h2>
+  <a class="action" href="#project-contact">{{Q_invitation}}</a>
+</section>
+<div class="research-sources"><a href="{{METHODS_URL}}#limits">{{Q_methodsLink}}</a><a href="{{REFERENCES_URL}}#stations">{{Q_weatherLink}}</a></div>

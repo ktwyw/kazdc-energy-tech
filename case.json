@@ -1,0 +1,8 @@
+{
+  "it_kw": 1000.0,
+  "loop_rise_k": 6.0,
+  "rated_approach_k": 5.0,
+  "chiller_cop": 4.0,
+  "dry_fan_kw": 25.0,
+  "loop_pump_kw": 15.0
+}

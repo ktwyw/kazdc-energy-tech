@@ -1,0 +1,2 @@
+supply_c,hours,off_hours,assist_hours,mechanical_hours,baseline_mwh_e,chiller_mwh_e,fan_mwh_e,pump_mwh_e,dry_mwh_th,chiller_mwh_th,hybrid_mwh_e,savings_mwh_e,savings_pct,dry_share_pct,off_pct
+18.0,8760,5888,1893,979,2321.4,443.281818,116.16392,131.4,6986.872727,1773.127273,690.845738,1630.554262,70.240125,79.758821,67.214612

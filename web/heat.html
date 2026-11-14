@@ -1,0 +1,34 @@
+<section class="page-intro"><p class="kicker">Technology study · Heat recovery</p>
+<h1>Who can use the heat?</h1><p class="deck">A liquid-cooled rack releases heat all year. A nearby building needs it only at certain temperatures and times. Explore how much of that demand coincides with usable heat.</p></section>
+<section class="workspace">
+<div class="heading"><h2>Match a rack to a heat user</h2><button class="quiet" id="reset">Reset case</button></div>
+<div class="compare-grid">
+ <form id="heat-form" class="controls"><h3>Heat recovery case</h3>
+  <label for="city">Weather location</label><select id="city" aria-describedby="weather-origin"></select>
+  <p class="fine" id="weather-origin"></p>
+  <label for="mode">Delivery method</label><select id="mode"><option value="direct">Direct heat exchanger</option><option value="lift">Direct with heat-pump backup</option></select>
+  <div class="field-pair"><div><label for="warm">Rack return (°C)</label><input required id="warm" type="number" value="40" min="15" max="65" step="0.5"></div><div><label for="target">User supply (°C)</label><input required id="target" type="number" value="35" min="20" max="80" step="0.5"></div></div>
+  <label for="capture">IT heat available in liquid loop (%)</label><input required id="capture" type="number" value="70" min="0" max="100" step="0.1">
+  <p id="capture-context" class="fine" hidden>The cold-plate fraction is applied to every watt of rack IT power in this scenario. For a real rack, weight each component’s capture fraction by its share of rack power.</p>
+  <label for="peak">Peak building demand (kW thermal)</label><input required id="peak" type="number" value="750" min="0" max="5000" step="any">
+  <label for="cop">Heating COP at selected temperatures</label><input required id="cop" type="number" value="4" min="1.1" max="10" step="0.1">
+  <p class="fine">Illustrative building and equipment. The IT load is fixed at {{IT_MW}} MW.</p>
+ </form>
+ <div class="result-panel"><div class="result-title"><h3 id="heat-title">Annual heat balance</h3><span>Typical year</span></div>
+  <div class="metrics"><div><span>Heat delivered</span><strong id="delivered">—</strong><small>MWh thermal</small></div><div><span>Demand covered</span><strong id="coverage">—</strong><small>of annual heating</small></div><div><span>Heat-pump input</span><strong id="compressor">—</strong><small>MWh electric</small></div></div>
+  {{COPY_CASE}}
+  <p id="heat-status" class="interpretation" role="status"></p><div class="chart-head"><h3>Heat delivered and demand</h3><span>MWh thermal</span></div>
+  <div id="heat-chart" class="graphic"></div><div class="legend"><span class="dot teal"></span>Delivered <span class="dot muted"></span>Demand</div>
+ </div></div>
+ <p class="error" id="heat-error" role="status" hidden></p>
+ <details class="details"><summary>Monthly energy balance and CSV</summary><div class="details-body"><div class="table-wrap"><table id="heat-table"></table></div><button class="action" id="download-heat">Download heat balance</button></div></details>
+</section>
+<section class="reading"><div><p class="kicker">Methods</p><h2>Temperature, capacity and timing</h2></div><div>
+ <h3>Match each hour</h3><p>Building demand rises linearly from zero at 15 °C outdoors to the selected peak at −25 °C and stays within those limits. This is an illustrative space-heating curve. The local weather supplies the timing. The peak, liquid capture fraction and fixed temperatures are scenario assumptions.</p>
+ <h3>Direct exchange or temperature lift</h3><p>Direct supply requires the hot rack return to exceed the user’s supply temperature by at least 3 K. For this screen the user return is 10 K below its supply, the rack loop cools by 6 K at full capture, and flows can be controlled. At that threshold the cold-end approach is at least 7 K. An exchanger sized for the captured duty is assumed. A detailed design needs both measured flows, temperatures and a vendor performance curve.</p>
+ <p>When direct transfer qualifies, delivered heat is the smaller of building demand and available rack heat. Otherwise direct delivery is zero. With heat-pump backup enabled, the model adds compressor work until demand is met or the source heat is exhausted. The heating COP is constant at the selected operating point. In heat-pump mode, source flow is modulated to maintain a 6 K water temperature drop while heat is extracted. The coldest source water therefore leaves at the rack return temperature minus 6 K. For a single evaporating and condensing temperature, the optimistic reversible heating COP is T<sub>user supply,K</sub> / (T<sub>user supply,K</sub> − T<sub>leaving source,K</sub>). Both temperatures are absolute. For a 15 °C rack return and 70 °C delivery, the source leaves at 9 °C and the bound is 343.15 / 61 ≈ 5.63. A real heat pump must operate below this bound, and its performance map sets the achievable COP.</p>
+ <p class="equation">Heat delivered = heat taken from the rack + compressor electricity</p>
+ <p>Remaining heating demand is the building demand minus the heat delivered by the rack and heat pump. The building’s other heating equipment is outside the calculation. Loop pumping, pipe losses, simultaneous residual cooling and displaced boiler energy are outside this heat balance. The thermal output is a separate service from cooling-plant electricity.</p>
+ <h3>Connect it to a measurement</h3><p>Measure the rack loop’s return temperature and flow together with the building supply, return and flow over the same interval. A nominally warm return is useful only while heat is requested at the receiving end. <a href="{{BENCH_URL}}">Try the water-loop experiment</a></p>
+ <p class="sources"><a href="{{REFERENCES_URL}}#heat">Heat recovery sources and assumptions</a> · <a href="https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf">DOE design guide, §§5.6 and 7.1</a> · <a href="https://www.nlr.gov/docs/fy15osti/62905.pdf#page=23">NREL measured rack study</a> · <a href="https://openstax.org/books/university-physics-volume-2/pages/4-5-the-carnot-cycle">Reversible COP, OpenStax §4.5</a></p>
+</div></section>

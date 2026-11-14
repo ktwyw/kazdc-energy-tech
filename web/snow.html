@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>Seasonal snow cooling in Astana · {{SITE_TITLE}}</title>
+  {{SITE_METADATA}}
+  <style>{{STYLE}}{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body class="snow-page">
+<a class="skip" href="#facility">Skip to the data-centre calculator</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" data-supply-link href="{{REGIONAL_URL}}" aria-label="{{SITE_TITLE}} home"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>{{SITE_TITLE}}</a>
+  <nav aria-label="Project pages"><a data-supply-link href="{{DASHBOARD_URL}}">Cooling dashboard</a><a href="{{METHODS_URL}}">Methods</a><a href="{{REFERENCES_URL}}">References</a><a href="{{RESEARCH_URL}}">{{RESEARCH_NAV_LABEL}}</a><a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main class="wrap snow-book">
+  <div class="snow-title"><p class="eyebrow">Astana · seasonal thermal storage</p>
+    <h1>Can winter snow cool a data centre in summer?</h1>
+    <p>Stored snow can absorb heat as it melts. Explore how much summer cooling one winter’s snow could provide in Astana, and how much electricity the chiller would still use.</p>
+  </div>
+  <nav class="view-links" aria-label="Snow study views">
+    <a href="#facility">Data-centre calculator</a><a href="#storage-designs">Storage designs and 5 kW simulation</a><a href="#equipment">Equipment and measurements</a>
+  </nav>
+  <noscript><p class="notice">Enable JavaScript to simulate the three plants and explore the seven-day replay. The storage designs, model assumptions and measurement notes below can be read offline.</p></noscript>
+
+  <section class="snow-section" id="facility" aria-labelledby="facility-title">
+    <div class="block-title"><div><h2 id="facility-title">Data-centre calculator</h2>
+      <p>Start with a <span id="plant-load">1 MW</span> IT load and an hourly Astana weather year. The dry cooler removes heat first. From June through August, meltwater can take some of the heat that would otherwise reach the chiller. Vary the snow volume to see how long it lasts, then vary the exchanger duty to see whether the chiller can switch off.</p></div>
+      <button type="button" class="plain-button" id="reset-snow">Reset scenario</button></div>
+    <div class="facility-grid">
+      <form id="facility-form" class="control-surface">
+        <h3>Plant and store</h3>
+        <div class="fields">
+          <label>Coolant supply <span>°C</span><select name="supply" id="snow-supply">{{SUPPLY_OPTIONS}}</select></label>
+          <label>Compacted snow <span>m³</span><input name="volume" type="number" min="0" max="500000" step="any" value="4000" required></label>
+          <label>Ice-equivalent density <span>kg ice/m³</span><input name="density" type="number" min="0" max="917" step="any" value="550" required></label>
+          <label>Usable on 1 June <span>% of initial ice energy</span><input name="retained" type="number" min="0" max="100" step="any" value="70" required></label>
+          <label>Useful exchanger duty <span>kW thermal</span><input name="rating" type="number" min="0" max="10000" step="any" value="500" required></label>
+          <label>Snow pump at rating <span>kW electric</span><input name="pump" type="number" min="0" max="1000" step="any" value="5" required></label>
+          <label class="wide">When to discharge<select name="policy" id="snow-policy"><option value="as-needed">Whenever the chiller is needed</option><option value="hot-hours">Reserve snow for hot hours</option></select></label>
+          <label class="wide" id="hot-control" hidden>Outdoor trigger <span>°C or warmer</span><input name="threshold" type="number" min="0" max="45" step="any" value="25" required></label>
+        </div>
+        <details class="small-detail"><summary>Collection and handling electricity</summary>
+          <label>Extra electricity per tonne of initial ice <span>kWh/t</span><input name="handling" type="number" min="0" max="1000" step="any" value="0" required></label>
+          <p>Enter electric haulage or compaction attributable to this fill. Record diesel use separately.</p>
+        </details>
+        <p class="validation" id="invalid-case" role="alert" hidden></p>
+      </form>
+      <div class="facility-results" aria-live="polite" aria-atomic="false">
+        <article class="savings-hero"><p>Annual electricity saved by adding snow</p>
+          <div class="savings-number" id="net-saved">—</div><p id="saving-split"></p>
+        </article>
+        <div class="snow-kpis">
+          <div><h3>Summer heat removed by snow</h3><strong id="snow-heat">—</strong><p id="snow-share"></p></div>
+          <div><h3>Additional chiller-off time</h3><strong id="added-hours">—</strong><p id="total-hours"></p></div>
+          <div><h3>Peak backup duty</h3><strong id="peak-duty">—</strong><p>Highest hourly chiller load in the typical year</p></div>
+        </div>
+        <figure class="stock-figure"><figcaption><h3>Usable snow inventory</h3><span>Daily closing balance · MWh thermal</span></figcaption>
+          <div id="stock-chart" class="snow-chart"></div>
+          <p id="stock-note"></p>
+        </figure>
+      </div>
+    </div>
+    {{COPY_CASE@facility}}
+    <div class="target-panel"><div><h3>Size a store for a summer target</h3><p>Match a share of the chiller duty left after dry cooling, with the selected equipment and dispatch rule.</p></div>
+      <label>Target share <span>%</span><input type="number" min="0" max="100" step="any" value="10" required id="size-target" name="target" form="facility-form"></label>
+      <div class="target-answer"><strong id="target-volume">—</strong><p id="target-note"></p><button type="button" id="apply-target" class="plain-button">Use this volume</button></div>
+    </div>
+    <article class="month-card">
+      <div class="block-title"><div><h3>Three plants across the year</h3><p id="monthly-boundary">Monthly cooling-plant electricity includes the chiller, fans and pumps. Electric handling is counted in the annual saving above. The annual stock entry is the usable energy remaining on 31 August, when dispatch ends.</p></div>
+      <div class="table-actions"><label>Electricity shown<select id="monthly-meter"><option value="plant">Whole cooling plant</option><option value="chiller">Chiller package only</option></select></label>
+      <button id="snow-download" type="button" class="plain-button">Download monthly CSV ↓</button></div></div>
+      <div class="scroll" tabindex="0" role="region" aria-label="Monthly comparison of three cooling plants">
+        <table><thead><tr><th scope="col">Month</th><th scope="col">Chiller only<br><em>MWh electric</em></th><th scope="col">Dry cooler + chiller<br><em>MWh electric</em></th><th scope="col">Dry cooler + snow + chiller<br><em>MWh electric</em></th><th scope="col">Heat removed by snow<br><em>MWh thermal</em></th><th scope="col">Extra off time<br><em>hours</em></th><th scope="col">Peak backup<br><em>kW thermal</em></th></tr></thead>
+        <tbody id="snow-months"></tbody><tfoot id="snow-year"></tfoot></table></div>
+    </article>
+    <details class="math-note"><summary>How the hourly calculation works</summary>
+      <p>The plant first applies the original dry-cooler controller. Each summer hour, the snow loop can take the smallest of the residual chiller load, the rated useful exchanger duty and the remaining usable energy divided by one hour. The backup chiller removes the balance. A chiller-off hour requires zero mechanical duty for the whole hourly balance. <a href="{{METHODS_URL}}#dispatch">Dry-cooler dispatch equations</a></p>
+      <p><strong>Storage.</strong> Initial latent energy in kWh is compacted volume × ice-equivalent density × 333.5 / 3,600. The usable fraction combines survival through the hold and accessible ice after reserve. On 1 June this sets the budget for useful heat delivery over the whole summer. Allow for expected storage losses and inaccessible ice when setting this fraction. The calculation assumes a constant useful exchanger duty while stock lasts. Site measurements could resolve heat leakage and changing water–ice contact hour by hour.</p>
+      <p><strong>Electricity.</strong> The buffered loop cycles the snow pump at rated duty. Pump energy per kWh of delivered heat equals rated pump input divided by rated exchanger duty. Discharge requires this ratio to be below 1/COP. The annual saving compares the snow plant with the dry cooler plus chiller, then subtracts the entered collection electricity. The net can be negative.</p>
+      <p><strong>Sizing.</strong> The target volume is the requested heat divided by usable energy per cubic metre. It can meet the target only if the eligible hours and useful exchanger duty allow that much heat transfer. The hot-hour policy uses each hour’s outdoor temperature and retains any unused reserve. Exchanger duty is an assumed net rating achievable at the selected supply temperature. The IT heat load stays fixed. Weather determines how much cooling the chiller must supply after dry cooling. Compacted volume and density are independent site inputs.</p>
+      <p>Reference physics and weather. <a href="https://www.teos-10.org/pubs/Feistel_2003.pdf">Feistel, latent heat of fusion at 0 °C</a> · <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">Astana TMYx weather</a></p>
+    </details>
+  </section>
+
+  <section class="snow-section" id="storage-designs" aria-labelledby="campus-title">
+    <div class="block-title" id="campus"><div><h2 id="campus-title">Three ways to store winter snow</h2>
+      <p>An insulated container, a store built from insulation panels and a pile covered with wood chips offer three ways to keep winter snow for summer cooling. Use the example volumes and assumed heat gains to estimate how much ice remains on 1 July. A separate seven-day simulation shows how contact between meltwater and ice affects cooling at a steady 5 kW load.</p></div></div>
+    <div class="campus-card">
+      <h3>How much ice could survive to 1 July?</h3>
+      <p>From 1 April to 1 July, the model holds the snow for 91 days before water circulation begins. All three stores start with the same assumed density and mean heat gain so you can see the effect of volume. Change a store’s heat gain to explore how better insulation would affect the ice left in July.</p>
+      <label class="campus-density">Shared ice-equivalent density <span>kg ice/m³</span><input type="number" required step="any" min="0" max="917" id="campus-density" value="550" form="campus-form"></label>
+      <form id="campus-form"><div class="store-grid">
+        <article><h4>Insulated container</h4><p>55 m³ · Active cooling design</p><p>An insulated jacket protects the snow. During discharge, meltwater carries heat from a separate coolant loop.</p><label>Assumed heat gain <span>W</span><input name="container" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-container">—</strong></article>
+        <article><h4>Panel store</h4><p>60 m³ · Passive comparison</p><p>Polyisocyanurate sandwich panels enclose the stored snow.</p><label>Assumed heat gain <span>W</span><input name="panels" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-panels">—</strong></article>
+        <article><h4>Covered pile</h4><p>50 m³ · Passive comparison</p><p>A wood-chip blanket insulates a pile placed on a liner.</p><label>Assumed heat gain <span>W</span><input name="pile" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-pile">—</strong></article>
+      </div></form>
+      {{COPY_CASE@storage-designs}}
+      <p class="fine" id="campus-note" aria-live="polite"></p>
+    </div>
+    <article class="replay-card" id="replay">
+      <div class="block-title"><div><h3>Can the store deliver 5 kW for seven days?</h3>
+        <p>The SnowCool simulation starts with 20 tonnes of ice in a 50 m³ cube with 300 mm of insulation. After a 120-day hold, the load calls for 5 kW continuously for 168 hours, or 840 kWh in total. Switch the contact condition to see when backup cooling starts and how much ice is still available then.</p></div>
+        <label>Contact condition<select id="contact"><option value="degraded">Degraded contact</option><option value="reference">Reference contact</option></select></label></div>
+      <div class="replay-metrics"><div><h4>Snow cooling delivered</h4><strong id="replay-snow">—</strong></div><div><h4>Backup cooling required</h4><strong id="replay-backup">—</strong></div><div><h4>Ice energy at the end</h4><strong id="replay-end">—</strong></div></div>
+      <div class="replay-plots"><figure><figcaption>Ice energy remaining <span>kWh thermal</span></figcaption><div class="snow-chart" id="ice-chart"></div></figure>
+      <figure><figcaption>Useful cooling delivered by snow <span>Hourly mean kW thermal</span></figcaption><div class="snow-chart" id="duty-chart"></div></figure></div>
+      <label class="replay-slider" for="replay-hour">Inspect the end of hour <output id="replay-hour-value" for="replay-hour">168</output><input type="range" id="replay-hour" min="1" max="168" value="168" step="1"></label>
+      {{COPY_CASE@replay}}
+      <p class="replay-readout" id="replay-readout" aria-live="polite"></p>
+      <p class="fine">Warm return water can find channels through the snow. A smaller wetted ice surface limits the heat transfer rate, even while ice remains. During discharge, enclosure heat gain (228 W) and pump heat (40 W) melt a further 45.03 kWh of ice over seven days. For reference contact, the initial 1,198.88 kWh therefore covers 840.00 kWh of useful cooling and leaves 313.86 kWh of ice. The replay aggregates the audited case-A traces to one-hour intervals. It retains the original study’s 334 kJ/kg fusion value and its 10% terminal reserve.</p>
+    </article>
+  </section>
+
+  <section class="snow-section" id="equipment" aria-labelledby="equipment-title">
+    <div class="block-title"><div><h2 id="equipment-title">Equipment and field measurements</h2><p>Which measurements would show whether a store performs as the model predicts? Each component in the building information model (BIM) can be linked to a measurable quantity, from heat entering the store to electricity drawn by the chiller.</p></div></div>
+    <div class="equipment-grid">
+      <details open><summary>Store and insulation</summary><p>Record fill volume, ice-equivalent density, footprint and cover construction. Weigh representative samples, survey the changing volume, and log cover and base heat flux to check the holding loss.</p></details>
+      <details><summary>Sump and snow contact</summary><p>Record the sump level, meltwater temperature and return-water distribution. A rising outlet temperature at the same load and flow can identify loss of contact. Measure drainage and conductivity to account for escaping water and dissolved salts.</p></details>
+      <details><summary>Plate exchanger and clean loop</summary><p>The meltwater circuit and clean coolant loop exchange heat across plates. Measure both flow rates and all four port temperatures. Compare each side’s mass flow × specific heat × temperature change with the assumed useful duty.</p></details>
+      <details><summary>Pumps, chiller and handling</summary><p>Submeter the snow pump and chiller package and log operating hours. Weigh collected snow and record electric and fuel inputs for additional hauling and compaction. Compare with a dry-cooler-plus-chiller run under the same load and weather.</p></details>
+    </div>
+    <p class="source-line"><a href="{{REFERENCES_URL}}#snow">Snow sources and scenario assumptions</a>. The technology has field precedents in Sweden and Japan. Only the facility plant uses Astana’s hourly typical year. The three-store comparison uses 91 days of assumed heat gain for each store. The seven-day model replay uses a prescribed summer boundary following 120 days of storage. <a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=86">Sundsvall hospital storage</a> · <a href="https://www.city.bibai.hokkaido.jp/soshiki/13/417.html">Bibai White Data Center</a></p>
+    <p class="fine">The seven-day simulation comes from <cite>Astana SnowCool, Physics-Guided Design of Seasonal Snow Storage for Data-Center Cooling in Astana</cite>, audited study v1.1, 16 September 2026. The project ZIP includes the hourly results and explains how they were derived.</p>
+  </section>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap">{{PROJECT_CREDIT}}</div></footer>
+<script id="snow-text" type="application/json">{{SNOW_TEXT}}</script>
+<script id="snow-data" type="application/json">{{DATA}}</script>
+<script>{{MODEL}}</script>
+<script>{{UI}}</script>
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body></html>

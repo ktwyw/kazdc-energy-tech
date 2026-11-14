@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>Сезонное охлаждение снегом в Астане · {{SITE_TITLE}}</title>
+  {{SITE_METADATA}}
+  <style>{{STYLE}}{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body class="snow-page">
+<a class="skip" href="#facility">К расчёту охлаждения дата-центра</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" data-supply-link href="{{REGIONAL_URL}}" aria-label="Главная страница {{SITE_TITLE}}"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>{{SITE_TITLE}}</a>
+  <nav aria-label="Страницы проекта"><a data-supply-link href="{{DASHBOARD_URL}}">Расчёт охлаждения</a><a href="{{METHODS_URL}}">Методика</a><a href="{{REFERENCES_URL}}">Источники</a><a href="{{RESEARCH_URL}}">{{RESEARCH_NAV_LABEL}}</a><a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main class="wrap snow-book">
+  <div class="snow-title"><p class="eyebrow">Астана · сезонное аккумулирование холода</p>
+    <h1>Может ли зимний снег охлаждать дата-центр летом?</h1>
+    <p>При таянии снег поглощает тепло. Оцените, сколько холода за лето в Астане даст снег, собранный за одну зиму, и сколько электроэнергии при этом потребуется чиллеру.</p>
+  </div>
+  <nav class="view-links" aria-label="Разделы исследования хранения снега">
+    <a href="#facility">Расчёт для дата-центра</a><a href="#storage-designs">Снегохранилища и модель на 5 кВт</a><a href="#equipment">Оборудование и измерения</a>
+  </nav>
+  <noscript><p class="notice">Включите JavaScript, чтобы сравнить три системы охлаждения и просмотреть семь суток моделирования по часам. Описания трёх вариантов хранения снега, допущения и рекомендации по измерениям доступны без подключения к сети.</p></noscript>
+
+  <section class="snow-section" id="facility" aria-labelledby="facility-title">
+    <div class="block-title"><div><h2 id="facility-title">Расчёт для дата-центра</h2>
+      <p>В расчёте используется постоянная ИТ-нагрузка <span id="plant-load">1 МВт</span> и почасовые метеоданные типового года для Астаны. Сначала тепло отводит сухой охладитель. С июня по август талая вода может принять часть тепла, которое иначе пришлось бы отводить чиллеру. Измените объём снега, чтобы узнать, насколько его хватит. Затем измените мощность теплообменника и проверьте, когда чиллер сможет отключиться.</p></div>
+      <button type="button" class="plain-button" id="reset-snow">Сбросить параметры</button></div>
+    <div class="facility-grid">
+      <form id="facility-form" class="control-surface">
+        <h3>Система охлаждения и хранилище</h3>
+        <div class="fields">
+          <label>Температура подачи теплоносителя <span>°C</span><select name="supply" id="snow-supply">{{SUPPLY_OPTIONS}}</select></label>
+          <label>Объём уплотнённого снега <span>м³</span><input name="volume" type="number" min="0" max="500000" step="any" value="4000" required></label>
+          <label>Плотность в ледовом эквиваленте <span>кг льда/м³</span><input name="density" type="number" min="0" max="917" step="any" value="550" required></label>
+          <label>Доступно на 1 июня <span>% начального запаса холода</span><input name="retained" type="number" min="0" max="100" step="any" value="70" required></label>
+          <label>Полезная мощность теплообменника <span>кВт (тепл.)</span><input name="rating" type="number" min="0" max="10000" step="any" value="500" required></label>
+          <label>Мощность насоса талой воды в номинальном режиме <span>кВт (эл.)</span><input name="pump" type="number" min="0" max="1000" step="any" value="5" required></label>
+          <label class="wide">Когда использовать запас<select name="policy" id="snow-policy"><option value="as-needed">Когда требуется чиллер</option><option value="hot-hours">Сохранять снег для жарких часов</option></select></label>
+          <label class="wide" id="hot-control" hidden>Порог наружной температуры <span>°C и выше</span><input name="threshold" type="number" min="0" max="45" step="any" value="25" required></label>
+        </div>
+        <details class="small-detail"><summary>Электроэнергия на сбор и обработку снега</summary>
+          <label>Дополнительный расход на тонну начальной массы льда <span>кВт·ч/т</span><input name="handling" type="number" min="0" max="1000" step="any" value="0" required></label>
+          <p>Укажите электроэнергию, дополнительно затраченную на перевозку или уплотнение этой партии снега. Расход дизельного топлива учитывается отдельно.</p>
+        </details>
+        <p class="validation" id="invalid-case" role="alert" hidden></p>
+      </form>
+      <div class="facility-results" aria-live="polite" aria-atomic="false">
+        <article class="savings-hero"><p>Годовая экономия электроэнергии при добавлении снега</p>
+          <div class="savings-number" id="net-saved">—</div><p id="saving-split"></p>
+        </article>
+        <div class="snow-kpis">
+          <div><h3>Тепло, отведённое снегом за лето</h3><strong id="snow-heat">—</strong><p id="snow-share"></p></div>
+          <div><h3>Дополнительное время отключения чиллера</h3><strong id="added-hours">—</strong><p id="total-hours"></p></div>
+          <div><h3>Пиковая нагрузка резервного чиллера</h3><strong id="peak-duty">—</strong><p>Наибольшая часовая нагрузка на чиллер за типовой год</p></div>
+        </div>
+        <figure class="stock-figure"><figcaption><h3>Доступный запас холода в снегу</h3><span>Остаток на конец суток · МВт·ч (тепл.)</span></figcaption>
+          <div id="stock-chart" class="snow-chart"></div>
+          <p id="stock-note"></p>
+        </figure>
+      </div>
+    </div>
+    {{COPY_CASE@facility}}
+    <div class="target-panel"><div><h3>Подбор объёма хранилища под летнюю нагрузку</h3><p>Задайте, какую долю летней нагрузки чиллера после сухого охлаждения должен покрыть снег при выбранных оборудовании и режиме работы.</p></div>
+      <label>Целевая доля <span>%</span><input type="number" min="0" max="100" step="any" value="10" required id="size-target" name="target" form="facility-form"></label>
+      <div class="target-answer"><strong id="target-volume">—</strong><p id="target-note"></p><button type="button" id="apply-target" class="plain-button">Использовать этот объём</button></div>
+    </div>
+    <article class="month-card">
+      <div class="block-title"><div><h3>Сравнение трёх систем за год</h3><p id="monthly-boundary">Месячное электропотребление системы включает чиллер, вентиляторы и насосы. Электроэнергия на сбор и обработку снега учтена в годовой экономии выше. В годовой записи указан остаток доступного холода на 31 августа, когда заканчивается сезон использования снега.</p></div>
+      <div class="table-actions"><label>Что включить в электропотребление<select id="monthly-meter"><option value="plant">Система охлаждения целиком</option><option value="chiller">Только чиллер</option></select></label>
+      <button id="snow-download" type="button" class="plain-button">Скачать месячные данные (CSV) ↓</button></div></div>
+      <div class="scroll" tabindex="0" role="region" aria-label="Сравнение трёх систем охлаждения по месяцам">
+        <table><thead><tr><th scope="col">Месяц</th><th scope="col">Только чиллер<br><em>МВт·ч (эл.)</em></th><th scope="col">Сухой охладитель + чиллер<br><em>МВт·ч (эл.)</em></th><th scope="col">Сухой охладитель + снег + чиллер<br><em>МВт·ч (эл.)</em></th><th scope="col">Тепло, отведённое снегом<br><em>МВт·ч (тепл.)</em></th><th scope="col">Дополнительное время отключения<br><em>ч</em></th><th scope="col">Пик резервной нагрузки<br><em>кВт (тепл.)</em></th></tr></thead>
+        <tbody id="snow-months"></tbody><tfoot id="snow-year"></tfoot></table></div>
+    </article>
+    <details class="math-note"><summary>Как выполняется почасовой расчёт</summary>
+      <p>Сначала система применяет исходный алгоритм управления сухим охладителем. В каждый летний час мощность снежного контура равна наименьшей из трёх величин: остаточной нагрузки чиллера, номинальной полезной мощности теплообменника и доступного запаса холода, делённого на один час. Оставшееся тепло отводит резервный чиллер. Час засчитывается как время отключения только при нулевой потребности в механическом охлаждении по балансу за весь час. <a href="{{METHODS_URL}}#dispatch">Уравнения управления сухим охладителем</a></p>
+      <p><strong>Хранение.</strong> Начальный запас скрытой теплоты плавления в кВт·ч равен произведению объёма уплотнённого снега на плотность в ледовом эквиваленте и на 333,5 / 3 600. Доступная доля учитывает сохранность льда за время хранения и ту его часть, которую можно использовать после вычета резерва. Так на 1 июня задаётся предельная полезная холодоотдача за лето. При выборе доли учитывайте ожидаемые потери и недоступный лёд. Полезная мощность теплообменника предполагается постоянной, пока есть запас. Натурные измерения позволили бы установить почасовой приток тепла и изменения контакта воды со льдом.</p>
+      <p><strong>Электроэнергия.</strong> Насос контура с буферной ёмкостью периодически включается в номинальном режиме. Расход электроэнергии насоса на 1 кВт·ч полезного холода равен отношению его номинальной электрической мощности к номинальной тепловой мощности теплообменника. Использование запаса допускается, если это отношение меньше 1/COP. Годовая экономия рассчитывается относительно сухого охладителя с чиллером, затем вычитается заданный расход на сбор и обработку снега. Чистая экономия может оказаться отрицательной.</p>
+      <p><strong>Подбор объёма.</strong> Необходимый объём равен целевому количеству отводимого тепла, делённому на доступный запас холода в одном кубометре. Цель достижима, если длительность подходящих периодов и полезная мощность теплообменника позволяют передать столько тепла. В режиме для жарких часов система ориентируется на наружную температуру каждого часа и сохраняет неиспользованный запас. Номинальная полезная мощность теплообменника считается достижимой при выбранной температуре подачи. Тепловая нагрузка ИТ-оборудования постоянна. Погода определяет остаточную потребность в охлаждении после сухого охладителя. Объём уплотнённого снега и его плотность задаются независимо по данным площадки.</p>
+      <p>Физические свойства и метеоданные. <a href="https://www.teos-10.org/pubs/Feistel_2003.pdf">Файстель, скрытая теплота плавления льда при 0 °C</a> · <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">Метеоданные TMYx для Астаны</a></p>
+    </details>
+  </section>
+
+  <section class="snow-section" id="storage-designs" aria-labelledby="campus-title">
+    <div class="block-title" id="campus"><div><h2 id="campus-title">Три способа сезонного хранения снега</h2>
+      <p>Сколько льда останется к 1 июля в утеплённом контейнере, в хранилище из теплоизоляционных панелей и в снежном бурте под укрытием? Объёмы хранилищ заданы для примера. Измените приток тепла для каждого варианта и сравните результаты. Отдельная модель SnowCool показывает, как контакт воды со льдом влияет на охлаждение при нагрузке 5 кВт в течение семи суток.</p></div></div>
+    <div class="campus-card">
+      <h3>Сколько льда сохранится к 1 июля?</h3>
+      <p>В модели снег хранится 91 день, с 1 апреля до 1 июля, прежде чем начинается циркуляция воды. Для сравнения влияния объёма у всех трёх хранилищ заданы одинаковые плотность снега и средний приток тепла. Измените приток тепла для отдельного хранилища, чтобы оценить влияние лучшей теплоизоляции на остаток льда в июле.</p>
+      <label class="campus-density">Общая плотность в ледовом эквиваленте <span>кг льда/м³</span><input type="number" required step="any" min="0" max="917" id="campus-density" value="550" form="campus-form"></label>
+      <form id="campus-form"><div class="store-grid">
+        <article><h4>Теплоизолированный контейнер</h4><p>55 м³ · система с активной подачей холода</p><p>Снег защищён теплоизолирующей оболочкой. При отдаче холода талая вода отводит тепло из отдельного контура теплоносителя.</p><label>Расчётный приток тепла <span>Вт</span><input name="container" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-container">—</strong></article>
+        <article><h4>Панельное хранилище</h4><p>60 м³ · пассивный вариант для сравнения</p><p>Хранилище ограждено сэндвич-панелями с полиизоциануратным утеплителем.</p><label>Расчётный приток тепла <span>Вт</span><input name="panels" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-panels">—</strong></article>
+        <article><h4>Снежный штабель под укрытием</h4><p>50 м³ · пассивный вариант для сравнения</p><p>Снег укладывают на подстилающий слой и укрывают древесной щепой для теплоизоляции.</p><label>Расчётный приток тепла <span>Вт</span><input name="pile" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-pile">—</strong></article>
+      </div></form>
+      {{COPY_CASE@storage-designs}}
+      <p class="fine" id="campus-note" aria-live="polite"></p>
+    </div>
+    <article class="replay-card" id="replay">
+      <div class="block-title"><div><h3>Может ли хранилище отдавать 5 кВт холода семь суток подряд?</h3>
+        <p>В модели SnowCool начальные 20 т льда помещены в кубическое хранилище объёмом 50 м³ с теплоизоляцией толщиной 300 мм. После 120 суток хранения требуется непрерывное охлаждение мощностью 5 кВт в течение 168 часов, всего 840 кВт·ч. Измените условия контакта воды со льдом, чтобы узнать, когда понадобится резервное охлаждение и сколько льда в тот момент ещё останется.</p></div>
+        <label>Контакт воды со льдом<select id="contact"><option value="degraded">Ухудшенный контакт</option><option value="reference">Базовый контакт</option></select></label></div>
+      <div class="replay-metrics"><div><h4>Холод, полученный от снега</h4><strong id="replay-snow">—</strong></div><div><h4>Необходимое резервное охлаждение</h4><strong id="replay-backup">—</strong></div><div><h4>Запас холода во льду на конец периода</h4><strong id="replay-end">—</strong></div></div>
+      <div class="replay-plots"><figure><figcaption>Оставшийся запас холода во льду <span>кВт·ч (тепл.)</span></figcaption><div class="snow-chart" id="ice-chart"></div></figure>
+      <figure><figcaption>Полезная мощность охлаждения снегом <span>Среднее за час · кВт (тепл.)</span></figcaption><div class="snow-chart" id="duty-chart"></div></figure></div>
+      <label class="replay-slider" for="replay-hour">Посмотреть состояние на конец часа <output id="replay-hour-value" for="replay-hour">168</output><input type="range" id="replay-hour" min="1" max="168" value="168" step="1"></label>
+      {{COPY_CASE@replay}}
+      <p class="replay-readout" id="replay-readout" aria-live="polite"></p>
+      <p class="fine">Тёплая обратная вода может прокладывать каналы в снегу. Сокращение смоченной поверхности льда ограничивает теплопередачу, даже когда лёд ещё есть. За семь суток отдачи холода приток тепла через ограждение (228 Вт) и тепловыделение насоса (40 Вт) дополнительно расходуют 45,03 кВт·ч запаса льда. При базовом контакте из начальных 1 198,88 кВт·ч обеспечивается 840,00 кВт·ч полезного охлаждения и остаётся 313,86 кВт·ч. Для просмотра проверенные ряды данных сценария A сведены к часовым интервалам. Сохранены принятые в исходном исследовании теплота плавления 334 кДж/кг и конечный резерв 10 %.</p>
+    </article>
+  </section>
+
+  <section class="snow-section" id="equipment" aria-labelledby="equipment-title">
+    <div class="block-title"><div><h2 id="equipment-title">Оборудование и натурные измерения</h2><p>Какие измерения позволят проверить прогноз работы хранилища? Каждому компоненту информационной модели здания (BIM) можно сопоставить измеряемую величину, от притока тепла в хранилище до электрической энергии, потребляемой чиллером.</p></div></div>
+    <div class="equipment-grid">
+      <details open><summary>Хранилище и теплоизоляция</summary><p>Зафиксируйте объём загрузки, плотность в ледовом эквиваленте, площадь основания и конструкцию покрытия. Взвешивайте типичные образцы, измеряйте изменение объёма и регистрируйте плотность теплового потока через покрытие и основание, чтобы оценить потери при хранении.</p></details>
+      <details><summary>Водосборник и контакт воды со снегом</summary><p>Регистрируйте уровень воды в приямке, температуру талой воды и распределение обратного потока. Рост температуры на выходе при прежних нагрузке и расходе может указывать на ухудшение контакта. Измеряйте объём стока и электропроводность, чтобы учитывать уходящую воду и растворённые соли.</p></details>
+      <details><summary>Пластинчатый теплообменник и чистый контур</summary><p>Контур талой воды и чистый контур теплоносителя обмениваются теплом через пластины. Измерьте расход по обеим сторонам и температуру во всех четырёх патрубках. Для каждой стороны сопоставьте произведение массового расхода, удельной теплоёмкости и разности температур с принятой полезной мощностью.</p></details>
+      <details><summary>Насосы, чиллер и обработка снега</summary><p>Раздельно измеряйте потребление электроэнергии насосом талой воды и чиллером, регистрируйте часы работы. Взвешивайте собранный снег и учитывайте электроэнергию и топливо, затраченные на дополнительную перевозку и уплотнение. Сравните с работой сухого охладителя и чиллера при тех же нагрузке и погоде.</p></details>
+    </div>
+    <p class="source-line"><a href="{{REFERENCES_URL}}#snow">Источники и допущения для расчёта хранения снега</a>. Опыт применения этой технологии есть в Швеции и Японии. Почасовые данные типового года для Астаны используются в расчёте для дата-центра. В расчёте для трёх хранилищ учитывается заданный приток тепла через ограждения за 91 день. В семисуточной модели после 120 суток хранения используются заданные летние граничные условия. <a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=86">Снегохранилище больницы в Сундсвалле</a> · <a href="https://www.city.bibai.hokkaido.jp/soshiki/13/417.html">Дата-центр White Data Center в Бибае</a></p>
+    <p class="fine">Семисуточная модель взята из исследования <cite>«Astana SnowCool: физически обоснованное проектирование сезонного снегохранилища для охлаждения дата-центра в Астане»</cite>, проверенная версия 1.1 от 16 сентября 2026 года. В ZIP-архив проекта входят почасовые результаты и описание расчёта.</p>
+  </section>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap">{{PROJECT_CREDIT}}</div></footer>
+<script id="snow-text" type="application/json">{{SNOW_TEXT}}</script>
+<script id="snow-data" type="application/json">{{DATA}}</script>
+<script>{{MODEL}}</script>
+<script>{{UI}}</script>
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body></html>

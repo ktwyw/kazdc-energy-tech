@@ -1,0 +1,23 @@
+<figure id="weather-comparison" class="climate-card" aria-labelledby="weather-figure-title">
+  <div class="chart-head"><h3 id="weather-figure-title">{{R_weatherYear}}</h3><span>{{R_monthlyMean}}</span></div>
+  <div id="weather-chart" class="graphic"></div>
+  <figcaption class="climate-pair">
+    <label><span><i class="model-line" aria-hidden="true"></i>{{R_modelledCity}}</span><select id="climate-city"></select></label>
+    <label><span><i class="peer-line" aria-hidden="true"></i>{{R_peerCity}}</span><select id="climate-peer"></select></label>
+  </figcaption>
+</figure>
+<details id="weather-values" class="ref-directory" hidden>
+  <summary>{{R_weatherTable}}</summary>
+  <div class="ref-table-wrap" tabindex="0" role="region" aria-labelledby="weather-caption">
+    <table>
+      <caption id="weather-caption"></caption>
+      <thead><tr>
+        <th scope="col">{{R_weatherMonth}}</th>
+        <th scope="col"><span id="weather-first"></span> (°C)</th>
+        <th scope="col"><span id="weather-second"></span> (°C)</th>
+      </tr></thead>
+      <tbody id="weather-rows"></tbody>
+    </table>
+  </div>
+</details>
+<p class="ref-action"><a data-weather-return href="{{REGIONAL_URL}}#compare">{{R_weatherReturn}}</a></p>

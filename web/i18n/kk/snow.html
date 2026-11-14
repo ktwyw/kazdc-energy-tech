@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>Астанада қарды маусымдық салқындатуға пайдалану · {{SITE_TITLE}}</title>
+  {{SITE_METADATA}}
+  <style>{{STYLE}}{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body class="snow-page">
+<a class="skip" href="#facility">Деректер орталығының салқындату есебіне өту</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" data-supply-link href="{{REGIONAL_URL}}" aria-label="{{SITE_TITLE}} басты беті"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>{{SITE_TITLE}}</a>
+  <nav aria-label="Жоба беттері"><a data-supply-link href="{{DASHBOARD_URL}}">Салқындату есебі</a><a href="{{METHODS_URL}}">Есептеу әдісі</a><a href="{{REFERENCES_URL}}">Дереккөздер</a><a href="{{RESEARCH_URL}}">{{RESEARCH_NAV_LABEL}}</a><a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main class="wrap snow-book">
+  <div class="snow-title"><p class="eyebrow">Астана · суықты маусымдық жинақтау</p>
+    <h1>Қыста жиналған қар жазда деректер орталығын салқындата ала ма?</h1>
+    <p>Қар ерігенде жылуды сіңіреді. Астанада бір қыста жиналған қардың жаз бойы қанша жылуды әкете алатынын және чиллерге сонда да қанша электр энергиясы қажет болатынын есептеңіз.</p>
+  </div>
+  <nav class="view-links" aria-label="Қар сақтау зерттеуінің бөлімдері">
+    <a href="#facility">Деректер орталығына арналған есеп</a><a href="#storage-designs">Қар қоймалары және 5 кВт жүктеме моделі</a><a href="#equipment">Жабдық және өлшеулер</a>
+  </nav>
+  <noscript><p class="notice">Үш салқындату жүйесін модельдеу және жеті тәуліктің нәтижелерін сағат бойынша қарау үшін JavaScript-ті қосыңыз. Төменде қар сақтаудың үш тәсілі, модельдің жорамалдары және өлшеу жөніндегі нұсқаулар берілген. Оларды интернетсіз де оқуға болады.</p></noscript>
+
+  <section class="snow-section" id="facility" aria-labelledby="facility-title">
+    <div class="block-title"><div><h2 id="facility-title">Деректер орталығына арналған есеп</h2>
+      <p>Модельдегі тұрақты IT жүктемесі <span id="plant-load">1 МВт</span> болып алынады. Есепте Астананың үлгілік жылға арналған сағаттық метеодеректері қолданылады. Жылуды алдымен құрғақ салқындатқыш әкетеді. Маусымнан тамызға дейін еріген қар суы чиллерге түсетін жылу жүктемесінің бір бөлігін қабылдай алады. Қордың қаншаға жететінін көру үшін қар көлемін өзгертіңіз. Содан кейін чиллердің қашан өше алатынын бағалау үшін жылу алмастырғыштың қуатын өзгертіңіз.</p></div>
+      <button type="button" class="plain-button" id="reset-snow">Бастапқы жағдайға қайтару</button></div>
+    <div class="facility-grid">
+      <form id="facility-form" class="control-surface">
+        <h3>Салқындату жүйесі мен қар қоймасы</h3>
+        <div class="fields">
+          <label>Салқындатқыш сұйықтықтың берілу температурасы <span>°C</span><select name="supply" id="snow-supply">{{SUPPLY_OPTIONS}}</select></label>
+          <label>Тығыздалған қар көлемі <span>м³</span><input name="volume" type="number" min="0" max="500000" step="any" value="4000" required></label>
+          <label>Мұз эквивалентімен алынған тығыздық <span>кг мұз/м³</span><input name="density" type="number" min="0" max="917" step="any" value="550" required></label>
+          <label>1 маусымда пайдалануға болатын үлес <span>бастапқы мұздың балқу энергиясының %-ы</span><input name="retained" type="number" min="0" max="100" step="any" value="70" required></label>
+          <label>Жылу алмастырғыштың пайдалы қуаты <span>кВт (жылу)</span><input name="rating" type="number" min="0" max="10000" step="any" value="500" required></label>
+          <label>Еріген қар суы сорғысының номиналды қуат тұтынуы <span>кВт (электр)</span><input name="pump" type="number" min="0" max="1000" step="any" value="5" required></label>
+          <label class="wide">Қар қорын пайдалану тәртібі<select name="policy" id="snow-policy"><option value="as-needed">Чиллер қажет болған сайын пайдалану</option><option value="hot-hours">Ыстық сағаттарға сақтап қою</option></select></label>
+          <label class="wide" id="hot-control" hidden>Іске қосатын сыртқы ауа температурасы <span>°C және одан жоғары</span><input name="threshold" type="number" min="0" max="45" step="any" value="25" required></label>
+        </div>
+        <details class="small-detail"><summary>Қар жинау мен өңдеуге кететін электр энергиясы</summary>
+          <label>Бастапқы мұз массасының әр тоннасына шаққандағы қосымша электр шығыны <span>кВт·сағ/т</span><input name="handling" type="number" min="0" max="1000" step="any" value="0" required></label>
+          <p>Осы қарды тасымалдауға немесе тығыздауға қосымша жұмсалған электр энергиясын енгізіңіз. Дизель отынының шығынын бөлек есептеңіз.</p>
+        </details>
+        <p class="validation" id="invalid-case" role="alert" hidden></p>
+      </form>
+      <div class="facility-results" aria-live="polite" aria-atomic="false">
+        <article class="savings-hero"><p>Қарды қосымша пайдаланудан болатын жылдық электр үнемі</p>
+          <div class="savings-number" id="net-saved">—</div><p id="saving-split"></p>
+        </article>
+        <div class="snow-kpis">
+          <div><h3>Жазда қар сіңірген жылу</h3><strong id="snow-heat">—</strong><p id="snow-share"></p></div>
+          <div><h3>Чиллердің қосымша тоқтау уақыты</h3><strong id="added-hours">—</strong><p id="total-hours"></p></div>
+          <div><h3>Резервтік чиллердің ең жоғары жүктемесі</h3><strong id="peak-duty">—</strong><p>Үлгілік жылдағы чиллердің ең жоғары сағаттық жүктемесі</p></div>
+        </div>
+        <figure class="stock-figure"><figcaption><h3>Пайдалануға болатын суық қоры</h3><span>Тәулік соңындағы қалдық · МВт·сағ (жылу)</span></figcaption>
+          <div id="stock-chart" class="snow-chart"></div>
+          <p id="stock-note"></p>
+        </figure>
+      </div>
+    </div>
+    {{COPY_CASE@facility}}
+    <div class="target-panel"><div><h3>Жазғы мақсатқа қажетті қойма көлемі</h3><p>Құрғақ салқындатудан кейін чиллерге қалатын жазғы жүктеменің қандай үлесін қар есебінен жабу керегін көрсетіңіз. Есеп таңдалған жабдық пен пайдалану тәртібін ескереді.</p></div>
+      <label>Мақсатты үлес <span>%</span><input type="number" min="0" max="100" step="any" value="10" required id="size-target" name="target" form="facility-form"></label>
+      <div class="target-answer"><strong id="target-volume">—</strong><p id="target-note"></p><button type="button" id="apply-target" class="plain-button">Осы көлемді қолдану</button></div>
+    </div>
+    <article class="month-card">
+      <div class="block-title"><div><h3>Үш жүйенің жыл бойғы жұмысы</h3><p id="monthly-boundary">Жүйенің айлық электр тұтынуына чиллер, желдеткіштер мен сорғылар кіреді. Қарды жинау мен өңдеуге кеткен электр энергиясы жоғарыда көрсетілген жылдық үнемде ескерілген. Жылдық қор көрсеткіші қармен салқындату аяқталатын 31 тамыздағы қолжетімді қалдықты білдіреді.</p></div>
+      <div class="table-actions"><label>Электр шығынын көрсету шекарасы<select id="monthly-meter"><option value="plant">Бүкіл салқындату жүйесі</option><option value="chiller">Тек чиллер қондырғысы</option></select></label>
+      <button id="snow-download" type="button" class="plain-button">Айлық деректерді жүктеу (CSV) ↓</button></div></div>
+      <div class="scroll" tabindex="0" role="region" aria-label="Үш салқындату жүйесін айлар бойынша салыстыру">
+        <table><thead><tr><th scope="col">Ай</th><th scope="col">Тек чиллер<br><em>МВт·сағ (электр)</em></th><th scope="col">Құрғақ салқындатқыш + чиллер<br><em>МВт·сағ (электр)</em></th><th scope="col">Құрғақ салқындатқыш + қар + чиллер<br><em>МВт·сағ (электр)</em></th><th scope="col">Қар сіңірген жылу<br><em>МВт·сағ (жылу)</em></th><th scope="col">Қосымша тоқтау уақыты<br><em>сағат</em></th><th scope="col">Ең жоғары резервтік жүктеме<br><em>кВт (жылу)</em></th></tr></thead>
+        <tbody id="snow-months"></tbody><tfoot id="snow-year"></tfoot></table></div>
+    </article>
+    <details class="math-note"><summary>Сағаттық есеп қалай орындалады?</summary>
+      <p>Алдымен құрғақ салқындатқыш бастапқы басқару алгоритмі бойынша жұмыс істейді. Жаздың әр сағатында қар контурының қуаты үш шаманың ең кішісіне тең: чиллерге қалған жүктеме, жылу алмастырғыштың номиналды пайдалы қуаты және қолжетімді суық қорын бір сағатқа бөлгендегі шама. Қалған жылуды резервтік чиллер әкетеді. Чиллердің тоқтау уақытына сағаттық жылу балансы бойынша механикалық салқындату мүлде қажет болмаған сағаттар ғана кіреді. <a href="{{METHODS_URL}}#dispatch">Құрғақ салқындатқышты басқару теңдеулері</a></p>
+      <p><strong>Сақтау.</strong> Мұздың бастапқы жасырын балқу энергиясы (кВт·сағ) тығыздалған қар көлемі × мұз эквивалентіндегі тығыздық × 333,5 / 3 600 формуласы бойынша есептеледі. Пайдалануға болатын үлес сақтау кезеңінен аман қалған мұзды және резервті шегергеннен кейін қолжетімді бөлікті ескереді. 1 маусымдағы осы қор жаз бойы әкетуге болатын жылу мөлшерін шектейді. Үлесті таңдағанда сақтау кезіндегі шығындарды және пайдалануға келмейтін мұзды ескеріңіз. Қор біткенше жылу алмастырғыштың пайдалы қуаты тұрақты деп алынады. Нысандағы өлшеулер сырттан келетін жылу ағынын және су мен мұздың жанасу жағдайын сағат сайын анықтауға мүмкіндік береді.</p>
+      <p><strong>Электр энергиясы.</strong> Буферлік сыйымдылығы бар контурда еріген қар суының сорғысы номиналды режимде мезгіл-мезгіл қосылады. Әкетілген әр кВт·сағ жылуға кететін электр энергиясы сорғының номиналды электр қуатының жылу алмастырғыштың номиналды пайдалы қуатына қатынасына тең. Осы қатынас 1/COP шамасынан төмен болғанда ғана қар қоры пайдаланылады. Жылдық үнем қар қоймасы бар жүйені құрғақ салқындатқыш пен чиллерден тұратын жүйемен салыстыру арқылы анықталады. Содан кейін қар жинауға және өңдеуге жұмсалған электр энергиясы шегеріледі. Таза үнем теріс болуы мүмкін.</p>
+      <p><strong>Көлемін таңдау.</strong> Қажетті көлем әкетілуі тиіс жылуды бір текше метрдегі қолжетімді суық қорына бөлу арқылы анықталады. Мақсатқа қолайлы сағаттар саны мен жылу алмастырғыштың пайдалы қуаты осы мөлшердегі жылуды әкетуге жеткілікті болса ғана қол жеткізуге болады. Ыстық сағаттарға арналған режим әр сағаттағы сыртқы температураға сүйеніп, пайдаланылмаған қорды сақтайды. Жылу алмастырғыштың есептік пайдалы қуатына таңдалған беру температурасында қол жеткізуге болады деп қабылданған. IT жабдығының жылу жүктемесі тұрақты. Құрғақ салқындатудан кейін чиллерге қалатын жүктеме ауа райына байланысты. Тығыздалған қар көлемі мен тығыздығы нысанның екі тәуелсіз параметрі ретінде енгізіледі.</p>
+      <p>Мұз қасиеттері және метеодеректер. <a href="https://www.teos-10.org/pubs/Feistel_2003.pdf">Файстель, 0 °C кезіндегі мұздың меншікті балқу жылуы</a> · <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">Астананың TMYx метеодеректері</a></p>
+    </details>
+  </section>
+
+  <section class="snow-section" id="storage-designs" aria-labelledby="campus-title">
+    <div class="block-title" id="campus"><div><h2 id="campus-title">Қарды маусымдық сақтаудың үш тәсілі</h2>
+      <p>1 шілдеге қарай жылу оқшаулағышы бар контейнерде, панельді қоймада және үсті жабылған қар үйіндісінде қанша мұз қалады? Қоймалардың көлемі мысал ретінде берілген. Әр нұсқаға сырттан түсетін жылуды өзгертіп, нәтижелерін салыстырыңыз. Бөлек SnowCool моделі жеті тәулік бойы 5 кВт жүктеме кезінде су мен мұздың жанасуы салқындату қуатына қалай әсер ететінін көрсетеді.</p></div></div>
+    <div class="campus-card">
+      <h3>1 шілдеге дейін қанша мұз сақталуы мүмкін?</h3>
+      <p>Модельде қар 1 сәуірден 1 шілдеге дейін 91 тәулік сақталады, содан кейін ғана су айналымы басталады. Көлемнің әсерін көру үшін үш қоймаға да бірдей бастапқы қар тығыздығы және бірдей орташа жылу түсімі берілген. Оқшаулауды жақсартудың шілдедегі мұз қалдығына әсерін көру үшін қоймаға түсетін жылу қуатын өзгертіңіз.</p>
+      <label class="campus-density">Барлық нұсқаға ортақ мұз эквивалентіндегі тығыздық <span>кг мұз/м³</span><input type="number" required step="any" min="0" max="917" id="campus-density" value="550" form="campus-form"></label>
+      <form id="campus-form"><div class="store-grid">
+        <article><h4>Жылу оқшаулағыш контейнер</h4><p>55 м³ · белсенді салқындату нұсқасы</p><p>Жылу оқшаулағыш қабық қарды қорғайды. Қар қоры пайдаланылғанда еріген су бөлек салқындатқыш контурынан жылуды әкетеді.</p><label>Қабылданған жылу түсімі <span>Вт</span><input name="container" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-container">—</strong></article>
+        <article><h4>Панельді қойма</h4><p>60 м³ · салыстыруға арналған пассивті нұсқа</p><p>Қар полиизоциануратты жылу оқшаулағышы бар сэндвич-панельдермен қоршалады.</p><label>Қабылданған жылу түсімі <span>Вт</span><input name="panels" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-panels">—</strong></article>
+        <article><h4>Жабынды астындағы қар үйіндісі</h4><p>50 м³ · салыстыруға арналған пассивті нұсқа</p><p>Төсеме үстіндегі қар үйіндісі жылу оқшаулау үшін ағаш жаңқасымен жабылады.</p><label>Қабылданған жылу түсімі <span>Вт</span><input name="pile" required type="number" min="0" max="5000" step="any" value="200"></label><strong id="ret-pile">—</strong></article>
+      </div></form>
+      {{COPY_CASE@storage-designs}}
+      <p class="fine" id="campus-note" aria-live="polite"></p>
+    </div>
+    <article class="replay-card" id="replay">
+      <div class="block-title"><div><h3>Қар қоры жеті тәулік бойы 5 кВт салқындату қуатын бере ала ма?</h3>
+        <p>SnowCool моделі көлемі 50 м³, жылу оқшаулағышының қалыңдығы 300 мм текше қоймадағы 20 т мұздан басталады. 120 тәулік сақталғаннан кейін 168 сағат бойы үздіксіз 5 кВт салқындату қажет. Жалпы қажеттілік 840 кВт·сағ. Резервтік салқындатудың қашан қосылатынын және сол кезде қанша мұз қалатынын көру үшін су мен мұздың жанасу жағдайын өзгертіңіз.</p></div>
+        <label>Су мен мұздың жанасуы<select id="contact"><option value="degraded">Жанасуы нашарлаған</option><option value="reference">Үлгілік жанасу</option></select></label></div>
+      <div class="replay-metrics"><div><h4>Қар берген суық мөлшері</h4><strong id="replay-snow">—</strong></div><div><h4>Қажетті резервтік салқындату</h4><strong id="replay-backup">—</strong></div><div><h4>Мерзім соңындағы мұздың суық қоры</h4><strong id="replay-end">—</strong></div></div>
+      <div class="replay-plots"><figure><figcaption>Мұзда қалған суық қоры <span>кВт·сағ (жылу)</span></figcaption><div class="snow-chart" id="ice-chart"></div></figure>
+      <figure><figcaption>Қармен салқындатудың пайдалы қуаты <span>Сағаттық орташа қуат · кВт (жылу)</span></figcaption><div class="snow-chart" id="duty-chart"></div></figure></div>
+      <label class="replay-slider" for="replay-hour">Сағат соңындағы күйді көру <output id="replay-hour-value" for="replay-hour">168</output><input type="range" id="replay-hour" min="1" max="168" value="168" step="1"></label>
+      {{COPY_CASE@replay}}
+      <p class="replay-readout" id="replay-readout" aria-live="polite"></p>
+      <p class="fine">Жылы кері су қарды тесіп өткен арналармен ағуы мүмкін. Мұздың суланған бетінің кішіреюі мұз әлі бар кезде де жылу беру қарқынын шектейді. Қар қорын пайдаланатын жеті тәулікте қоршау арқылы келетін жылу (228 Вт) мен сорғыдан бөлінетін жылу (40 Вт) қосымша 45,03 кВт·сағ суық қорын жұмсайды. Үлгілік жанасу жағдайында бастапқы 1 198,88 кВт·сағ қордан 840,00 кВт·сағ пайдалы салқындату қамтамасыз етіліп, 313,86 кВт·сағ қалады. Көрсетілген нәтижелер тексерілген A сценарийінің деректерін бір сағаттық аралықтарға біріктіру арқылы алынды. Бастапқы зерттеудегі мұздың меншікті балқу жылуы 334 кДж/кг және соңғы резерв 10 % болып сақталды.</p>
+    </article>
+  </section>
+
+  <section class="snow-section" id="equipment" aria-labelledby="equipment-title">
+    <div class="block-title"><div><h2 id="equipment-title">Жабдық және нысандағы өлшеулер</h2><p>Қойманың нақты жұмысы модель болжамына сәйкес келе ме? Мұны қандай өлшемдер көрсетеді? Ғимараттың ақпараттық моделіндегі (BIM) әр құрамдасты өлшенетін шамамен байланыстыруға болады. Олардың қатарына қоймаға кіретін жылу мен чиллер тұтынатын электр энергиясы жатады.</p></div></div>
+    <div class="equipment-grid">
+      <details open><summary>Қойма және жылу оқшаулау</summary><p>Толтыру көлемін, мұз эквивалентіндегі тығыздықты, табан ауданын және жабынды құрылымын тіркеңіз. Өкілдік сынамаларды өлшеп, көлемнің өзгеруін бақылаңыз. Сақтау кезіндегі шығынды тексеру үшін жабынды мен табан арқылы өтетін жылу ағынының тығыздығын тіркеңіз.</p></details>
+      <details><summary>Су жинағыш және судың қармен жанасуы</summary><p>Су жинағыштағы су деңгейін, еріген қар суының температурасын және кері судың таралуын тіркеңіз. Жүктеме мен су шығыны өзгермегенде шығыс температурасының өсуі жанасудың нашарлауын көрсетуі мүмкін. Ағып кеткен суды және еріген тұздарды ескеру үшін дренаж суының көлемі мен электрөткізгіштігін өлшеңіз.</p></details>
+      <details><summary>Пластиналы жылу алмастырғыш және таза контур</summary><p>Еріген қар суы контуры мен таза салқындатқыш контуры пластиналар арқылы жылу алмасады. Екі жақтағы шығынды және төрт келте құбырдағы температураны өлшеңіз. Әр жақ үшін массалық шығын × меншікті жылусыйымдылық × температура айырмасын есептеп, қабылданған пайдалы қуатпен салыстырыңыз.</p></details>
+      <details><summary>Сорғылар, чиллер және қарды өңдеу</summary><p>Еріген қар суы сорғысы мен чиллердің электр энергиясын бөлек есептеп, жұмыс сағаттарын тіркеңіз. Жиналған қарды таразыға тартып, қосымша тасымалдау мен тығыздауға жұмсалған электр энергиясы мен отынды есепке алыңыз. Сол жүктеме мен ауа райында құрғақ салқындатқыш пен чиллер ғана жұмыс істейтін нұсқамен салыстырыңыз.</p></details>
+    </div>
+    <p class="source-line"><a href="{{REFERENCES_URL}}#snow">Қарға қатысты дереккөздер мен сценарий жорамалдары</a>. Бұл технология Швеция мен Жапонияда іс жүзінде қолданылған. Астананың үлгілік жылына арналған сағаттық метеодеректер деректер орталығының есебінде қолданылады. Қар сақтаудың үш тәсілін салыстырғанда 91 тәулік ішінде қоймаға сырттан түсетін жылу ескеріледі. Жеті тәуліктік модельде 120 тәулік сақтаудан кейін жазғы шекаралық шарттар беріледі. <a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=86">Сундсвалль ауруханасының қар қоймасы</a> · <a href="https://www.city.bibai.hokkaido.jp/soshiki/13/417.html">Бибайдағы White Data Center деректер орталығы</a></p>
+    <p class="fine">Жеті тәуліктік модельдің дереккөзі — <cite>«Astana SnowCool: Астанадағы деректер орталығын салқындатуға арналған маусымдық қар қоймасын физикалық заңдарға сүйеніп жобалау»</cite> атты зерттеудің 2026 жылғы 16 қыркүйектегі тексерілген 1.1 нұсқасы. Жоба ZIP мұрағатында сағаттық нәтижелер және оларды есептеу жолы келтірілген.</p>
+  </section>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap">{{PROJECT_CREDIT}}</div></footer>
+<script id="snow-text" type="application/json">{{SNOW_TEXT}}</script>
+<script id="snow-data" type="application/json">{{DATA}}</script>
+<script>{{MODEL}}</script>
+<script>{{UI}}</script>
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body></html>

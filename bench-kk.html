@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123c3a"><title>Су контурындағы тәжірибе · KazDC энергетика технологиялары</title>
+<meta name="description" content="Су ағыны алып кететін жылу қыздырғыш есептегіші көрсеткен энергияға қаншалықты сәйкес келеді? Мысал арқылы жылу балансын құрып көріңіз немесе орныққан режимдегі өз өлшемдеріңізді енгізіңіз.">
+<meta property="og:site_name" content="KazDC энергетика технологиялары">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Су контурындағы тәжірибе · KazDC энергетика технологиялары">
+<meta property="og:description" content="Су ағыны алып кететін жылу қыздырғыш есептегіші көрсеткен энергияға қаншалықты сәйкес келеді? Мысал арқылы жылу балансын құрып көріңіз немесе орныққан режимдегі өз өлшемдеріңізді енгізіңіз.">
+<link rel="alternate" hreflang="en" href="bench.html">
+<link rel="alternate" hreflang="kk" href="bench-kk.html">
+<link rel="alternate" hreflang="ru" href="bench-ru.html">
+<link rel="alternate" hreflang="zh-Hans" href="bench-zh.html">
+<script>"use strict";
+
+window.SiteI18n = (() => {
+  const data = {"lang":"kk","locale":"kk","months":["қаңтар","ақпан","наурыз","сәуір","мамыр","маусым","шілде","тамыз","қыркүйек","қазан","қараша","желтоқсан"],"shortMonths":["қаң.","ақп.","нау.","сәу.","мам.","мау.","шіл.","там.","қыр.","қаз.","қар.","жел."],"cities":{"aktau":"Ақтау","aktobe":"Ақтөбе","almaty":"Алматы","astana":"Астана","atyrau":"Атырау","ekibastuz":"Екібастұз","karaganda":"Қарағанды","kokshetau":"Көкшетау","kostanay":"Қостанай","kyzylorda":"Қызылорда","oral":"Орал","oskemen":"Өскемен","pavlodar":"Павлодар","petropavl":"Петропавл","qonaev":"Қонаев","semey":"Семей","shymkent":"Шымкент","taldykorgan":"Талдықорған","taraz":"Тараз","turkistan":"Түркістан","zhezkazgan":"Жезқазған"},"station":{"station":"{city} метеостанциясы","airport":"{city} әуежайының метеостанциясы","internationalAirport":"{city} халықаралық әуежайының метеостанциясы","era":"{city} үшін ERA5 реанализі","qonaev":"Қонаев үшін ERA5 реанализі (файлда Қапшағай деп көрсетілген)","origin":"{location} · {period} жылдар аралығындағы {years} жылдың дерегі","quality":"Файлдағы кейбір өкілдік айлар әуежайдағы бақылаудан салқынырақ. 2024 жылғы маусымның орташа температурасы файлда 21,2 °C, әуежай бақылауында 24,3 °C. Салқындатуға жұмсалатын электр энергиясы кем бағалануы мүмкін."}};
+  const cityName = (slug, fallback) => data.cities[slug] || fallback || slug;
+  function formatNumber(value, options) {
+    if (data.lang !== "kk") return value.toLocaleString(data.locale, options);
+    // Some browsers ship a partial Kazakh locale and silently use English punctuation.
+    return value.toLocaleString("en-US", options).replaceAll(",", "\u00a0").replace(".", ",");
+  }
+  function stationNote(station) {
+    const location = station.location_note || "";
+    let kind = "station";
+    if (location.includes("ERA5")) kind = station.slug === "qonaev" ? "qonaev" : "era";
+    else if (location.includes("International Airport")) kind = "internationalAirport";
+    else if (location.includes("Airport")) kind = "airport";
+    const place = data.lang === "en" && location ? location :
+      data.station[kind].replace("{city}", cityName(station.slug, station.name));
+    const origin = data.station.origin.replace("{location}", place)
+      .replace("{years}", station.source_years).replace("{period}", station.period);
+    const quality = station.slug === "almaty" && station.quality_note ? ". " + data.station.quality : "";
+    return origin + quality;
+  }
+  return {lang: data.lang, locale: data.locale, months: data.months, shortMonths: data.shortMonths, cityName, stationNote, formatNumber};
+})();
+</script>
+<script type="application/json" id="case-share-data">{"publicURL":"https://ktwyw.github.io/kazdc-energy-tech/bench-kk.html","version":"1.0.0","labels":{"copy":"Осы есепті көшіру","copied":"Есептің параметрлері мен сілтемесі көшірілді.","manual":"Белгіленген есеп параметрлері мен сілтемені көшіріңіз.","model":"Модель нұсқасы {version}","link":"Есепке сілтеме: {url}","versionNotice":"Бұл есепті бөліскен кезде модельдің {requested} нұсқасы қолданылған. Бұл бетте {version} нұсқасы қолданылады."}}</script>
+<script>"use strict";
+
+window.CaseShare = (() => {
+  // A study can replace its address during startup. Retain the version on the incoming link.
+  const incomingVersion = new URLSearchParams(location.search).get("model");
+  const cards = [];
+  let config, provider;
+
+  function caseText(button) {
+    const state = provider && provider(button);
+    if (!state) return "";
+    // The provider supplies validated model parameters, never raw readings or the incoming query.
+    const link = new URL(config.publicURL);
+    if (link.protocol !== "https:" && link.protocol !== "http:") return "";
+    link.search = state.params.toString();
+    link.searchParams.set("model", config.version);
+    const anchor = (button.dataset.caseSection || state.anchor || "").replace(/^#/, "");
+    link.hash = /^[A-Za-z][\w-]*$/.test(anchor) && document.getElementById(anchor) ? anchor : "";
+    return [document.title, ...state.details, config.labels.model.replace("{version}", config.version),
+      config.labels.link.replace("{url}", link.href)].join("\n");
+  }
+
+  function update(card) {
+    const text = caseText(card.button);
+    card.button.disabled = !text;
+    if (card.text === text) return;
+    card.text = text;
+    card.revision++;
+    card.fallback.hidden = true;
+    card.fallback.value = "";
+    card.status.textContent = "";
+  }
+
+  function refresh() {
+    cards.forEach(update);
+  }
+
+  function describeFields(fields) {
+    return fields.filter(field => !field.disabled).map(field => {
+      const label = field.labels[0]?.cloneNode(true);
+      label?.querySelectorAll("input,select,output,button,textarea").forEach(node => node.remove());
+      const name = label?.textContent.trim().replace(/\s+/g," ") || field.name;
+      const value = field.selectedOptions ? field.selectedOptions[0].textContent
+        : window.SiteI18n.formatNumber(field.valueAsNumber, {maximumSignificantDigits:15});
+      return name + " · " + value;
+    });
+  }
+  function resultLines() {
+    return [...document.querySelectorAll(".metrics > div")].map(metric =>
+      [...metric.children].map(el => el.textContent.trim()).filter(Boolean).join(" "));
+  }
+
+  async function copy(card) {
+    update(card);
+    if (!card.text) return;
+    const revision = ++card.revision;
+    try {
+      await navigator.clipboard.writeText(card.text);
+      if (revision !== card.revision) return;
+      card.fallback.hidden = true;
+      card.status.textContent = config.labels.copied;
+    } catch {
+      // Offline browsers and restricted clipboards can still copy selected, plain text.
+      if (revision !== card.revision) return;
+      card.status.textContent = config.labels.manual;
+      card.fallback.value = card.text;
+      card.fallback.hidden = false;
+      card.fallback.focus();
+      card.fallback.select();
+    }
+  }
+
+  function bind() {
+    const script = document.getElementById("case-share-data");
+    if (!script) return;
+    config = JSON.parse(script.textContent);
+    for (const wrapper of document.querySelectorAll(".case-share")) {
+      wrapper.hidden = false;
+      const card = {button:wrapper.querySelector("button[data-copy-case]"),
+        status:wrapper.querySelector('output[role="status"]'),
+        fallback:wrapper.querySelector("textarea[readonly]"), text:"", revision:0};
+      card.fallback.setAttribute("aria-label", config.labels.manual);
+      if (incomingVersion && incomingVersion !== config.version) {
+        const notice = document.createElement("p");
+        notice.className = "case-version-note";
+        const shownVersion = /^\d+(?:\.\d+){0,3}(?:-[a-z\d.-]{1,35})?$/i.test(incomingVersion) ? incomingVersion : "–";
+        notice.textContent = config.labels.versionNotice.replace("{requested}", shownVersion)
+          .replace("{version}", config.version);
+        wrapper.append(notice);
+      }
+      card.button.addEventListener("click", () => copy(card));
+      cards.push(card);
+    }
+    refresh();
+    // These bubble after each study has validated and rendered its new settings.
+    for (const event of ["input","change","click"]) document.addEventListener(event, refresh);
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind, {once:true});
+  else bind();
+  return {register(getCase) { provider = getCase; refresh(); }, refresh, describeFields, resultLines};
+})();
+</script>
+<style>:root{--paper:#f6f5ef;--panel:#fffefa;--ink:#203630;--secondary:#4b6158;--rule:#d0d8cb;--forest:#143f3a;--teal:#087b69;--light:#d7e6d9;--mint:#a9dfbf;--ochre:#986026;font-family:"Inter","Arial",sans-serif;color:var(--ink);background:var(--paper);font-variant-numeric:tabular-nums}
+*{box-sizing:border-box}body{margin:0;line-height:1.52}a{color:#126452;text-underline-offset:.18em}a:hover{text-decoration:underline}button,input,select{font:inherit}button,a,input,select,summary{touch-action:manipulation}button{cursor:pointer}h1,h2,h3,h4,p,figure{margin:0}h1,h2,.brand,.chart-head h2{letter-spacing:-.045em}h1,h2{font-family:"DM Sans","Inter","Arial",sans-serif}h3{letter-spacing:-.025em}b,strong{font-weight:700}a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #bd7b36;outline-offset:3px}
+.inner{width:min(1190px,calc(100% - 80px));margin-inline:auto}.mast{border-bottom:1px solid var(--rule);background:var(--panel)}.mast-row{display:flex;align-items:center;justify-content:space-between;min-height:74px;gap:28px}.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-size:22px;font-weight:750;white-space:nowrap}.brand b{font-weight:480}.coil{position:relative;display:grid;gap:3px;padding:6px 5px;background:var(--forest);border-radius:4px;width:28px}.coil i{display:block;height:3px;background:#a8debc;transform:skew(-22deg)}.mast nav,.foot nav{display:flex;align-items:center;gap:23px}.mast nav a,.foot nav a{font-size:.86rem;font-weight:600;text-decoration:none;color:var(--secondary);white-space:nowrap}.mast nav a:hover,.foot nav a:hover{text-decoration:underline}.mast nav a[aria-current]{color:var(--teal);box-shadow:0 2px var(--teal)}.skip{position:absolute;left:-300px;top:0;background:white;padding:.8em;z-index:10}.skip:focus{left:6px}
+.hero{display:grid;grid-template-columns:.93fr 1.07fr;gap:5vw;align-items:center;padding:56px 0 50px;border-bottom:1px solid var(--rule)}.kicker{color:var(--teal);font-size:.7rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}.hero h1{font-size:clamp(54px,5.6vw,82px);line-height:.96;font-weight:660}.hero h1 span,.page-intro h1 span{color:var(--teal)}.deck{font-size:clamp(1rem,1.35vw,1.22rem);line-height:1.48;color:var(--secondary);margin:20px 0 0;max-width:43rem}.text-links,.tools{display:flex;gap:18px;flex-wrap:wrap;align-items:center}.text-links{margin-top:23px}.text-links a,.details-body>a,.sources a{font-weight:650;font-size:.91rem}.climate-card{background:var(--forest);color:#fcfff9;padding:25px 27px 17px;border-radius:8px;min-width:0}.chart-head,.result-title,.heading,.range-line,.cities-head,.ends,.foot,.legend{display:flex;align-items:center;justify-content:space-between;gap:12px}.chart-head h2,.chart-head h3{font-family:inherit;font-size:1.05rem;font-weight:680;letter-spacing:-.02em}.chart-head>span,.result-title>span,.cities-head>span,.fine,.details-body,.climate-card figcaption,.control-note,.ends{font-size:.84rem}.chart-head>span,.result-title>span,.cities-head>span,.fine,.control-note,.ends{color:var(--secondary)}.climate-card .chart-head span,.climate-card figcaption{color:#d4e6d7}.graphic{width:100%;min-width:0;line-height:1}.graphic svg{display:block;width:100%;height:auto;overflow:visible}.climate-card figcaption{line-height:1.4;margin-top:4px}.climate-card figcaption span{display:inline-flex;align-items:center;margin:3px 14px 2px 0;gap:5px;font-weight:600}.chart-head{margin-bottom:10px}
+.workspace,.studies,.reading{padding:39px 0 43px;border-bottom:1px solid var(--rule);scroll-margin-top:14px}.heading{margin-bottom:23px;flex-wrap:wrap}.heading h2,.reading h2{font-size:clamp(27px,3vw,40px);line-height:1.1;font-weight:635}.heading .kicker{margin-bottom:7px}.quiet,.action{border:1px solid #a6bcac;border-radius:5px;padding:.54em .86em;font-weight:620;font-size:.88rem;line-height:1.4;display:inline-flex;align-items:center;justify-content:center}.quiet{background:transparent;color:var(--forest)}.quiet:hover{background:#e1e9de}.action{background:var(--forest);color:white;border-color:var(--forest)}.action:hover{background:#20584d}.action:disabled{opacity:.42;cursor:default}.compare-grid{display:grid;grid-template-columns:minmax(220px,.79fr) minmax(0,1.9fr);gap:20px;align-items:stretch}.controls,.result-panel{border:1px solid var(--rule);border-radius:7px;padding:23px 26px;min-width:0}.controls{background:#e8eee4;align-self:start}.result-panel{background:var(--panel)}.controls h3,.result-title h3{font-size:1.2rem;line-height:1.35}.controls h3{margin-bottom:17px}.controls label{display:block;margin:12px 0 4px;font-size:.86rem;font-weight:640}.controls select,.controls input:not([type=range]){width:100%;min-width:0;border:1px solid #9aafa0;border-radius:4px;background:#fffffa;color:var(--ink);padding:7px 9px;min-height:39px}.range-line{margin-top:18px;align-items:baseline}.range-line label{margin:0}.range-line output{font-size:1.24rem;color:var(--forest);font-weight:700}.controls input[type=range]{display:block;width:100%;accent-color:var(--teal);margin:10px 0 0}.ends{font-size:.72rem}.control-note,.controls .fine{margin-top:13px;line-height:1.45}.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:18px 0 24px}.metrics>div+div{border-left:1px solid var(--rule);padding-left:16px}.metrics span,.metrics small{display:block;color:var(--secondary);font-size:.79rem;line-height:1.3}.metrics strong{display:block;color:var(--forest);font-size:clamp(24px,3vw,43px);letter-spacing:-.05em;line-height:1.22;font-weight:650}.cities-head{font-size:.89rem;margin:0 0 8px}.city-bars{display:grid;gap:7px}.bar-row{display:grid;grid-template-columns:minmax(65px,.7fr) 2fr minmax(65px,.4fr);gap:12px;align-items:center;font-size:.87rem}.bar-row>span:first-child{color:var(--secondary)}.bar-row.active>span:first-child{font-weight:750;color:var(--ink)}.bar-track{height:9px;background:#edf1e9;border-radius:1px;overflow:hidden}.bar-track i{display:block;height:100%;background:#8ba89a}.active .bar-track i{background:var(--teal)}.bar-row>strong{text-align:right;font-weight:650}.fine{line-height:1.46}.result-panel>.fine{margin-top:14px}
+.details{border-top:1px solid var(--rule);margin-top:13px}.details+.details{margin-top:0}.details summary{padding:12px 1px;font-weight:650;font-size:.92rem;cursor:pointer;color:var(--forest)}.details-body{padding:4px 0 13px;font-size:.95rem;line-height:1.55}.details-body p+p,.reading p+p{margin-top:12px}.details-body button{margin:10px 9px 0 0}.table-wrap{min-width:0;overflow-x:auto}.table-wrap table{border-collapse:collapse;width:100%;margin:12px 0 7px;font-size:.82rem;line-height:1.35}.table-wrap th,.table-wrap td{text-align:right;border-bottom:1px solid var(--rule);padding:8px 9px}.table-wrap th:first-child,.table-wrap td:first-child{text-align:left}.table-wrap thead th{color:var(--secondary);background:#ecf0e8;font-weight:650}.table-wrap tfoot{font-weight:700}.study-rows{border-top:1px solid var(--rule)}.study-rows a{display:grid;grid-template-columns:minmax(110px,.55fr) 2fr 30px;gap:20px;align-items:center;padding:16px 6px;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none}.study-rows a:hover{background:#ebefe6}.study-rows b,.study-rows small{display:block}.study-rows b{font-size:1.13rem}.study-rows small{font-size:.88rem;color:var(--secondary);margin-top:2px}.study-tag{color:var(--teal);font-weight:650;font-size:.78rem}.study-rows i{color:var(--teal);font-size:1.45rem;font-style:normal;text-align:center}
+.page-intro{padding:47px 0 32px;border-bottom:1px solid var(--rule)}.page-intro h1{overflow-wrap:anywhere;hyphens:auto;font-size:clamp(42px,5.4vw,74px);line-height:1.02;font-weight:650}.page-intro .deck{max-width:56rem;margin-top:14px}.reading{display:grid;grid-template-columns:.78fr 1.7fr;gap:45px}.reading h3{font-size:1.16rem;margin:20px 0 7px}.reading h3:first-child{margin-top:0}.reading p{color:#364b42;font-size:.97rem}.reading .sources{margin:18px 0 3px}.equation,.interpretation{background:#eaf1e8;border-left:3px solid var(--teal);padding:12px 15px;color:var(--forest);font-size:.95rem;line-height:1.5}.interpretation{margin:18px 0}.equation{font-weight:620;margin:15px 0}.legend{justify-content:flex-start;color:var(--secondary);gap:6px;font-size:.8rem}.dot{width:9px;height:9px;border-radius:50%;display:inline-block}.dot.teal{background:var(--teal)}.dot.muted{background:#b0c0b6;margin-left:12px}.error,.notice{padding:11px 13px;margin:12px 0;background:#fcf1e4;border-left:3px solid var(--ochre);color:#693f1f}.foot{padding:28px 0 33px;flex-wrap:wrap}.foot>div{display:flex;gap:15px;align-items:baseline}.foot>div span{font-size:.85rem;color:var(--secondary)}.foot strong{letter-spacing:-.02em}.foot nav{gap:19px}.error[hidden]{display:none}button:disabled,.controls input:disabled{opacity:.54}
+@media(max-width:900px){.inner{width:calc(100% - 42px)}.mast-row{align-items:flex-start;justify-content:flex-start;gap:13px;flex-wrap:wrap;padding:11px 0}.mast nav{flex-wrap:wrap;gap:6px 19px}.hero{gap:28px;padding:38px 0}.climate-card{padding:16px 19px}.controls,.result-panel{padding:18px}.compare-grid{grid-template-columns:minmax(200px,.8fr) minmax(0,1.7fr)}.metrics{gap:10px}.metrics>div+div{padding-left:11px}.mast nav a{font-size:.8rem}.range-line{gap:5px}}
+@media(max-width:670px){.inner{width:calc(100% - 32px)}.mast-row{display:block}.mast nav{padding-top:7px;gap:4px 14px}.hero{grid-template-columns:1fr;padding:32px 0 27px;gap:24px}.hero h1 br{display:none}.hero h1{font-size:clamp(44px,10vw,63px)}.deck{margin-top:13px}.text-links{gap:8px 16px;margin-top:14px}.climate-card{padding:15px 19px}.compare-grid,.reading{grid-template-columns:1fr;gap:14px}.workspace,.studies,.reading{padding:25px 0}.heading{margin-bottom:14px}.controls h3{margin-bottom:8px}.range-line{margin-top:12px}.metrics span,.metrics small{font-size:.73rem}.metrics strong{font-size:clamp(23px,6.8vw,34px)}.metrics{gap:6px}.metrics>div+div{padding-left:8px}.page-intro{padding:31px 0 25px}.study-rows a{grid-template-columns:1fr 28px;gap:2px 10px;padding:12px 1px}.study-tag{grid-row:1;grid-column:1}.study-rows a>span:nth-child(2){grid-row:2;grid-column:1}.study-rows i{grid-column:2;grid-row:1/3}.foot>div{flex-wrap:wrap;gap:2px 12px}.foot nav{gap:6px 15px;flex-wrap:wrap}.foot{gap:10px}.table-wrap th,.table-wrap td{padding:7px 5px}.reading h2{max-width:25ch}.tools{gap:7px}}
+@media print{.mast nav,.foot,.tools,button,.text-links{display:none}.inner{width:100%}.controls,.result-panel,.climate-card{break-inside:avoid}.hero{padding:10px 0}.workspace,.reading{padding:15px 0}}
+
+.climate-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;padding-top:8px;border-top:1px solid #507168}
+.climate-pair label{min-width:0}
+.climate-card .climate-pair span{display:flex;gap:7px;margin:0 0 4px;font-size:.78rem}
+.climate-pair i{width:19px;border-top:3px solid #a5e5bd}
+.climate-pair .peer-line{border-top:2px dashed #ebc888}
+.climate-pair select{display:block;width:100%;min-height:34px;padding:4px 7px;border:1px solid #75958b;border-radius:4px;color:#f6fff8;background:#234d44;font-weight:600}
+.city-export{margin-top:12px}
+#city-bars{display:block}
+#city-bars .bar-row{break-inside:avoid;grid-template-columns:minmax(5.7rem,.92fr) 1.3fr 3.8rem;gap:8px;padding:3px 0}
+@media(min-width:950px){
+  #city-bars{column-count:2;column-gap:24px;column-rule:1px solid var(--rule)}
+  #city-bars .bar-row{font-size:.80rem}
+}
+@media(max-width:370px){.climate-pair{gap:9px}.climate-card .climate-pair span{gap:4px;font-size:.71rem}}
+
+
+@media (max-width: 500px) {
+  .result-panel .metrics {grid-template-columns: 1fr; gap: 0}
+  .result-panel .metrics > div {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center; column-gap: 12px; padding-block: 8px;
+  }
+  .result-panel .metrics > div + div {border-left: 0; border-top: 1px solid var(--rule); padding-left: 0}
+  .result-panel .metrics span {grid-row: 1 / 3; font-size: .85rem}
+  .result-panel .metrics strong, .result-panel .metrics small {grid-column: 2; text-align: right}
+  .result-panel .metrics small {max-width: 15ch; overflow-wrap: anywhere}
+  .bar-row > span:first-child {overflow-wrap: anywhere; hyphens: auto}
+  #power-bars .bar-row {grid-template-columns: minmax(8rem, 1.6fr) minmax(0, 1fr) auto}
+}
+.mast .mast-row, .mast .mast-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px clamp(12px, 1.7vw, 25px);
+}
+.mast .mast-row > nav, .mast .mast-inner > nav {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px clamp(10px, 1.35vw, 20px);
+}
+.language-menu {position: relative; justify-self: end; z-index: 3; color: #173f36}
+.language-menu summary {
+  display: flex; align-items: center; gap: 6px; min-height: 38px;
+  padding: 5px 9px; cursor: pointer; list-style: none;
+  border: 1px solid #9bb6a8; border-radius: 5px;
+  background: #fffefa; font-family: inherit; line-height: 1.35;
+  font-size: .86rem; font-weight: 600; white-space: nowrap;
+}
+.language-menu summary::-webkit-details-marker {display: none}
+.language-menu summary::after {
+  content: ""; width: 6px; height: 6px; margin: -3px 2px 0;
+  border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg);
+}
+.language-menu[open] summary::after {margin-top: 3px; transform: rotate(225deg)}
+.language-menu summary:hover, .language-menu[open] summary {background: #eaf2e9}
+.language-menu svg {width: 17px; height: 17px; flex: none}
+.language-options {
+  position: absolute; right: 0; top: calc(100% + 5px); min-width: 10rem; width: max-content;
+  max-width: min(19rem, calc(100vw - 36px)); padding: 5px;
+  background: #fffefa; border: 1px solid #aac1b5; border-radius: 6px;
+  box-shadow: 0 5px 14px #143d3429;
+}
+.language-options p {margin: 4px 6px 5px; font: inherit; font-size: .8rem; color: #405a4e}
+.language-options a, .language-options [aria-current] {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  min-height: 40px; padding: 5px 9px; color: #173f36;
+  border-radius: 3px; font-size: .92rem; text-decoration: none;
+}
+.language-options a:hover, .language-options a:focus-visible {background: #e9f2e9; text-decoration: underline}
+.language-options [aria-current] {background: #e9f2e9; font-weight: 650}
+.language-menu :focus-visible {outline: 2px solid #886020; outline-offset: 2px}
+html:lang(zh-Hans) body {font-family: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif}
+html:lang(zh-Hans) :is(h1, h2) {font-family: inherit; letter-spacing: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .hero h1 {font-size: clamp(2.25rem, 4.1vw, 3.9rem); overflow-wrap: anywhere}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line label {min-width: 0}
+body[data-page="regional"]:is(:lang(ru), :lang(kk)) .range-line output {flex-shrink: 0}
+@media (max-width: 1050px) {
+  .mast .mast-row, .mast .mast-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand language" "nav nav"; gap: 5px 10px; padding: 8px 0;
+  }
+  .mast .brand {grid-area: brand; min-width: 0; width: fit-content; white-space: normal; line-height: 1.2}
+  .mast .brand .coil {flex: none}
+  .mast .language-menu {grid-area: language}
+  .mast .mast-row > nav, .mast .mast-inner > nav {grid-area: nav; justify-content: flex-start; padding: 0}
+}
+@media print {.mast .language-menu {display: none}}
+.project-credit {
+  scroll-margin-top: 1rem;
+  border-block: 1px solid #cbd8cc;
+  background: #e9efe7;
+  color: #203b32;
+}
+.credit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.35rem clamp(2rem, 5vw, 5rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+}
+.credit-grid h2 {
+  margin: 0 0 .45rem;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: normal;
+  color: #476054;
+}
+.credit-grid p {margin: .13rem 0 0; font-size: .93rem; line-height: 1.5; overflow-wrap: anywhere}
+.credit-grid address {font-style: normal}
+.credit-grid .credit-institute {margin: 0 0 .35rem; font-size: clamp(1.5rem, 2.1vw, 1.9rem); line-height: 1.12; font-weight: 700}
+.credit-grid .credit-name {font-size: 1.05rem; line-height: 1.4; font-weight: 600; margin-bottom: .25rem}
+.credit-grid a {color: #15594a; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .17em}
+.credit-grid a:hover {text-decoration-thickness: 2px}
+@media (max-width: 670px) {
+  .credit-grid {grid-template-columns: minmax(0, 1fr)}
+}
+@media print {
+  .project-credit {background: transparent; break-inside: avoid}
+  .credit-grid {padding-block: .8rem}
+}
+
+.credit-grid .credit-feedback {margin-top: .7rem; max-width: 49ch; color: #405b4f}
+.case-share {display: flex; align-items: center; flex-wrap: wrap; gap: 4px 9px; max-width: 100%; margin: .35rem 0}
+.case-share button {padding: 5px 10px; border: 1px solid #92ab9d; border-radius: 4px; background: transparent; color: #164e40; font: inherit; font-size: .82rem; font-weight: 630; line-height: 1.4; cursor: pointer}
+.case-share button:hover {background: #e2ece3}
+.case-share button:disabled {cursor: default; opacity: .56}
+.case-share output,.case-version-note {font-size: .81rem; line-height: 1.35; color: #3c594c}
+.case-version-note {margin: 0}
+.case-share textarea {display: block; flex: 1 0 100%; width: 100%; max-width: 100%; min-height: 6rem; box-sizing: border-box; font: inherit; font-size: .86rem}
+.case-share[hidden],.case-share [hidden],.case-share.private-readings {display: none}
+@media print {.case-share {display: none}}
+</style>
+</head>
+<body data-page="bench">
+<a href="#main" class="skip">Негізгі мазмұнға өту</a>
+<header class="mast"><div class="inner mast-row">
+<a class="brand" href="regional-kk.html" data-study-link="regional"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span><span>KazDC <b>энергетика технологиялары</b></span></a>
+<nav aria-label="Модельдер мен тәжірибелер"><a href="regional-kk.html" data-study-link="regional">Қалалар</a><a href="technologies-kk.html" data-study-link="tech">Технологиялар</a><a href="snow-kk.html" data-study-link="snow">Қар сақтау</a><a href="heat-kk.html" data-study-link="heat">Жылуды пайдалану</a><a href="power-kk.html" data-study-link="power">Электрмен жабдықтау</a><a href="bench-kk.html" data-study-link="bench" aria-current="page">Тәжірибе</a><a href="references-kk.html" data-study-link="references">Дереккөздер</a><a href="research-priorities-kk.html" data-study-link="research">Зерттеу басымдықтары</a><a href="#project-contact">Байланыс</a></nav>
+<details class="language-menu"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>Тіл</summary><div class="language-options"><a lang="en" hreflang="en" href="bench.html" data-language-section>English</a><span lang="kk" aria-current="page">Қазақша<b aria-hidden="true">✓</b></span><a lang="ru" hreflang="ru" href="bench-ru.html" data-language-section>Русский</a><a lang="zh-Hans" hreflang="zh-Hans" href="bench-zh.html" data-language-section>简体中文</a></div></details>
+</div></header>
+<main class="inner" id="main">
+<section class="page-intro"><p class="kicker">Тәжірибе · Сумен калориметрия</p><h1>Салқындату контурын сынау<span>.</span></h1><p class="deck">Су ағыны алып кететін жылу қыздырғыш есептегіші көрсеткен энергияға қаншалықты сәйкес келеді? Мысал арқылы жылу балансын құрып көріңіз немесе орныққан режимдегі өз өлшемдеріңізді енгізіңіз.</p></section>
+<section class="workspace">
+<div class="heading"><h2>Болжам және өлшем</h2><div class="tools"><button id="sample" class="quiet">Мысалды жүктеу</button><button id="new-run" class="action">Тәжірибе деректерін енгізу</button></div></div>
+<div class="compare-grid"><form id="bench-form" class="controls"><h3 id="run-kind">Мысалдағы көрсеткіштер</h3>
+<label for="run-name">Тәжірибе атауы немесе нөмірі</label><input id="run-name" required maxlength="64" value="Оқу мысалы">
+<label for="predicted">Болжамды жылу қуаты (кВт)</label><input id="predicted" required type="number" value="2" min="0" max="500" step="any">
+<label for="flow">Судың массалық шығыны (кг/с)</label><input id="flow" required type="number" value="0.1" min="0" max="20" step="any">
+<div class="field-pair"><div><label for="tin">Кіріс температурасы (°C)</label><input id="tin" required type="number" value="20" min="1" max="95" step="any"></div><div><label for="tout">Шығыс температурасы (°C)</label><input id="tout" required type="number" value="25" min="1" max="95" step="any"></div></div>
+<div class="field-pair"><div><label for="duration">Ұзақтығы (мин)</label><input id="duration" required type="number" min="0.01" max="10080" step="any" value="30"></div><div><label for="meter">Қыздырғыш тұтынған энергия (кВт·сағ)</label><input id="meter" required type="number" min="0" max="100000" step="any" value="1.10"></div></div>
+</form>
+<div class="result-panel"><div class="result-title"><h3>Су жағындағы жылу балансы</h3><span id="evidence">Оқу мысалы</span></div>
+<div class="metrics"><div><span>Судың алып кететін жылу қуаты</span><strong id="duty">—</strong><small>кВт жылу</small></div><div><span>Су алып кеткен жылу</span><strong id="absorbed">—</strong><small>кВт·сағ жылу</small></div><div><span>Қыздырғыш энергиясы мен су алып кеткен жылудың айырмасы</span><strong id="gap">—</strong><small>айырмасы, кВт·сағ</small></div></div>
+<p class="interpretation" id="bench-note" role="status"></p><div class="table-wrap"><table id="bench-table"></table></div><div class="case-share" hidden><button type="button" data-copy-case disabled>Осы есепті көшіру</button><output role="status"></output><textarea readonly hidden></textarea></div><button id="download-run" class="action">Тәжірибе жазбасын жүктеу</button><p class="fine">Көрсеткіштер осы браузер қойындысында қалады. Енгізілген мәндерді, деректер түрін (мысал немесе нақты өлшем) және нәтижені сақтау үшін CSV файлын жүктеңіз.</p></div></div><p class="error" id="bench-error" role="status" hidden></p></section>
+<section class="reading"><div><p class="kicker">Оқыту және сынақ</p><h2>Болжамнан тәжірибеге дейін</h2></div><div>
+ <h3>Тәжірибе алдында</h3><p>Сынақ бөлігінің шекарасын қыздырғыш пен су температурасының екі датчигі де оның ішінде қалатындай етіп белгілеңіз. Өлшеуді бастамай тұрып болжамды жазыңыз. Шығын өлшегіш пен температура датчиктерінің өлшеу белгісіздігін көрсетіңіз. Датчиктерді бірдей температурада қатар орналастырып, көрсеткіштерінің өзара ығысуын бағалаңыз.</p>
+ <h3>Бірдей уақыт аралығын пайдалану</h3><p>Ағын шығыны, кіріс және шығыс температуралары, сондай-ақ қыздырғыштың энергия есептегішіндегі көрсеткіштер бір уақыт аралығына қатысты болсын. Шығын мен температуралар тұрақтанғаннан кейін олардың орташа мәндерін енгізіңіз. Тербеліс елеулі болса, тәжірибені қысқа орныққан аралықтарға бөліп, сол аралықтардағы энергияны қосыңыз. Сорғыдан бөлінетін жылу сынақ бөлігіне түссе, оның есептегіш көрсеткішін бөлек жазыңыз.</p>
+ <p class="equation">Су алып кететін жылу қуаты = массалық шығын × 4,18 кДж/(кг·К) × (шығыс температурасы − кіріс температурасы)</p>
+ <p>Мысалда 0,100 кг/с су 5,0 К-ге қызғанда 2,09 кВт жылу қуатын алып кетеді. Жарты сағатта бұл 1,045 кВт·сағ энергияға тең. 4,18 — сұйық судың меншікті жылу сыйымдылығының жуық мәні. Гликоль контуры үшін ерітіндінің өлшенген концентрациясы мен температурасына сәйкес меншікті жылу сыйымдылығын пайдалану керек.</p>
+ <h3>Баланстың қалдығын түсіндіру</h3><p>Таңбасы ескерілген айырмаға қоршаған ортамен жылу алмасу, қондырғы қызған кезде жиналатын энергия және өлшеу белгісіздігі әсер етеді. Жалғыз оң нәтиже осы әсерлерді ажыратуға жеткіліксіз. Қыздырғыш қуатын өзгертпей, су шығынын өзгертіп тәжірибені қайталаңыз да, екі балансты салыстырыңыз. Температура өсімі азайған сайын датчиктер көрсеткіштерінің өзара ығысуы нәтижеге күштірек әсер етеді.</p>
+ <p class="sources"><a href="references-kk.html#liquid">Сұйықтық контурындағы өлшемдерге қатысты дереккөздер</a> · <a href="https://www.nlr.gov/docs/fy15osti/62905.pdf#page=23">NREL: сервер тірегіндегі тәжірибе және өлшеу мысалы</a> · <a href="https://handbook.ashrae.org/Handbooks/S24/IP/s24_ch12/s24_ch12_ip.aspx">ASHRAE анықтамалығы: жылу энергиясын өлшеу</a></p>
+</div></section>
+
+<noscript><p class="notice">Модельдерді іске қосу және тәжірибе парағына деректер енгізу үшін JavaScript-ті қосыңыз.</p></noscript>
+</main>
+<footer><div class="project-credit" id="project-contact" tabindex="-1"><div class="inner"><div class="credit-grid">
+  <div>
+    <h2>Жобаны ұсынған ұйым</h2>
+    <p class="credit-institute"><a href="https://inmet.nu.edu.kz/kz" aria-label="INMET — Жаңа материалдар және энергетикалық технологиялар институты">INMET</a></p>
+    <p>Жаңа материалдар және энергетикалық технологиялар институты</p>
+    <p>Назарбаев Университеті</p>
+  </div>
+  <div>
+    <h2>Байланыс тұлғасы</h2>
+    <address>
+      <p class="credit-name"><a href="https://research.nu.edu.kz/en/persons/yanwei-wang/">Янвей Ванг, PhD</a></p>
+      <p><a href="mailto:yanwei.wang@nu.edu.kz">yanwei.wang@nu.edu.kz</a></p>
+    </address>
+    <p class="credit-feedback"><a href="mailto:yanwei.wang@nu.edu.kz?subject=KazDC%20Energy%20Tech%3A%20%D0%BD%D0%B0%D2%9B%D1%82%D1%8B%20%D0%BD%D1%8B%D1%81%D0%B0%D0%BD%D2%93%D0%B0%20%D0%B0%D1%80%D0%BD%D0%B0%D0%BB%D2%93%D0%B0%D0%BD%20%D1%8D%D1%82%D0%B0%D0%BB%D0%BE%D0%BD%D0%B4%D1%8B%D2%9B%20%D0%B5%D1%81%D0%B5%D0%BF">INMET-пен нақты нысанға арналған эталондық есепті талқылау</a></p>
+  </div>
+</div>
+</div></div>
+<div class="inner foot"><div><strong>KazDC-BIM</strong><span>Қазақстандағы деректерді өңдеу орталықтарының энергия тұтынуы</span></div>
+<nav aria-label="Материалдар"><a href="methods-kk.html">Астанаға арналған есептеу әдісі</a><a href="references-kk.html" data-reference-link>Дереккөздер</a><a href="bench-kk.html">Тәжірибе</a><a href="source.zip" data-source-download download>Жобаны жүктеу (ZIP)</a></nav></div></footer>
+<script type="application/json" id="energy-text">{"invalid":"Нәтижені көру үшін барлық өріске көрсетілген аралықтағы мәндерді енгізіңіз.","annual":"Жыл","heatTitle":"{city} · жылдық жылу балансы","chartDemand":"Жылуға сұраныс","chartDelivered":"Берілген жылу","chartDescription":"Айлар бойынша жылуға сұраныс пен берілген жылу, МВт·сағ. Нақты мәндер нәтижелер кестесінде көрсетілген.","copLimit":"Бұл температураларда жылыту коэффициенті (COP) идеал шектен (шамамен {limit}) төмен болуы керек.","zeroDemand":"Таңдалған ғимараттың жылуға сұранысы нөлге тең.","zeroCapture":"Сұйықтық контурында тіректен алуға болатын жылу жоқ.","direct":"Тіректен қайтатын су мен тұтынушыға берілетін су арасындағы температура айырмасы кемінде 3 К. Жылу тікелей беріледі.","tooCool":"Тіректен қайтатын судың температурасы сұралған температурада тікелей жылу беруге жеткіліксіз.","lift":"Ғимаратқа жылу қажет болып, тіректен жылу алуға мүмкіндік болса, жылу сорғысы су температурасын қажетті деңгейге көтереді.","heatSummary":"{route} Ғимаратқа жылына {demand} МВт·сағ жылу қажет. Оның {unmet} МВт·сағ бөлігін басқа жылыту жүйесі қамтамасыз етуі керек.","heatTable":["Ай","Сұраныс (МВт·сағ жылу)","Тіректен алынған жылу (МВт·сағ)","Компрессордың электр тұтынуы (МВт·сағ)","Берілген жылу (МВт·сағ)","Қалған сұраныс (МВт·сағ жылу)"],"heatCsv":["Станция","EPW станция коды","Метеодеректер кезеңі","Жылу беру тәсілі","Алынатын жылу үлесі (%)","Тіректен қайтатын су (°C)","Тұтынушыға берілетін су (°C)","Ғимараттың ең жоғары жүктемесі (кВт жылу)","Жылыту коэффициенті (COP)","Ай","Сұраныс (МВт·сағ жылу)","Тіректен алынған жылу (МВт·сағ)","Компрессордың электр тұтынуы (МВт·сағ)","Берілген жылу (МВт·сағ)","Қалған сұраныс (МВт·сағ жылу)","EPW файлы бойынша орын атауы","EPW дереккөзі","Бастапқы деректер қамтыған жыл саны","Каталогтағы кезең","Метеодеректер мұрағатының сілтемесі","Станция туралы ескерту"],"csvDirect":"Тікелей жылу алмасу","csvLift":"Тікелей беру және қосалқы жылу сорғысы","reference":"Базалық UPS","alternative":"Баламалы UPS","powerSummary":"IT жабдығына {load} кВт қуат берілгенде базалық UPS құрылғысында {before} кВт, ал баламалы құрылғыда {after} кВт қуат жоғалады. Екі жолақ та жоғалатын қуатты кВт бірлігімен көрсетеді.","powerCsv":["Нұсқа","Шығыс қуаты (кВт)","ПӘК (%)","Кіріс қуаты (кВт)","Жоғалатын қуат (кВт)","Жұмыс уақыты (сағ)","Электр энергиясының шығыны (МВт·сағ)","Базалық нұсқамен салыстырғандағы үнем (МВт·сағ)"],"measuredEvidence":"Пайдаланушы енгізген өлшемдер","exampleEvidence":"Оқу мысалы","measuredHeading":"Белгіленген уақытта алынған өлшемдеріңіз","exampleHeading":"Мысалдағы көрсеткіштер","runRequired":"Тәжірибе атауын немесе нөмірін енгізіңіз.","benchSummary":"Су ағыны {duty} кВт жылу алып кетеді. Болжам {predicted} кВт болған. Өлшемнен болжамды шегергендегі айырма {difference} кВт.","benchTable":["Салыстырылатын шама","Нәтиже"],"rise":"Шығыс пен кіріс температурасының айырмасы","meter":"Есептегіш бойынша қыздырғыш тұтынған энергия","residual":"Баланс қалдығы / қыздырғыш тұтынған энергия","zeroInput":"Кіріс энергиясы нөл болса, қатынас анықталмайды","tempDifference":"{v} К","meterEnergy":"{v} кВт·сағ","benchCsv":["Тәжірибе атауы немесе нөмірі","Дерек түрі","Болжамды жылу қуаты (кВт)","Массалық шығын (кг/с)","Кіріс температурасы (°C)","Шығыс температурасы (°C)","Ұзақтығы (мин)","Қыздырғыш тұтынған энергия (кВт·сағ)","Меншікті жылу сыйымдылығы (кДж/(кг·К))","Су алып кететін қуат (кВт)","Су алып кеткен жылу (кВт·сағ)","Қыздырғыш энергиясы мен су алып кеткен жылудың айырмасы (кВт·сағ)","Баланс қалдығының кіріс энергиясына қатынасы (%)","Су жағындағы қуат пен болжамның айырмасы (кВт)"],"csvMeasured":"Пайдаланушы өлшемдері","csvExample":"Оқу мысалы"}</script>
+<script type="application/json" id="lab-data">{"it_kw":1000.0}</script>
+<script>"use strict";
+
+const EnergyLab = (() => {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  function cooling(data, station, supply) {
+    const table = data.cooling[supply];
+    if (!table) throw new Error("Select a supply temperature in the supported range.");
+    const rows = station.months.map((bins, month) => {
+      let hours = 0, hybrid = 0, off = 0, degreeHours = 0;
+      for (const [bin, count] of bins) {
+        const [power, chillerOff] = table[bin];
+        hours += count;
+        hybrid += count * power / 1000;
+        off += count * chillerOff;
+        degreeHours += count * data.temperatures[bin];
+      }
+      return {month: months[month], hours, baseline: hours * data.baseline_kw / 1000, hybrid, off, mean: degreeHours / hours};
+    });
+    return {rows, year: total(rows, ["hours", "baseline", "hybrid", "off"])};
+  }
+
+  function total(rows, keys) {
+    return Object.fromEntries(keys.map(key => [key, rows.reduce((sum, row) => sum + row[key], 0)]));
+  }
+
+  function heatingCopLimit(warmReturn, target) {
+    // The flow-modulated source circuit cools by 6 K whenever the heat pump runs.
+    const leavingSource = warmReturn - 6;
+    return target > leavingSource ? (target + 273.15) / (target - leavingSource) : Infinity;
+  }
+
+  function recovery(data, station, inputs) {
+    const {capture, warmReturn, target, peak, cop, mode} = inputs;
+    const heatCapacity = data.it_kw * capture / 100;
+    const directPossible = warmReturn >= target + 3;
+    const activeLift = mode === "lift" && !directPossible && heatCapacity > 0 && peak > 0;
+    if (activeLift &&
+        !(cop > 1 && cop < heatingCopLimit(warmReturn, target))) {
+      throw new RangeError("Heating COP must exceed 1 and stay below the reversible limit.");
+    }
+    const rows = station.months.map((bins, month) => {
+      const row = {month: months[month], demand: 0, delivered: 0, source: 0, compressor: 0, unmet: 0};
+      for (const [bin, count] of bins) {
+        const temp = data.temperatures[bin];
+        const demand = peak * Math.max(0, Math.min(1, (15 - temp) / 40));
+        let delivered = 0, compressor = 0;
+        if (mode === "direct" || directPossible) {
+          if (directPossible) delivered = Math.min(demand, heatCapacity);
+        } else if (activeLift) {
+          delivered = Math.min(demand, heatCapacity / (1 - 1 / cop));
+          compressor = delivered / cop;
+        }
+        const duration = count / 1000;
+        row.demand += demand * duration;
+        row.delivered += delivered * duration;
+        row.compressor += compressor * duration;
+        row.source += (delivered - compressor) * duration;
+        row.unmet += (demand - delivered) * duration;
+      }
+      return row;
+    });
+    return {rows, year: total(rows, ["demand", "delivered", "source", "compressor", "unmet"]), directPossible};
+  }
+
+  function ups(load, reference, alternative, hours = 8760) {
+    const loss = efficiency => load * (100 / efficiency - 1);
+    const before = loss(reference), after = loss(alternative);
+    return {before, after, beforeMwh: before * hours / 1000, afterMwh: after * hours / 1000,
+      saved: (before - after) * hours / 1000};
+  }
+
+  function waterRun(flow, inlet, outlet, minutes, energy) {
+    const duty = flow * 4.18 * (outlet - inlet);
+    const absorbed = duty * minutes / 60;
+    return {duty, absorbed, gap: energy - absorbed, gapPercent: energy ? (energy - absorbed) / energy * 100 : null};
+  }
+
+  return {months, cooling, recovery, heatingCopLimit, ups, waterRun};
+})();
+if (typeof module !== "undefined" && module.exports) module.exports = EnergyLab;
+</script>
+<script>"use strict";
+
+const LabView = (() => {
+  function make(tag, value, className) {
+    const node = document.createElement(tag);
+    if (value !== undefined) node.textContent = value;
+    if (className) node.className = className;
+    return node;
+  }
+
+  function drawTable(id, headers, body, footer) {
+    const holder = document.getElementById(id);
+    holder.replaceChildren();
+    const head = holder.createTHead(), bodyNode = document.createElement("tbody");
+    const top = head.insertRow();
+    for (const label of headers) {
+      const cell = make("th", label);
+      cell.scope = "col";
+      top.append(cell);
+    }
+    function appendRow(target, values) {
+      const tr = target.insertRow();
+      for (const [index, value] of values.entries()) {
+        const cell = make(index === 0 ? "th" : "td", value);
+        if (index === 0) cell.scope = "row";
+        tr.append(cell);
+      }
+    }
+    body.forEach(values => appendRow(bodyNode, values));
+    if (footer) {
+      const foot = document.createElement("tfoot");
+      appendRow(foot, footer);
+      holder.replaceChildren(head, bodyNode, foot);
+    } else {
+      holder.replaceChildren(head, bodyNode);
+    }
+  }
+
+  function download(name, rows) {
+    function quote(value) {
+      const text = String(value);
+      return '"' + text.replace(/"/g, '""') + '"';
+    }
+    const body = rows.map(row => row.map(quote).join(",")).join("\r\n") + "\r\n";
+    const prefix = document.documentElement.lang === "en" ? "" : "\uFEFF";
+    const url = URL.createObjectURL(new Blob([prefix, body], {type:"text/csv;charset=utf-8"}));
+    const link = make("a");
+    link.href = url;
+    link.download = name;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  // A draft may be carried once to the reader's chosen language in this tab.
+  // On the web the host may redirect a link ending in .html to an extensionless URL.
+  function draftPath(path) {
+    return location.protocol === "file:" ? path : path.replace(/\.html\/?$|\/$/i, "");
+  }
+
+  function onLanguageChange(key, getDraft) {
+    document.querySelector(".language-menu").addEventListener("click", event => {
+      const link = event.target.closest("a[hreflang]");
+      if (!link || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey ||
+          event.shiftKey || event.altKey || (link.target && link.target !== "_self")) return;
+      const target = new URL(link.href);
+      if (target.origin !== location.origin) return;
+      const draft = getDraft();
+      if (!draft) return;
+      const record = JSON.stringify({path: target.pathname, language: link.hreflang, draft});
+      if (target.protocol === "file:") window.name = key + ":" + record;
+      else {
+        try { sessionStorage.setItem(key, record); } catch { /* Storage may be disabled. */ }
+      }
+    });
+  }
+
+  function takeLanguageDraft(key) {
+    let raw;
+    if (location.protocol === "file:") {
+      const prefix = key + ":";
+      if (window.name.startsWith(prefix)) {
+        raw = window.name.slice(prefix.length);
+        window.name = "";
+      }
+    } else {
+      try {
+        raw = sessionStorage.getItem(key);
+        sessionStorage.removeItem(key);
+      } catch { /* Storage may be disabled. */ }
+    }
+    if (!raw) return;
+    try {
+      const record = JSON.parse(raw);
+      if (typeof record.path === "string" && draftPath(record.path) === draftPath(location.pathname) &&
+          record.language === document.documentElement.lang) return record.draft;
+    } catch { /* Ignore damaged or older records. */ }
+  }
+
+  return {make, drawTable, download, onLanguageChange, takeLanguageDraft,
+    weatherOrigin: station => window.SiteI18n.stationNote(station)};
+})();
+
+"use strict";
+
+(() => {
+  const data = JSON.parse(document.getElementById("lab-data").textContent);
+  const get = id => document.getElementById(id);
+  const number = id => get(id).valueAsNumber;
+  const language = document.documentElement.lang;
+  const {locale, formatNumber} = window.SiteI18n;
+  const fmt = (n, digits = 0) => formatNumber(n, {minimumFractionDigits: digits, maximumFractionDigits: digits});
+  const localNumber = n => formatNumber(n, {maximumFractionDigits: 5, useGrouping: false});
+  const regionalText = get("regional-text") && JSON.parse(get("regional-text").textContent);
+  const energyText = get("energy-text") && JSON.parse(get("energy-text").textContent);
+  const cityName = station => window.SiteI18n.cityName(station.slug, station.name);
+  const months = regionalText?.months || EnergyLab.months;
+  function message(key, values) {
+    return regionalText[key].replace(/\{(\w+)\}/g, (_, name) => values[name]);
+  }
+  function energyMessage(key, values) {
+    return energyText[key].replace(/\{(\w+)\}/g, (_, name) => values[name]);
+  }
+  const printable = n => Number(n.toFixed(6));
+  const query = new URLSearchParams(location.search);
+
+  const {make, drawTable, download} = LabView;
+
+  function bars(id, rows) {
+    const max = Math.max(...rows.map(r => r.value), 1);
+    get(id).replaceChildren(...rows.map(r => {
+      const row = make("div", undefined, r.active ? "bar-row active":"bar-row");
+      const track = make("span", undefined, "bar-track"), bar = make("i");
+      track.setAttribute("aria-hidden", "true");
+      bar.style.width = (100 * r.value / max) + "%";
+      track.append(bar);
+      row.append(make("span", r.name), track, make("strong", fmt(r.value, 1)));
+      return row;
+    }));
+  }
+
+  function fillCities(select) {
+    const sorted = [...data.stations].sort((a, b) => cityName(a).localeCompare(cityName(b), locale));
+    select.replaceChildren(...sorted.map(station => {
+      const opt = make("option", cityName(station));
+      opt.value = station.slug;
+      return opt;
+    }));
+  }
+
+  function stations() {
+    const select = get("city");
+    fillCities(select);
+    const chosen = data.stations.find(station => station.slug === query.get("city"));
+    select.value = chosen ? chosen.slug : "astana";
+    return () => data.stations.find(station => station.slug === select.value);
+  }
+
+  function setLink(id, param, value) {
+    const a = get(id);
+    const url = new URL(a.href);
+    url.searchParams.set(param, value);
+    a.href = url.href;
+  }
+
+  function syncLabLinks(city, supply) {
+    for (const navLink of document.querySelectorAll('[data-study-link]')) {
+      const url = new URL(navLink.href);
+      const target = navLink.dataset.studyLink;
+      if (["regional", "heat", "tech"].includes(target)) {
+        url.searchParams.set("city", city);
+        navLink.href = url.href;
+      }
+      if (supply !== undefined && ["tech","snow","regional","heat"].includes(target)) {
+        url.searchParams.set("supply",supply);
+        navLink.href=url.href;
+      }
+    }
+  }
+
+  function bindForm(id, render, reset) {
+    const form = get(id);
+    form.addEventListener("input", render);
+    form.addEventListener("change", render);
+    form.addEventListener("submit", event => event.preventDefault());
+    if (reset) get("reset").addEventListener("click", () => { form.reset(); reset(); render(); });
+  }
+
+  function invalidate(prefix, form, values, outputs, tables, chartId) {
+    const bad = !get(form).checkValidity();
+    get(prefix + "-error").hidden = !bad;
+    if (!bad) return false;
+    const field = get(form).querySelector(":invalid");
+    get(prefix + "-error").textContent = field?.validity.customError
+      ? field.validationMessage : energyText.invalid;
+    outputs.forEach(id => { get(id).textContent = ""; });
+    values.forEach(id => { get(id).textContent = "—"; });
+    tables.forEach(id => get(id).replaceChildren());
+    if (chartId) get(chartId).replaceChildren();
+    return true;
+  }
+
+  function restoreModelFields(ids) {
+    for (const id of ids) {
+      const raw = query.get(id);
+      if (!raw || !raw.trim()) continue;
+      const field = get(id);
+      if (field.tagName === "SELECT") {
+        if (Array.from(field.options).some(option=>option.value===raw)) field.value=raw;
+      } else {
+        const initial = field.value;
+        field.value = raw;
+        if (!field.validity.valid) field.value=initial;
+      }
+    }
+  }
+
+  function saveModelFields(ids, extra = {}) {
+    const address = new URL(location.href);
+    for (const id of ids) {
+      const field = get(id);
+      const initial = field.tagName === "SELECT" ? field.options[0].value : field.defaultValue;
+      if (!field.disabled && field.value !== initial) address.searchParams.set(id,field.value);
+      else address.searchParams.delete(id);
+    }
+    for (const [key,value] of Object.entries(extra)) {
+      if (value) address.searchParams.set(key,value);
+      else address.searchParams.delete(key);
+    }
+    if (/^https?:$/.test(location.protocol) && address.href !== location.href) {
+      history.replaceState(null, "", address);
+    }
+    for (const link of document.querySelectorAll(".language-menu a[hreflang]")) {
+      const destination = new URL(link.href);
+      destination.search = address.search;
+      destination.hash = address.hash;
+      link.href = destination.href;
+    }
+  }
+
+  function fieldCase(ids, extra, details) {
+    const fields = ids.map(get).filter(field => !field.disabled);
+    const params = new URLSearchParams(extra);
+    for (const field of fields) params.set(field.id, field.value);
+    return {params, details:[...CaseShare.describeFields(fields), ...details]};
+  }
+
+  function regional() {
+    const station = stations();
+    const supplied = Number(query.get("supply"));
+    if (Object.hasOwn(data.cooling, supplied)) get("supply").value = supplied;
+    get("almaty-details").addEventListener("click", () => { get("regional-method").open = true; });
+    if (location.hash === "#almaty-source") get("regional-method").open = true;
+    let peer = data.stations.find(s => s.slug === query.get("peer"))?.slug || "shymkent";
+    const results = new Map();
+    let result, ranked, lastSupply, lastCity;
+    const pairLabels = regionalText.pairLabels;
+    const firstSelect = get("pair-first"), secondSelect = get("pair-second"), pairSupply = get("pair-supply");
+    fillCities(firstSelect);
+    fillCities(secondSelect);
+    for (const t of Object.keys(data.cooling).map(Number).sort((a, b) => a - b)) {
+      const option = make("option", localNumber(t) + " °C");
+      option.value = t;
+      pairSupply.append(option);
+    }
+    const metricControls = [...document.querySelectorAll('input[name="pair-metric"]')];
+    if (query.get("metric") === "off") metricControls[1].checked = true;
+    const pairMetric = () => metricControls[1].checked ? "off" : "hybrid";
+    const peerStation = () => data.stations.find(s => s.slug === peer);
+    function comparisonParams() {
+      const params = new URLSearchParams({city:station().slug, supply:number("supply"), peer});
+      if (pairMetric() === "off") params.set("metric","off");
+      return params;
+    }
+    function drawPair() {
+      const metric = pairMetric(), label = metric === "off" ? pairLabels.pairOff : pairLabels.pairPower;
+      const unit = metric === "off" ? pairLabels.pairHoursUnit : pairLabels.pairEnergyUnit;
+      const cities = [station(), peerStation()];
+      get("pair-unit").textContent = label + " (" + unit + ")";
+      MonthlyChart.draw("pair-chart", cities.map((city, i) => ({
+        name:cityName(city), values:results.get(city).rows.map(row => row[metric]),
+        color:i ? "#98571f" : "#087563", weight:2.6, mark:i === 0, dash:i ? "6 4" : ""
+      })), window.SiteI18n.shortMonths, [label, unit, ...cities.map(cityName)].join(" · "));
+      const [left,right] = cities.map(city => results.get(city).rows);
+      const differences = left.map((row,i) => row[metric] - right[i][metric]);
+      const largest = Math.max(...differences.map(Math.abs));
+      const month = differences.findIndex(d => Math.abs(d) === largest);
+      const higher = differences[month] > 0 ? 0 : 1;
+      get("pair-difference").textContent = largest < 1e-7 ? message("pairEqual", {metric:label})
+        : message(metric === "off" ? "pairHoursDifference" : "pairEnergyDifference", {
+          month:window.SiteI18n.months[month], city:cityName(cities[higher]), other:cityName(cities[1-higher]),
+          gap:fmt(largest, metric === "off" ? 0 : 2)
+        });
+    }
+    function pairRows() {
+      const left = result, right = results.get(peerStation());
+      const rows = left.rows.map((a, i) => [window.SiteI18n.months[i], a, right.rows[i]]);
+      return [...rows, [pairLabels.pairAnnual, left.year, right.year]];
+    }
+    function renderPair(city) {
+      firstSelect.value = city.slug;
+      secondSelect.value = peer;
+      for (const option of secondSelect.options) option.disabled = option.value === city.slug;
+      pairSupply.value = number("supply");
+      const second = peerStation();
+      for (const [suffix, name] of [["first",cityName(city)], ["second",cityName(second)]]) {
+        get("pair-name-" + suffix).textContent = get("pair-heading-" + suffix).textContent = name;
+      }
+      get("pair-caution").hidden = !city.quality_note && !second.quality_note;
+      get("pair-caution").textContent = regionalText.pairCaution;
+      drawPair();
+      const rows = pairRows().map(([period, a, b]) => {
+        const tr = make("tr"), heading = make("th", period);
+        heading.scope = "row";
+        tr.append(heading);
+        for (const r of [a,b]) tr.append(make("td", fmt(r.hybrid,2)), make("td", fmt(r.off)));
+        return tr;
+      });
+      const table = get("pair-table");
+      table.tFoot.replaceChildren(rows.pop());
+      table.tBodies[0].replaceChildren(...rows);
+    }
+    function studyLink(id, fields) {
+      const link = get(id), target = new URL(link.href);
+      target.search = new URLSearchParams(fields);
+      link.href = target.href;
+    }
+    const snowData = JSON.parse(get("snow-reference").textContent);
+    const snowCase = SnowModel.defaultCase(snowData);
+    const snow = SnowModel.simulate(snowData, snowCase);
+    get("snow-result").textContent = fmt(snow.annual.extraOff);
+    get("snow-result-context").textContent = message("snowContext", {
+      supply:localNumber(snowCase.supply), volume:fmt(snowCase.volume)
+    });
+    studyLink("snow-result-link", snowCase);
+    const referenceEfficiency = 94, alternativeEfficiency = 97;
+    const ups = EnergyLab.ups(data.it_kw, referenceEfficiency, alternativeEfficiency);
+    get("ups-result").textContent = fmt(ups.saved, 1);
+    get("ups-result-context").textContent = message("upsContext", {
+      load:localNumber(data.it_kw / 1000), before:referenceEfficiency, after:alternativeEfficiency
+    });
+    studyLink("ups-result-link", {load:data.it_kw, "reference-eff":referenceEfficiency, "alternative-eff":alternativeEfficiency});
+    function showHeatResult(city) {
+      const heatCase = {mode:"direct", warmReturn:40, target:35, peak:750, capture:70};
+      const heat = EnergyLab.recovery(data, city, heatCase);
+      get("heat-result").textContent = fmt(heat.year.delivered, 1);
+      get("heat-result-context").textContent = message("heatContext", {
+        city:cityName(city), returnTemp:heatCase.warmReturn, target:heatCase.target, peak:fmt(heatCase.peak)
+      });
+      studyLink("heat-result-link", {city:city.slug, mode:heatCase.mode, warm:heatCase.warmReturn,
+        target:heatCase.target, peak:heatCase.peak, capture:heatCase.capture});
+      get("study-results-title").parentElement.hidden = false;
+    }
+    function saveComparison() {
+      const address = new URL(location.href);
+      for (const [key,value] of comparisonParams()) address.searchParams.set(key,value);
+      if (pairMetric() !== "off") address.searchParams.delete("metric");
+      const links = document.querySelectorAll('[data-language-case], [data-weather-link], [data-study-link="regional"], [data-study-link="references"], .foot a[data-reference-link]');
+      for (const link of links) {
+        const target = new URL(link.href);
+        target.search = address.search;
+        if (link.hasAttribute("data-language-case")) target.hash = address.hash;
+        link.href = target.href;
+      }
+      if (/^https?:$/.test(location.protocol) && address.href !== location.href) history.replaceState(null, "", address);
+    }
+    function render() {
+      const city = station(), supply = number("supply");
+      if (supply !== lastSupply) {
+        for (const s of data.stations) results.set(s, EnergyLab.cooling(data, s, supply));
+        ranked = [...data.stations].sort((a, b) => results.get(a).year.hybrid - results.get(b).year.hybrid);
+        lastSupply = supply;
+      }
+      result = results.get(city);
+      if (city.slug !== lastCity) {
+        showHeatResult(city);
+        if (peer === city.slug) peer = lastCity || (city.slug === "astana" ? "shymkent" : "astana");
+        lastCity = city.slug;
+      }
+      const year = result.year, base = year.baseline;
+      get("weather-origin").textContent = window.SiteI18n.stationNote(city);
+      get("supply-value").textContent = localNumber(supply) + " °C";
+      const share = year.hybrid / base;
+      get("selected-cooling").textContent = message("selectedCooling", {
+        city:cityName(city), energy:fmt(year.hybrid, 1), off:fmt(year.off)
+      });
+      get("case-context").textContent = message("caseContext", {
+        city:cityName(city), it:localNumber(data.it_kw / 1000), supply:localNumber(supply)
+      });
+      get("case-saving").textContent = fmt(100 * (1 - share), 1) + "%";
+      get("case-baseline").textContent = fmt(base, 1);
+      get("case-hybrid").textContent = fmt(year.hybrid, 1);
+      get("case-hybrid-bar").style.width = (100 * share) + "%";
+      get("case-off").textContent = message("caseOff", {off:fmt(year.off), hours:fmt(year.hours)});
+      const july = result.rows[6];
+      get("case-july").textContent = message("caseJuly", {off:fmt(july.off), hours:fmt(july.hours)});
+      const tried = supply === 24;
+      get("case-july").hidden = tried;
+      get("experiment").hidden = false;
+      get("experiment-prompt").hidden = tried;
+      get("experiment-result").hidden = !tried;
+      get("experiment-result").textContent = tried ? message("experimentResult", {
+        city:cityName(city), hours:fmt(july.hours), before:fmt(EnergyLab.cooling(data, city, 18).rows[6].off),
+        after:fmt(july.off)
+      }) : "";
+      get("try-supply").textContent = tried ? pairLabels.back18 : pairLabels.try24;
+      get("threshold").textContent = message("threshold", {temperature:localNumber(supply - data.plant.rated_approach_k)});
+      get("baseline-note").textContent = message("baseline", {energy:fmt(base, 1)});
+      get("station-detail").textContent = message("detail", {
+        location:city.epw_location, source:city.epw_source, id:city.station_id, lat:localNumber(city.lat),
+        lon:localNumber(city.lon), height:localNumber(city.elevation_m), offset:"+" + localNumber(city.utc_offset),
+        catalogue:city.catalogue_period, years:city.source_years, period:city.period
+      });
+      get("station-source").href = city.source_url;
+      bars("city-bars", ranked.map(s => ({name:cityName(s), value:results.get(s).year.hybrid, active:s===city})));
+      drawTable("regional-table", regionalText.columns,
+        result.rows.map((r, i)=>[months[i],fmt(r.mean,1),fmt(r.baseline,2),fmt(r.hybrid,2),fmt(r.off)]),
+        [regionalText.annual,fmt(result.rows.reduce((sum,r)=>sum+r.mean*r.hours,0)/year.hours,1),fmt(base,2),fmt(year.hybrid,2),fmt(year.off)]);
+      setLink("astana-link","supply",supply);
+      setLink("snow-link","supply",supply);
+      setLink("heat-link","city",city.slug);
+      setLink("heat-link","supply",supply);
+      syncLabLinks(city.slug,supply);
+      renderPair(city);
+      saveComparison();
+    }
+    bindForm("regional-form", render, () => { get("city").value="astana"; peer="shymkent"; metricControls[0].checked=true; });
+    get("try-supply").addEventListener("click", () => { get("supply").value = number("supply") === 24 ? 18 : 24; render(); });
+    get("pair-form").addEventListener("submit", event => event.preventDefault());
+    firstSelect.addEventListener("change", () => { get("city").value = firstSelect.value; render(); });
+    secondSelect.addEventListener("change", () => { peer = secondSelect.value; render(); });
+    pairSupply.addEventListener("change", () => { get("supply").value = pairSupply.value; render(); });
+    metricControls.forEach(control => control.addEventListener("change", () => { drawPair(); saveComparison(); }));
+    get("example-pair").addEventListener("click", () => {
+      get("city").value = "ekibastuz"; peer = "oskemen"; render();
+    });
+    window.addEventListener("resize", drawPair);
+    CaseShare.register(button => {
+      if (!result) return null;
+      const details = [get("case-context").textContent, get("selected-cooling").textContent,
+        document.querySelector(".energy-comparison dt").textContent + " · " + fmt(result.year.baseline,1) + " " + pairLabels.pairEnergyUnit,
+        [...get("cooling-result-title").children].map(el => el.textContent).join(" "), get("case-july").textContent];
+      if (button.dataset.caseSection === "city-comparison") {
+        const second = peerStation(), year = results.get(second).year;
+        details.push(message("selectedCooling", {city:cityName(second), energy:fmt(year.hybrid,1), off:fmt(year.off)}),
+          message("caseJuly", {off:fmt(results.get(second).rows[6].off), hours:fmt(results.get(second).rows[6].hours)}));
+      }
+      return {params:comparisonParams(), details};
+    });
+    function csvHeaders(keys) {
+      return keys.map(key => regionalText.csvFields?.[key] || key);
+    }
+    const stationWarning = city => city.quality_note ? regionalText.quality : "";
+    get("download-pair").addEventListener("click", () => {
+      const cities = [station(), peerStation()];
+      const headings = cities.flatMap(city => [
+        cityName(city) + " · " + pairLabels.pairPower + " (" + pairLabels.pairEnergyUnit + ")",
+        cityName(city) + " · " + pairLabels.pairOff + " (" + pairLabels.pairHoursUnit + ")"
+      ]);
+      download(cities.map(city => city.slug).join("-") + "-" + number("supply") + "C.csv", [
+        [pairLabels.pairMonth, ...headings, pairLabels.pairSupply + " (°C)",
+          ...cities.map(city => cityName(city) + " · " + csvHeaders(["weather_archive"])[0])],
+        ...pairRows().map(([period,a,b]) => [period, printable(a.hybrid), a.off, printable(b.hybrid), b.off,
+          number("supply"), ...cities.map(city => city.source_url)])
+      ]);
+    });
+    get("download-cities").addEventListener("click", () => {
+      const supply = number("supply");
+      const rows = ranked.map(city => {
+        const y = results.get(city).year;
+        return [cityName(city),city.station_id,city.period,city.source_years,city.catalogue_period,supply,y.hours,
+          printable(y.baseline),printable(y.hybrid),y.off,city.epw_location,city.epw_source,city.source_url,stationWarning(city)];
+      });
+      download("kazakhstan-cooling-"+supply+"C.csv", [
+        csvHeaders(["station","epw_station_id","source_period","source_years","catalogue_period","supply_c","hours","chiller_only_mwh_e","dry_chiller_mwh_e","chiller_off_h","epw_location","epw_source","weather_archive","station_note"]),
+        ...rows
+      ]);
+    });
+    get("download-months").addEventListener("click", () => {
+      const city = station(), supply = number("supply");
+      const rows = result.rows.concat([{...result.year, month:"Annual",mean:result.rows.reduce((s,r)=>s+r.mean*r.hours,0)/result.year.hours}]);
+      download(city.slug+"-cooling-"+supply+"C.csv", [
+        csvHeaders(["station","epw_station_id","tmyx_period","supply_c","month","hours","mean_air_c","chiller_only_mwh_e","dry_chiller_mwh_e","chiller_off_h","epw_location","epw_source","source_years","catalogue_period","weather_archive","station_note"]),
+        ...rows.map((r,i)=>[cityName(city),city.station_id,city.period,supply,months[i] || regionalText.annual,r.hours,printable(r.mean),printable(r.baseline),printable(r.hybrid),r.off,city.epw_location,city.epw_source,city.source_years,city.catalogue_period,city.source_url,stationWarning(city)])]);
+    });
+    render();
+  }
+
+  function heat() {
+    const station = stations();
+    const monthNames = window.SiteI18n.months;
+    const chartMonths = window.SiteI18n.shortMonths;
+    const heatFields = ["mode","warm","target","capture","peak","cop"];
+    restoreModelFields(heatFields);
+    get("capture-context").hidden = query.get("from") !== "cold-plate" || !query.has("capture");
+    get("capture").addEventListener("input", () => { get("capture-context").hidden = true; });
+    let result, inputs;
+    CaseShare.register(() => {
+      if (!result || !get("heat-form").checkValidity()) return null;
+      const extra = {city:station().slug};
+      if (!get("capture-context").hidden) extra.from = "cold-plate";
+      const linked = Number(query.get("supply"));
+      if (linked >= 8 && linked <= 32 && Number.isInteger(linked * 2)) extra.supply = linked;
+      return fieldCase(heatFields, extra, [cityName(station()), ...CaseShare.resultLines(), get("heat-status").textContent]);
+    });
+    function draw() {
+      if (!result) return;
+      MonthlyChart.draw("heat-chart", [
+        {name:energyText.chartDemand,values:result.rows.map(r=>r.demand),color:"#82968a",weight:3,dash:"5 4"},
+        {name:energyText.chartDelivered,values:result.rows.map(r=>r.delivered),color:"#087b69",weight:2,mark:true}
+      ], chartMonths, energyText.chartDescription);
+    }
+    function render() {
+      const city = station();
+      get("weather-origin").textContent = window.SiteI18n.stationNote(city);
+      const linkedSupply = Number(query.get("supply"));
+      const supply = linkedSupply>=8 && linkedSupply<=32 && Number.isInteger(linkedSupply*2) ? linkedSupply : undefined;
+      syncLabLinks(city.slug,supply);
+      const mode = get("mode").value;
+      const direct = number("warm") >= number("target")+3;
+      get("cop").disabled = mode === "direct" || direct || number("capture") === 0 || number("peak") === 0;
+      const limit = EnergyLab.heatingCopLimit(number("warm"), number("target"));
+      const cop = get("cop");
+      cop.setCustomValidity(!cop.disabled && number("cop") >= limit
+        ? energyMessage("copLimit", {limit:fmt(limit, 2)}) : "");
+      const invalid = invalidate("heat","heat-form",["delivered","coverage","compressor"],["heat-status"],["heat-table"],"heat-chart");
+      get("download-heat").disabled = invalid;
+      if (invalid) { result = null; return; }
+      inputs = {mode,capture:number("capture"),warmReturn:number("warm"),target:number("target"),peak:number("peak"),
+        cop:get("cop").disabled ? null : number("cop")};
+      result = EnergyLab.recovery(data, city, inputs);
+      saveModelFields(heatFields,{city:city.slug,from:get("capture-context").hidden ? null : "cold-plate",
+        capture:get("capture-context").hidden && get("capture").value===get("capture").defaultValue ? null : get("capture").value});
+      const y = result.year;
+      get("heat-title").textContent = energyMessage("heatTitle", {city:cityName(city)});
+      get("delivered").textContent = fmt(y.delivered,1);
+      get("coverage").textContent = y.demand ? fmt(100*y.delivered/y.demand,1)+"%" : "—";
+      get("compressor").textContent = fmt(y.compressor,1);
+      const route = inputs.peak === 0 ? "zeroDemand" : inputs.capture === 0 ? "zeroCapture" :
+        direct ? "direct" : mode === "direct" ? "tooCool" : "lift";
+      get("heat-status").textContent = energyMessage("heatSummary", {route:energyText[route], demand:fmt(y.demand,1), unmet:fmt(y.unmet,1)});
+      const cells = (r, label) => [label,fmt(r.demand,2),fmt(r.source,2),fmt(r.compressor,2),fmt(r.delivered,2),fmt(r.unmet,2)];
+      drawTable("heat-table", energyText.heatTable, result.rows.map((r,i) => cells(r, monthNames[i])), cells(y, energyText.annual));
+      draw();
+    }
+    bindForm("heat-form",render,()=>{get("city").value="astana"; get("capture-context").hidden=true;});
+    get("download-heat").addEventListener("click",()=>{
+      const s=station();
+      const rows = [...result.rows, result.year];
+      const mode = inputs.mode === "direct" ? energyText.csvDirect : energyText.csvLift;
+      const stationNote = s.quality_note ? (language === "en" ? s.quality_note : window.SiteI18n.stationNote(s)) : "";
+      download(s.slug+"-heat-reuse.csv",[
+        energyText.heatCsv,
+        ...rows.map((r,i)=>[cityName(s),s.station_id,s.period,mode,inputs.capture,inputs.warmReturn,inputs.target,inputs.peak,inputs.cop??"",
+          i === 12 ? energyText.annual : language === "en" ? r.month : monthNames[i],
+          ...["demand","source","compressor","delivered","unmet"].map(k=>printable(r[k])),
+          s.epw_location,s.epw_source,s.source_years,s.catalogue_period,s.source_url,stationNote])]);
+    });
+    render();
+    window.addEventListener("resize",draw);
+  }
+
+  function power() {
+    const fields=["load","reference-eff","alternative-eff"];
+    restoreModelFields(fields);
+    let result;
+    CaseShare.register(() => result && get("power-form").checkValidity()
+      ? fieldCase(fields, {}, [...CaseShare.resultLines(), get("power-note").textContent]) : null);
+    function render() {
+      const invalid = invalidate("power","power-form",["power-before","power-after","power-saving"],["power-note"],[],"power-bars");
+      get("download-power").disabled=invalid;
+      if(invalid) return;
+      saveModelFields(fields);
+      result=EnergyLab.ups(number("load"),number("reference-eff"),number("alternative-eff"));
+      get("power-before").textContent=fmt(result.beforeMwh,1);
+      get("power-after").textContent=fmt(result.afterMwh,1);
+      get("power-saving").textContent=fmt(result.saved,1);
+      bars("power-bars",[{name:energyText.reference,value:result.before,active:false},{name:energyText.alternative,value:result.after,active:true}]);
+      get("power-note").textContent = energyMessage("powerSummary", {load:fmt(number("load"),1), before:fmt(result.before,1), after:fmt(result.after,1)});
+    }
+    bindForm("power-form",render,()=>{});
+    get("download-power").addEventListener("click",()=>download("ups-comparison.csv",[
+      energyText.powerCsv,
+      ...[[energyText.reference,"reference-eff",result.before,result.beforeMwh,0],[energyText.alternative,"alternative-eff",result.after,result.afterMwh,result.saved]]
+      .map(([name,id,loss,mwh,saved])=>[name,number("load"),number(id),printable(number("load")+loss),printable(loss),8760,printable(mwh),printable(saved)])]));
+    render();
+  }
+
+  function bench() {
+    let measured=false, result;
+    const form=get("bench-form");
+    // Readings stay in this tab. Transfer them once, only when following a language link.
+    const transferKey = "kazdc-bench-language-v1";
+    const fields = [...form.querySelectorAll("input")];
+    const numericIds = fields.filter(field => field.type === "number").map(field => field.id);
+    if (query.get("example") === "1") restoreModelFields(numericIds);
+    const draft = LabView.takeLanguageDraft(transferKey);
+    if (draft && typeof draft.measured === "boolean" && draft.values) {
+      measured = draft.measured;
+      for (const field of fields) {
+        if (typeof draft.values[field.id] === "string") field.value = draft.values[field.id];
+      }
+    }
+    LabView.onLanguageChange(transferKey, () => {
+      const values = {};
+      for (const field of fields) {
+        if (!measured && field.id === "run-name" && field.value === field.defaultValue) continue;
+        values[field.id] = field.value;
+      }
+      return {measured, values};
+    });
+    CaseShare.register(() => !measured && result && form.checkValidity()
+      ? fieldCase(numericIds, {example:1}, [get("evidence").textContent, get("bench-note").textContent]) : null);
+    function render() {
+      document.querySelector(".case-share").classList.toggle("private-readings", measured);
+      get("evidence").textContent=measured?energyText.measuredEvidence:energyText.exampleEvidence;
+      get("run-kind").textContent=measured?energyText.measuredHeading:energyText.exampleHeading;
+      get("run-name").setCustomValidity(get("run-name").value.trim() ? "" : energyText.runRequired);
+      const invalid=invalidate("bench","bench-form",["duty","absorbed","gap"],["bench-note"],["bench-table"]);
+      get("download-run").disabled=invalid;
+      if(invalid) return;
+      result=EnergyLab.waterRun(number("flow"),number("tin"),number("tout"),number("duration"),number("meter"));
+      get("duty").textContent=fmt(result.duty,3);
+      get("absorbed").textContent=fmt(result.absorbed,3);
+      get("gap").textContent=fmt(result.gap,3);
+      const difference=result.duty-number("predicted");
+      get("bench-note").textContent = energyMessage("benchSummary", {duty:fmt(result.duty,3), predicted:fmt(number("predicted"),3), difference:fmt(difference,3)});
+      drawTable("bench-table",energyText.benchTable,[
+        [energyText.rise,energyMessage("tempDifference", {v:fmt(number("tout")-number("tin"),2)})],
+        [energyText.meter,energyMessage("meterEnergy", {v:fmt(number("meter"),3)})],
+        [energyText.residual,result.gapPercent===null?energyText.zeroInput:fmt(result.gapPercent,1)+"%"]]);
+    }
+    bindForm("bench-form",render);
+    get("sample").addEventListener("click",()=>{measured=false;form.reset();render();});
+    get("new-run").addEventListener("click",()=>{
+      measured=true;
+      for(const input of form.querySelectorAll("input")) input.value="";
+      render();
+      get("run-name").focus();
+    });
+    get("download-run").addEventListener("click",()=>{
+      const label=get("run-name").value.trim();
+      const safeLabel=/^[=+@\-\t\r]/.test(label) ? "'"+label : label;
+      download("water-loop-run.csv",[
+        energyText.benchCsv,
+        [safeLabel,measured?energyText.csvMeasured:energyText.csvExample,number("predicted"),number("flow"),number("tin"),number("tout"),number("duration"),number("meter"),
+          4.18,printable(result.duty),printable(result.absorbed),printable(result.gap),result.gapPercent===null?"":printable(result.gapPercent),printable(result.duty-number("predicted"))]]);
+    });
+    render();
+  }
+
+  const page = document.body.dataset.page;
+  function openLegacySection() {
+    if (page !== "regional" || !["#controls", "#charts", "#monthly", "#top"].includes(location.hash)) return false;
+    const destination = new URL(get("astana-link").getAttribute("href"), location.href);
+    destination.search = location.search;
+    destination.hash = location.hash;
+    location.replace(destination.href);
+    return true;
+  }
+  if (!openLegacySection()) {
+    ({regional,heat,power,bench})[page]();
+    if (page === "regional") window.addEventListener("hashchange", openLegacySection);
+  }
+})();
+</script>
+<script>// Native disclosure and links also work without JavaScript.
+(() => {
+  const menu = document.querySelector(".language-menu");
+  const summary = menu.querySelector("summary");
+  document.addEventListener("click", event => {
+    if (menu.open && !menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && menu.open) {
+      menu.open = false;
+      summary.focus();
+    }
+  });
+  function syncLanguageLinks() {
+    for (const link of menu.querySelectorAll("a[hreflang]")) {
+      const destination = new URL(link.href);
+      // Offline studies set their target queries directly because file URLs cannot be rewritten with history.
+      if (location.protocol !== "file:") destination.search = location.search;
+      destination.hash = location.hash;
+      link.href = destination.href;
+    }
+  }
+  syncLanguageLinks();
+  menu.addEventListener("toggle", syncLanguageLinks);
+  menu.addEventListener("click", syncLanguageLinks, true);
+  window.addEventListener("hashchange", syncLanguageLinks);
+  window.addEventListener("popstate", syncLanguageLinks);
+})();
+</script>
+</body></html>

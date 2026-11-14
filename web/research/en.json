@@ -1,0 +1,60 @@
+{
+  "title": "Research priorities for Kazakhstan",
+  "nav": "Research priorities",
+  "homeLink": "Which cooling predictions should we test first?",
+  "invitation": "Discuss a reference case with INMET",
+  "subject": "KazDC Energy Tech reference case",
+  "intro": "Which cooling designs merit a closer look in Kazakhstan? One operating data centre could help test the regional model and show which inputs matter most for the next design decision.",
+  "caseTitle": "How often can the chiller stay off in Ekibastuz in July?",
+  "caseContext": "In the same typical weather year, a dry cooler serves a fixed {it} MW IT load with chiller backup. Only the coolant supply temperature changes between these two model runs.",
+  "caseMetric": "July hours with the chiller off",
+  "supplyLabel": "{temperature} °C supply",
+  "hoursLabel": "{off} of {hours} h",
+  "openCase": "Open {temperature} °C case",
+  "caseNote": "A warmer supply temperature extends the hours when outdoor air can carry the full cooling load. Which setpoints could the equipment at a particular facility support?",
+  "methodsLink": "Cooling model and assumptions",
+  "weatherLink": "Weather data and station notes",
+  "prioritiesTitle": "Three questions for the next studies",
+  "workLabel": "What to study",
+  "outcomeLabel": "What the result would tell us",
+  "questions": [
+    {
+      "question": "How closely does the model match an operating data centre?",
+      "work": "Match actual weather, IT load and coolant temperatures to the cooling electricity meter and the chiller’s on/off record. Set aside complete weeks before calibrating the model.",
+      "outcome": "An operator could see the error in predicted electricity use and chiller-off hours on weeks the model has never seen."
+    },
+    {
+      "question": "How much backup cooling is needed in the hottest hours?",
+      "work": "Run several years of hourly weather for selected cities using equipment performance curves and the facility’s coolant limits.",
+      "outcome": "A designer could compare annual electricity savings with the peak backup cooling duty in kW of heat, including the hours that set the peak."
+    },
+    {
+      "question": "Where could a building use heat from a data centre?",
+      "work": "Match hourly heat available from the data centre with one nearby building or heat network. Check the receiving temperature, distribution losses and electricity for pumps and any heat pump.",
+      "outcome": "A building operator could see how much heat reaches the user each month and how much additional electricity it takes to deliver it."
+    }
+  ],
+  "pilotTitle": "A first study with one operator",
+  "pilotIntro": "This example scope assumes that a partner can supply historical operating records. The timetable and effort can be refined together.",
+  "partnerLabel": "Data partner",
+  "partner": "One willing data-centre operator in Kazakhstan, with an operations engineer who knows the meters and controls.",
+  "recordsLabel": "Hourly records",
+  "records": "Use at least eight weeks of time-aligned, anonymised records. Include IT load, outdoor temperature, supply and return temperatures, cooling-plant electricity and chiller status.",
+  "timeLabel": "Proposed timetable",
+  "time": "In weeks 1–2, check meters and reserve the last two weeks of records. In weeks 3–5, calibrate on the earlier records. In weeks 6–8, test on the reserved weeks and review the errors with the operator.",
+  "staffLabel": "Staff time",
+  "staff": "Allow 12 analyst-days and 3 operator-engineer days across the eight-week study. These are planning assumptions.",
+  "costLabel": "Metering costs",
+  "cost": "Additional meter hire is 0 KZT if existing meters cover all channels. For missing readings, price rental days × the local daily rate, plus installation and calibration. Confirm a KZT quote with the operator before fieldwork.",
+  "deliverableLabel": "First deliverable",
+  "deliverable": "One anonymised reference case reporting predicted and metered cooling electricity (kWh), chiller-off hours and errors for the reserved weeks.",
+  "briefLink": "Download the one-page meeting brief (PDF)",
+  "briefTitle": "Testing cooling predictions in Kazakhstan",
+  "briefIntro": "A discussion brief for a first study with a data-centre operator.",
+  "briefCase": "Ekibastuz · {it} MW IT load · typical July",
+  "briefMetric": "Modelled chiller-off hours out of {hours} July hours",
+  "briefNextLabel": "Follow-on studies",
+  "briefNext": "Estimate backup cooling during extreme heat and match recoverable heat with the demand of a nearby building.",
+  "closing": "Which facility in Kazakhstan would be willing to help us test the first prediction?",
+  "webLink": "Research priorities and interactive models"
+}

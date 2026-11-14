@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073e41">
+  <title>Astana data-centre cooling · {{SITE_TITLE}}</title>
+  {{SITE_METADATA}}
+  <style>{{STYLE}}{{LANGUAGE_STYLE}}{{CREDIT_STYLE}}</style>
+</head>
+<body>
+<a class="skip" href="#controls">Skip to supply temperature</a>
+<header class="mast"><div class="wrap mast-inner">
+  <a class="brand" data-snow-link href="{{REGIONAL_URL}}" aria-label="{{SITE_TITLE}} home"><span class="coil" aria-hidden="true"><i></i><i></i><i></i></span>{{SITE_TITLE}}</a>
+  <nav aria-label="Study sections"><a href="#charts">Comparison</a><a href="#monthly">Monthly data</a><a href="{{METHODS_URL}}">Methods</a><a href="{{SNOW_URL}}" data-snow-link>Snow cooling</a><a href="{{REFERENCES_URL}}">References</a><a href="{{RESEARCH_URL}}">{{RESEARCH_NAV_LABEL}}</a><a href="#project-contact">{{CONTACT_LABEL}}</a></nav>
+{{LANGUAGE_MENU}}
+</div></header>
+<main class="wrap" id="top">
+  <div class="intro"><div><p class="eyebrow">Data-centre reference case</p>
+    <h1>Astana data-centre cooling</h1>
+    <p class="lead">How much of a steady <span data-val="load-mw">1</span> MW IT load can outdoor air cool through a dry cooler?</p>
+  </div><div class="station"><strong>Astana, Kazakhstan</strong><span>EPW station ID 351880 · 2011–2025 TMYx</span><span>8,760 hourly dry-bulb values</span></div></div>
+  <noscript><p class="notice">Enable JavaScript to explore the results, or use the reference CSVs in the project package.</p></noscript>
+  <section class="scenario" aria-label="Supply temperature and annual results">
+    <div class="control-card" id="controls"><div class="label-line"><label for="supply">Coolant supply temperature</label><button id="reset" class="reset" type="button">Reset</button></div>
+      <div class="value-line"><output id="supply-value" for="supply">18<span> °C</span></output>
+        <div class="steppers"><button id="down" aria-label="Decrease supply temperature by half a degree">−</button><button id="up" aria-label="Increase supply temperature by half a degree">+</button></div>
+      </div>
+      <input id="supply" type="range" min="8" max="32" step="0.5" value="18" aria-describedby="threshold">
+      <div class="range-ends" aria-hidden="true"><span>8 °C</span><span>20 °C</span><span>32 °C</span></div>
+      <p id="threshold"></p>
+    </div>
+    <div class="results-card"><div class="result-heading"><h2>Annual results</h2><span>Dry cooler + chiller</span></div>
+      <div class="kpi-grid">
+        <div><h3>Cooling electricity saved</h3><p class="big" id="savings"></p><p class="small" id="saved-energy"></p></div>
+        <div><h3>Chiller off</h3><p class="big" id="off"></p><p class="small" id="off-share"></p></div>
+        <div><h3>Heat removed by dry cooler</h3><p class="big" id="dry-share"></p><p class="small" id="dry-energy"></p></div>
+      </div>
+    </div>
+  </section>
+  {{COPY_CASE@controls}}
+  <section id="charts" class="charts" aria-label="Monthly comparison charts">
+    <article class="panel">
+      <h2>Cooling electricity</h2><p class="unit">Monthly plant consumption · MWh</p>
+      <div class="legend"><span><i class="base"></i>Chiller only</span><span><i class="hybrid"></i>Dry cooler + chiller</span></div>
+      <div id="power-chart" class="chart"></div>
+      <p id="power-note" class="chart-note"></p>
+    </article>
+    <article class="panel">
+      <h2>Chiller operating hours</h2><p class="unit">Hours per month · dry cooler + chiller system</p>
+      <div class="legend"><span><i class="dry"></i>Chiller off</span><span><i class="assist"></i>Assisted</span><span><i class="mech"></i>Chiller only</span></div>
+      <div id="mode-chart" class="chart"></div>
+      <p id="mode-note" class="chart-note"></p>
+    </article>
+  </section>
+  <section id="monthly" class="panel table-panel"><div class="section-heading"><div><h2>Monthly results</h2>
+    <p class="unit">Electricity includes the chiller package, operating dry-cooler fan and common loop pump.</p></div>
+    <button class="download" id="download" type="button">Download CSV <span aria-hidden="true">↓</span></button></div>
+    <div class="scroll" role="region" aria-label="Monthly results table, scroll horizontally on small screens" tabindex="0"><table>
+      <caption class="sr-only">Monthly scenario comparison, with an annual total</caption>
+      <thead><tr><th scope="col">Period</th><th scope="col">Chiller only<br><em>MWh electric</em></th><th scope="col">Dry cooler + chiller<br><em>MWh electric</em></th><th scope="col">Electricity saved<br><em>%</em></th><th scope="col">Chiller off<br><em>hours</em></th><th scope="col">Assisted<br><em>hours</em></th><th scope="col">Chiller only<br><em>hours</em></th></tr></thead>
+      <tbody id="table-body"></tbody><tfoot id="table-foot"></tfoot>
+    </table></div>
+  </section>
+  <section id="method" class="panel method"><div class="section-heading"><div><h2>How the cooling estimate is calculated</h2>
+    <p class="unit">An hourly comparison at the same IT load and coolant supply temperature.</p></div>
+    <a class="guide-link" href="{{METHODS_URL}}">Detailed methods <span aria-hidden="true">→</span></a></div>
+    <div class="method-grid"><div><h3>Plant assumptions</h3><dl id="assumptions"></dl>
+      <h3 class="method-subhead">Weather input</h3><p class="method-copy">The model reads 8,760 outdoor dry-bulb temperatures from the Astana typical year. Applying the control rule hour by hour counts cold nights and warm afternoons separately.</p>
+      <p class="sources"><a href="{{REFERENCES_URL}}#cooling">Cooling sources and assumptions</a> · <a href="data/astana_hourly.csv" download>Astana hourly weather CSV</a></p></div>
+      <div class="prose"><h3>How outdoor air takes up heat</h3>
+      <p>The IT equipment warms the circulating coolant. The return stream enters the outdoor dry cooler first. The chiller removes the remaining heat and the pump circulates the coolant back to the IT equipment.</p>
+      <h3>Operating limits at <span id="method-supply"></span> supply</h3>
+      <p id="method-thresholds"></p>
+      <h3>What the three percentages measure</h3><p>Chiller-off hours count complete hours of outdoor cooling. The dry-cooling heat share also includes heat removed during assisted hours. Electricity savings compare the two plants after counting chiller, fan and pump input.</p>
+      <p>The <a href="{{METHODS_URL}}#worked-hours">worked hours</a> show how the same equipment responds to cold, mild and warm outdoor air.</p>
+      <p>Explore how a finite supply of stored winter snow could displace summer chiller duty at this setpoint. <a href="{{SNOW_URL}}" data-snow-link>Seasonal snow calculator</a></p>
+    </div></div>
+  </section>
+</main>
+<footer class="project-credit" id="project-contact" tabindex="-1"><div class="wrap">{{PROJECT_CREDIT}}</div></footer>
+<div id="live" class="sr-only" role="status" aria-live="polite"></div>
+<div id="tip" class="tip" hidden></div>
+<script id="case-data" type="application/json">{{DATA}}</script>
+<script id="dashboard-text" type="application/json">{{DASHBOARD_TEXT}}</script>
+<script>{{SCRIPT}}</script>
+<script>{{LANGUAGE_SCRIPT}}</script>
+</body>
+</html>

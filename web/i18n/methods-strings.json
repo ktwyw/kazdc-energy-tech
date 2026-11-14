@@ -1,0 +1,174 @@
+{
+  "en": {
+    "months": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    "date": "{day} {month} {year} · EPW hour {hour}",
+    "modes": {
+      "dry_only": "Chiller off",
+      "assisted": "Assisted",
+      "chiller_only": "Chiller only"
+    },
+    "reference": "{value} K (reference)",
+    "approach": "{value} K",
+    "years_separator": ", ",
+    "pct": "{value}%",
+    "regimes": "At {full} °C or colder the chiller is off. Between {full} °C and {bypass} °C the dry cooler and chiller share the load. At {bypass} °C or warmer the controller bypasses the dry cooler. Increasing the supply setpoint by one degree shifts both boundaries one degree warmer for this equipment.",
+    "no_assist": "For these equipment inputs the electrical break-even temperature is at or below the full-load boundary. Below {bypass} °C outdoor cooling supplies the entire load. At and above that temperature the controller selects the chiller. The assisted mode has zero hours.",
+    "trace_title": "{mode} at {outdoor} °C outdoors",
+    "terms": [
+      "Full-fan capacity",
+      "Dispatch",
+      "Heat balance",
+      "Fan and chiller",
+      "Electricity this hour"
+    ],
+    "capacity": "{conductance} kW/K × max(0, {return_c} − ({outdoor})) K ≈ {capacity} kW of available cooling.",
+    "dispatch_bypass": "Available capacity is at or below the {break_even} kW thermal break-even point. The controller bypasses the dry cooler.",
+    "dispatch_assisted": "Available capacity exceeds the {break_even} kW thermal break-even point. The chiller supplies the balance.",
+    "dispatch_full": "Available capacity exceeds the {break_even} kW thermal break-even point. The dry cooler can meet the entire load.",
+    "balance": "{dry_kw_th} kW from the dry cooler + {chiller_kw_th} kW from the chiller = {load} kW of heat removed. Coolant after the dry-cooler stage averages {after_dry} °C.",
+    "fan": "The fan operates for {duty}% of the hour at {fan} kW when on. The chiller draws {chiller_kw_th} / {cop} = {chiller_kw_e} kW.",
+    "electric": "{pump_kw_e} kW pump + {dry_fan_kw_e} kW average fan + {chiller_kw_e} kW chiller = {hybrid_kw_e} kW average. This uses {hybrid_kw_e} kWh and saves {saved} kWh against chiller only."
+  },
+  "zh-Hans": {
+    "months": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12"
+    ],
+    "date": "{year}年{month}月{day}日 · EPW 第{hour}小时",
+    "modes": {
+      "dry_only": "冷水机组停机",
+      "assisted": "联合运行",
+      "chiller_only": "仅冷水机组"
+    },
+    "reference": "{value} K（基准）",
+    "approach": "{value} K",
+    "years_separator": "、",
+    "pct": "{value}%",
+    "regimes": "当室外温度为 {full} °C 或更低时，冷水机组停机。当温度高于 {full} °C、低于 {bypass} °C 时，干冷器和冷水机组分担负荷。达到或超过 {bypass} °C 时，控制器让冷却液旁通干冷器。对这套设备，供液设定温度每提高 1 °C，两个界限均提高 1 °C。",
+    "no_assist": "这组设备参数下，耗电持平点对应的温度低于或等于满负荷温度界限。低于 {bypass} °C 时，室外供冷足以承担全部负荷；达到或超过此温度时，控制器选择冷水机组。联合运行小时数为零。",
+    "trace_title": "室外 {outdoor} °C，{mode}",
+    "terms": [
+      "风机满速时的排热能力",
+      "运行模式选择",
+      "热平衡",
+      "风机与冷水机组",
+      "本小时耗电量"
+    ],
+    "capacity": "{conductance} kW/K × max(0, {return_c} − ({outdoor})) K ≈ {capacity} kW，为干冷器的可用排热能力。",
+    "dispatch_bypass": "可用排热能力低于或等于耗电持平点对应的 {break_even} kW 热功率，因此旁通干冷器。",
+    "dispatch_assisted": "可用排热能力高于耗电持平点对应的 {break_even} kW 热功率。冷水机组承担剩余负荷。",
+    "dispatch_full": "可用排热能力高于耗电持平点对应的 {break_even} kW 热功率，干冷器可单独承担全部负荷。",
+    "balance": "干冷器排热 {dry_kw_th} kW，加上冷水机组的 {chiller_kw_th} kW，共计 {load} kW。经过干冷器后冷却液的小时平均温度为 {after_dry} °C。",
+    "fan": "风机运行时间占本小时的 {duty}%，开启时耗电功率为 {fan} kW。冷水机组的输入电功率为 {chiller_kw_th} / {cop} = {chiller_kw_e} kW。",
+    "electric": "泵耗电 {pump_kw_e} kW，风机平均耗电 {dry_fan_kw_e} kW，冷水机组耗电 {chiller_kw_e} kW，整套系统的平均电功率为 {hybrid_kw_e} kW。本小时耗电 {hybrid_kw_e} kWh，比单独使用冷水机组节省 {saved} kWh。"
+  },
+  "ru": {
+    "months": [
+      "января",
+      "февраля",
+      "марта",
+      "апреля",
+      "мая",
+      "июня",
+      "июля",
+      "августа",
+      "сентября",
+      "октября",
+      "ноября",
+      "декабря"
+    ],
+    "date": "{day} {month} {year} г. · час EPW {hour}",
+    "modes": {
+      "dry_only": "Без чиллера",
+      "assisted": "Совместная работа",
+      "chiller_only": "Только чиллер"
+    },
+    "reference": "{value} К (базовый вариант)",
+    "approach": "{value} К",
+    "years_separator": ", ",
+    "pct": "{value} %",
+    "regimes": "При наружной температуре {full} °C и ниже чиллер выключен. При температуре выше {full} °C и ниже {bypass} °C сухой охладитель и чиллер делят нагрузку. При {bypass} °C и выше контроллер направляет поток в обход сухого охладителя. Для этого оборудования повышение уставки подачи на один градус сдвигает обе границы на один градус вверх.",
+    "no_assist": "При таких параметрах оборудования температура равного электропотребления не превышает границу полной нагрузки. Ниже {bypass} °C наружное охлаждение покрывает всю нагрузку. При этой температуре и выше контроллер выбирает чиллер. Режим совместной работы ни разу не включается.",
+    "trace_title": "{mode} при наружной температуре {outdoor} °C",
+    "terms": [
+      "Мощность при полной скорости вентилятора",
+      "Выбор режима",
+      "Тепловой баланс",
+      "Вентилятор и чиллер",
+      "Электроэнергия за этот час"
+    ],
+    "capacity": "{conductance} кВт/К × max(0, {return_c} − ({outdoor})) К ≈ {capacity} кВт доступной мощности охлаждения.",
+    "dispatch_bypass": "Доступная мощность не превышает порог {break_even} кВт тепловой мощности, при котором схемы потребляют одинаковую электрическую мощность. Поток идёт в обход сухого охладителя.",
+    "dispatch_assisted": "Доступная мощность выше порога равного электропотребления ({break_even} кВт тепловой мощности). Чиллер покрывает остаток нагрузки.",
+    "dispatch_full": "Доступная мощность выше порога равного электропотребления ({break_even} кВт тепловой мощности). Сухой охладитель самостоятельно покрывает всю нагрузку.",
+    "balance": "Сухой охладитель отводит {dry_kw_th} кВт, чиллер — {chiller_kw_th} кВт, всего {load} кВт тепла. Средняя за час температура теплоносителя после сухого охладителя равна {after_dry} °C.",
+    "fan": "Вентилятор включён {duty} % часа и при работе потребляет {fan} кВт. Электрическая мощность чиллера равна {chiller_kw_th} / {cop} = {chiller_kw_e} кВт.",
+    "electric": "Насос потребляет {pump_kw_e} кВт, вентилятор в среднем — {dry_fan_kw_e} кВт, чиллер — {chiller_kw_e} кВт. Средняя мощность установки составляет {hybrid_kw_e} кВт. За час израсходовано {hybrid_kw_e} кВт·ч, экономия относительно схемы с одним чиллером составила {saved} кВт·ч."
+  },
+  "kk": {
+    "months": [
+      "қаңтар",
+      "ақпан",
+      "наурыз",
+      "сәуір",
+      "мамыр",
+      "маусым",
+      "шілде",
+      "тамыз",
+      "қыркүйек",
+      "қазан",
+      "қараша",
+      "желтоқсан"
+    ],
+    "date": "{year} ж. {day} {month} · EPW сағаты {hour}",
+    "modes": {
+      "dry_only": "Чиллер өшірулі",
+      "assisted": "Аралас режим",
+      "chiller_only": "Тек чиллер"
+    },
+    "reference": "{value} К (базалық нұсқа)",
+    "approach": "{value} К",
+    "years_separator": ", ",
+    "pct": "{value} %",
+    "regimes": "Сыртқы температура {full} °C немесе одан төмен болса, чиллер өшірулі. Температура {full} °C-тан жоғары және {bypass} °C-тан төмен болса, құрғақ салқындатқыш пен чиллер жүктемені бөліседі. {bypass} °C және одан жоғары болғанда ағын құрғақ салқындатқышты айналып өтеді. Осы жабдық үшін берілістің белгіленген температурасын бір градусқа көтерсе, екі шек те бір градусқа жоғарылайды.",
+    "no_assist": "Осы параметрлерде электр тұтынуы теңесетін температура толық жүктеме шегінен төмен немесе оған тең. Сыртқы температура {bypass} °C-тан төмен болса, бүкіл жүктемені сыртқы ауамен салқындату өтейді. Осы температурада және одан жоғарыда басқару жүйесі чиллерді таңдайды. Аралас режимдегі сағат саны нөлге тең.",
+    "trace_title": "{mode} · сыртқы температура {outdoor} °C",
+    "terms": [
+      "Желдеткіш толық жылдамдықпен істегендегі қуат",
+      "Режимді таңдау",
+      "Жылу балансы",
+      "Желдеткіш пен чиллер",
+      "Осы сағаттағы электр энергиясы"
+    ],
+    "capacity": "{conductance} кВт/К × max(0, {return_c} − ({outdoor})) К ≈ {capacity} кВт. Бұл — қолжетімді салқындату қуаты.",
+    "dispatch_bypass": "Қолжетімді қуат электр тұтынуы теңесетін {break_even} кВт жылу қуатынан аспайды. Ағын құрғақ салқындатқышты айналып өтеді.",
+    "dispatch_assisted": "Қолжетімді қуат электр тұтынуы теңесетін {break_even} кВт жылу қуатынан жоғары. Қалған жүктемені чиллер өтейді.",
+    "dispatch_full": "Қолжетімді қуат электр тұтынуы теңесетін {break_even} кВт жылу қуатынан жоғары. Құрғақ салқындатқыш бүкіл жүктемені өзі өтей алады.",
+    "balance": "Құрғақ салқындатқыш {dry_kw_th} кВт, чиллер {chiller_kw_th} кВт, ал барлығы {load} кВт жылу әкетеді. Құрғақ салқындатқыштан кейінгі жылу тасымалдағыштың орташа температурасы {after_dry} °C.",
+    "fan": "Желдеткіштің бір сағаттағы жұмыс уақытының үлесі {duty} %. Ол қосулы кезде {fan} кВт тұтынады. Чиллердің электр қуаты {chiller_kw_th} / {cop} = {chiller_kw_e} кВт.",
+    "electric": "Сорғы {pump_kw_e} кВт, желдеткіш орта есеппен {dry_fan_kw_e} кВт, чиллер {chiller_kw_e} кВт тұтынады. Қондырғының орташа қуаты {hybrid_kw_e} кВт. Осы сағатта {hybrid_kw_e} кВт·сағ жұмсалады, тек чиллер қолданылатын сұлбамен салыстырғандағы үнем {saved} кВт·сағ."
+  }
+}

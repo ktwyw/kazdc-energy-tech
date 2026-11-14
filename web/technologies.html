@@ -1,0 +1,32 @@
+<section class="page-intro tech-intro">
+  <p class="kicker">KazDC-BIM · Technology studies</p><h1>Technology workbench<span>.</span></h1>
+  <p class="deck">Try a different way to cool or power the same {{IT_MW}} MW data centre. Compare a typical year of operation, or use the cold-plate worksheet to test a measurement.</p>
+</section>
+<nav class="study-switch" aria-label="Choose a technology" id="study-switch"></nav>
+<section class="workspace tech-work" id="model" aria-labelledby="study-title">
+  <div class="heading"><div><p class="kicker" id="study-domain"></p><h2 id="study-title"></h2></div><button class="quiet" id="reset">Reset study</button></div>
+  <p class="tech-question" id="study-question"></p>
+  <div class="compare-grid">
+    <form class="controls" id="tech-form"><h3 id="input-title">Model inputs</h3>
+      <div id="place-input"><label for="city">Weather location</label><select id="city"></select><p class="fine" id="weather-origin"></p></div>
+      <div id="study-inputs"></div>
+      <p id="input-assumptions" class="fine"></p>
+    </form>
+    <div class="result-panel tech-results">
+      <div class="result-title"><h3 id="result-title"></h3><span id="result-type"></span></div>
+      <p id="tech-error" class="error" hidden role="status"></p>
+      <div id="tech-output">
+        <div class="metrics" id="tech-metrics"></div>
+        <p id="interpretation" class="interpretation"></p>
+        <div id="chart-area"><div class="chart-head"><h3 id="chart-title"></h3><span id="chart-unit"></span></div>
+          <div class="tech-plot" id="tech-chart"></div><div class="tech-legend" id="tech-legend"></div></div>
+        <div class="table-wrap" id="bench-area" hidden><table id="bench-results"></table></div>
+        <a class="capture-link" id="apply-capture" href="{{HEAT_URL}}" hidden>Use this fraction as a whole-rack assumption</a>
+      </div>
+    </div>
+  </div>
+  <div class="tech-download">{{COPY_CASE@model}}<button class="action" id="download-study">Download results (CSV)</button></div>
+  <details class="details" id="monthly-details"><summary>Monthly results and annual totals</summary><div class="table-wrap"><table id="tech-table"></table></div></details>
+  <details class="details" open><summary>Method, assumptions and sources</summary><div class="details-body tech-method" id="study-method"></div></details>
+</section>
+<script type="application/json" id="technology-text">{{TECHNOLOGY_TEXT}}</script>

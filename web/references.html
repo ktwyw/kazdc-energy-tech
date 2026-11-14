@@ -1,0 +1,121 @@
+<header class="ref-hero">
+  <div>
+    <div class="ref-heading-row"><p class="kicker">KazDC-BIM · Methods and data</p></div>
+    <h1>References</h1>
+    <p class="deck">Where the weather comes from, which equations drive each study, and which numbers you can change.</p>
+  </div>
+  <aside class="ref-feature" aria-labelledby="ref-feature-title">
+    <p class="ref-feature-label">Astana reference case</p>
+    <h2 id="ref-feature-title">Follow one hour from weather to electricity.</h2>
+    <p>Start with an outdoor temperature, follow the cooling load through the plant, then check the result against the hourly output.</p>
+    <a href="{{METHODS_URL}}#worked-hours">Trace a worked hour <span aria-hidden="true">→</span></a>
+  </aside>
+</header>
+
+<div class="ref-layout">
+  <nav class="ref-index" aria-label="Reference topics">
+    <h2>On this page</h2>
+    <a href="#weather">Weather and time</a><a href="#stations">Station archives</a>
+    <a href="#cooling">Cooling plant and air</a><a href="#liquid">Liquid loops and metering</a>
+    <a href="#heat">Heat recovery</a><a href="#storage">Chilled-water storage</a>
+    <a href="#snow">Seasonal snow</a><a href="#power">UPS, solar and batteries</a>
+    <a href="#reproduce">Reproduce a result</a>
+  </nav>
+
+  <div class="ref-content">
+    <section id="weather" class="ref-section"><h2>Weather and time</h2>
+      <p>Each city contributes 8,760 one-hour intervals from a typical meteorological year (TMYx). Its twelve months may come from different years. The files support seasonal comparisons. A design extreme or a prediction for a particular year needs a different weather series.</p>
+      <dl class="ref-list">
+        <dt>Climate.OneBuilding · Development of Global Typical Meteorological Years</dt>
+        <dd>Linda K. Lawrie and Drury B. Crawley compiled the TMYx series. The 2011–2025 Kazakhstan collection supplies outdoor dry-bulb temperature, relative humidity, station pressure and global horizontal solar radiation. The publisher derives solar radiation from ERA5. <span><a href="https://climate.onebuilding.org/contact/default.html">Publisher and attribution</a> · <a href="https://climate.onebuilding.org/sources/default.html">TMYx construction</a> · <a href="https://climate.onebuilding.org/WMO_Region_2_Asia/KAZ_Kazakhstan/index.html">Kazakhstan catalogue</a></span></dd>
+        <dt>EnergyPlus · EPW Data Dictionary and source flags</dt>
+        <dd>The four input fields carry the source/uncertainty pair <code>?9</code> throughout these files. Individual values cannot be identified as direct observations from those flags. Hour indices run from 1 to 24 and the supplied minute field is 30. Radiation is energy over the interval in Wh/m². Dividing by one hour gives the mean irradiance in W/m² used by the PV model. <span><a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/energyplus-weather-file-epw-data-dictionary.html">EPW fields and units</a> · <a href="https://bigladdersoftware.com/epx/docs/24-2/auxiliary-programs/data-sources-uncertainty.html">Source and uncertainty codes</a></span></dd>
+        <dt>NOAA and Kazakhstan · Independent checks and time conventions</dt>
+        <dd>NOAA’s daily and hourly station records provide the comparison for Almaty. Its airport file averages 21.2 °C in the selected June 2024, versus 24.3 °C in the airport observations. This can lower modeled cooling electricity. Sixteen EPWs use UTC+6 and five use UTC+5. Monthly results follow each source calendar. The tank converts to Kazakhstan’s current UTC+5 clock for its dispatch windows. <span><a href="https://www.ncei.noaa.gov/products/land-based-station/integrated-surface-database">NOAA hourly archive</a> · <a href="https://registry.opendata.aws/noaa-gsod/">NOAA daily summaries</a> · <a href="{{REGIONAL_URL}}#almaty-source">Almaty station comparison</a> · <a href="https://www.gov.kz/org/vko-shemonaiha-volchan/press/news/details/720058?lang=en">Kazakhstan time change</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="stations" class="ref-section"><h2>Station archives</h2>
+      <p>Use the EPW identifier to match a city to its source. Ekibastuz, Qonaev and Taldykorgan use gridded ERA5 reanalysis. The other files identify NCEI station data and ERA5. Aktau has 14 source years and Taraz has 10. Each of the other files has 15.</p>
+      {{WEATHER_FIGURE}}
+      <details class="ref-directory"><summary>Browse {{CITY_COUNT}} weather files <span>City, source period and original ZIP</span></summary>
+        <div class="ref-table-wrap" tabindex="0" role="region" aria-label="Scrollable station archive table">
+          <table><caption>Station names and identifiers as distributed in the EPW files</caption>
+            <thead><tr><th scope="col">City</th><th scope="col">EPW location</th><th scope="col">EPW ID</th><th scope="col">Source</th><th scope="col">Years (period)</th><th scope="col">File time</th><th scope="col">Archive</th></tr></thead>
+            <tbody>{{STATION_ROWS}}</tbody>
+          </table>
+        </div>
+      </details>
+      <p class="ref-action"><a href="data/regions/stations.json" download>Download station metadata and SHA-256 checksums (JSON)</a></p>
+    </section>
+
+    <section id="cooling" class="ref-section"><h2>Cooling plant and air</h2>
+      <dl class="ref-list">
+        <dt>Dry cooler and backup chiller</dt>
+        <dd>The U.S. Department of Energy’s <cite>EnergyPlus Engineering Reference</cite>, version 24.2, explains sensible heat rejection in single- and two-speed fluid coolers. KazDC uses a simplified capacity curve fitted to one assumed rating. The reference case assumes {{IT_MW}} MW of IT heat, a {{LOOP_RISE}} K loop rise, {{APPROACH}} K rated approach, chiller COP {{COP}}, a {{FAN}} kW full-speed fan and a {{PUMP}} kW pump. “Chiller off” counts a complete hour with zero compressor cooling duty. <span><a href="https://bigladdersoftware.com/epx/docs/24-2/engineering-reference/cooling-towers-and-evaporative-fluid-coolers.html#one-and-two-speed-fluid-coolers">EnergyPlus fluid coolers</a> · <a href="{{METHODS_URL}}#dispatch">KazDC dispatch equations</a> · <a href="case.json" download>Plant inputs (JSON)</a></span></dd>
+        <dt>Adiabatic pad and wet-bulb temperature</dt>
+        <dd>ASHRAE <cite>Fundamentals</cite> (2017), ch. 1, supplies the psychrometric relations. The rounded wet-bulb series was checked against Meyer and Thevenard’s PsychroLib (2019). EnergyPlus 26.2, §16.3, gives the pad saturation-effectiveness relation. The air mass flow, 2 kW spray pump, 10% make-up allowance, summer trigger and water budget belong to the KazDC case. <span><a href="https://handbook.ashrae.org/Handbooks/F17/SI/f17_ch01/f17_ch01_si.aspx">ASHRAE psychrometrics</a> · <a href="https://joss.theoj.org/papers/10.21105/joss.01137">PsychroLib paper</a> · <a href="https://energyplus.readthedocs.io/en/v26.2.0/guides/engineering-reference/16.3-evaporative-coolers.html">EnergyPlus pad equation</a> · <a href="{{TECH_URL}}?study=pad">Pad study</a></span></dd>
+        <dt>Indirect air-to-air heat exchanger</dt>
+        <dd>EnergyPlus 26.2, §16.8, relates sensible duty to effectiveness, the smaller heat-capacity rate and the inlet temperature difference. ASHRAE <cite>HVAC Applications</cite> (2015), ch. 19, discusses data-centre economizers. KazDC assumes equal stream heat-capacity rates, a selectable additional fan input and a simple cold-weather lockout. <span><a href="https://energyplus.readthedocs.io/en/v26.2.0/guides/engineering-reference/16.8-heat-exchangers.html">EnergyPlus heat exchangers</a> · <a href="https://handbook.ashrae.org/Handbooks/A15/IP/A15_CH19/a15_ch19_ip.aspx">ASHRAE data centres</a> · <a href="{{TECH_URL}}?study=air">Indirect air study</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="liquid" class="ref-section"><h2>Liquid loops and metering</h2>
+      <dl class="ref-list">
+        <dt>Measuring heat carried by water</dt>
+        <dd>ASHRAE <cite>HVAC Systems and Equipment</cite> (2024), ch. 12, “Flow and Energy Metering,” describes the flow and temperature measurements needed for thermal energy. Sickinger, Van Geet and Ravenscroft (2014) give a measured rack example in NREL/TP-2C00-62905, §2.4. The worksheet uses 4.18 kJ/(kg·K) and assumes steady readings across the entered interval. It reports the signed difference between heater input and water heat. <span><a href="https://handbook.ashrae.org/Handbooks/S24/IP/s24_ch12/s24_ch12_ip.aspx">ASHRAE metering</a> · <a href="https://www.nlr.gov/docs/fy15osti/62905.pdf#page=23">NREL rack experiment</a> · <a href="{{BENCH_URL}}">Water-loop worksheet</a></span></dd>
+        <dt>Cold-plate measurement boundaries</dt>
+        <dd>The Open Compute Project’s <cite>Cold Plate Development and Qualification</cite> (2022), §§1.3.2.1–2, defines case-to-inlet thermal resistance and plate pressure drop. The KazDC input locates the probe on the plate surface, so its output is plate-surface-to-inlet resistance per watt of heater input. Determining case-to-inlet resistance requires a component-case temperature. The pump estimate covers the pressure drop across the plate. <span><a href="https://www.opencompute.org/documents/ocp-cold-plate-development-and-qualification-with-integrated-comments-pdf">OCP qualification guide</a> · <a href="https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-federal-data-centers">DOE liquid cooling guidance</a> · <a href="{{TECH_URL}}?study=cold">Cold-plate worksheet</a></span></dd>
+        <dt>Glycol, first ice and pumping power</dt>
+        <dd>Dow’s <cite>DOWFROST Engineering and Operating Guide</cite> (2001), tables 3, 10, 14 and 22, supplies freezing and liquid-property data. Pátek et al. (2009) give water properties at 0.1 MPa. The EPA’s <cite>EPANET 2.2 User Manual</cite> (2020), chs. 3 and 12, describes Darcy–Weisbach head loss. KazDC specifies pipe roughness and minor losses and interpolates the friction factor linearly between Reynolds numbers 2,300 and 4,000. The exposure count compares outdoor air to first ice. A pipe’s actual temperature also depends on its flow and insulation. <span><a href="https://ingredi.com/content/pdfs/DOWFROST_Manual.pdf">Dow property tables</a> · <a href="https://www.nist.gov/publications/reference-correlations-thermophysical-properties-liquid-water-01-mpa">Water correlations</a> · <a href="https://nepis.epa.gov/Exe/ZyPURL.cgi?Dockey=P10113EM.TXT">EPA pipe hydraulics</a> · <a href="{{TECH_URL}}?study=glycol">Glycol study</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="heat" class="ref-section"><h2>Heat recovery</h2>
+      <dl class="ref-list">
+        <dt>Capturing rack heat and matching a user</dt>
+        <dd>Van Geet and Sickinger’s <cite>Best Practices Guide for Energy-Efficient Data Center Design</cite> (U.S. DOE, 2024), §§5.6 and 7.1, discusses direct liquid cooling and waste heat use. The local building’s hourly demand curve, capture fraction, 3 K minimum direct-exchange approach and 10 K user-side temperature drop are scenario inputs. <span><a href="https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf">DOE design guide</a> · <a href="{{HEAT_URL}}">Heat recovery study</a></span></dd>
+        <dt>Checking a heating coefficient of performance (COP)</dt>
+        <dd>OpenStax, <cite>University Physics, Volume 2</cite>, §4.5, gives the reversible heat-pump limit using absolute temperatures. KazDC assumes a single evaporating and condensing temperature and a 6 K water temperature drop on the source side. Using the cooled source outlet and the requested hot-water supply gives an optimistic upper bound. A real operating COP requires a performance map at the specified conditions. <span><a href="https://openstax.org/books/university-physics-volume-2/pages/4-5-the-carnot-cycle">OpenStax reversible cycle</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="storage" class="ref-section"><h2>Chilled-water storage</h2>
+      <dl class="ref-list">
+        <dt>Tank capacity, loss and dispatch</dt>
+        <dd>ASHRAE <cite>HVAC Systems and Equipment</cite> (2024), ch. 50, describes sensible thermal storage and stratified chilled-water tanks. The model calculates usable capacity from water volume, density, specific heat and temperature rise. It tracks charge, discharge, standing loss and closing stock hour by hour. The overnight charging window, afternoon discharge window and transfer-pump allowance are operating assumptions. <span><a href="https://handbook.ashrae.org/handbooks/S24/SI/s24_ch50/s24_ch50_si.aspx">ASHRAE thermal storage</a> · <a href="{{TECH_URL}}?study=tank">Tank study</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="snow" class="ref-section"><h2>Seasonal snow</h2>
+      <dl class="ref-list">
+        <dt>Ice energy and three Astana scenarios</dt>
+        <dd>Feistel (2003), <cite>Progress in Oceanography</cite> 58, p. 83, eq. 60, gives approximately 333.5 kJ/kg for freshwater ice melting near 0 °C at atmospheric pressure. The facility model uses this value, an assumed recoverable snow inventory and hourly residual chiller duty. The storage comparison uses example volumes of 55, 60 and 50 m³ and applies an assumed mean heat gain to each store for 91 days. The default 550 kg/m³ and 200 W are comparison inputs.</dd>
+        <dd>The separate <cite>Astana SnowCool</cite> model replay (v1.1, 16 September 2026) retains its own 334 kJ/kg, 120-day hold and 168-hour, 5 kW test load. The export contains computed contact scenarios. Hour zero is the initial state and the 168 later rows report interval results. <span><a href="https://www.teos-10.org/pubs/Feistel_2003.pdf#page=41">Feistel, ice fusion enthalpy</a> · <a href="data/snowcool_replay.csv" download>SnowCool replay (CSV)</a> · <a href="{{SNOW_URL}}">Astana snow studies</a></span></dd>
+        <dt>Operating precedents in Sweden and Japan</dt>
+        <dd>Skogsberg and Nordell (2001) describe the Sundsvall hospital store in <cite>Cold Regions Science and Technology</cite> 32, 63–70. Skogsberg (2002) reports the first operating season in vol. 34, 135–142. Bibai City’s White Data Center account describes a server-cooling trial using snow in Hokkaido. These sites show how snow has been used in practice. The Astana estimates use their own assumed collection, storage and heat-exchanger performance. <span><a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=86">Sundsvall design</a> · <a href="https://ltu.diva-portal.org/smash/get/diva2%3A990071/FULLTEXT01.pdf#page=96">Sundsvall operating results</a> · <a href="https://www.city.bibai.hokkaido.jp/soshiki/13/417.html">Bibai City account (Japanese)</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="power" class="ref-section"><h2>UPS, solar and batteries</h2>
+      <dl class="ref-list">
+        <dt>UPS efficiency at a common output</dt>
+        <dd>U.S. EPA ENERGY STAR’s <cite>Uninterruptible Power Supplies Key Product Criteria</cite>, table 1, documents the use of defined load points. The worksheet takes operating-point efficiency as output power divided by input power. The 94% and 97% examples assume identical, constant output for the full year. <span><a href="https://www.energystar.gov/products/uninterruptible_power_supplies/key_product_criteria">ENERGY STAR criteria</a> · <a href="{{POWER_URL}}">UPS comparison</a></span></dd>
+        <dt>PV generation and battery dispatch</dt>
+        <dd>Dobos (2014), <cite>PVWatts Version 5 Manual</cite>, NREL/TP-6A20-62641, §10, eq. 8, gives the irradiance and temperature correction for DC power. The System Advisor Model documents PV design and behind-the-meter dispatch. KazDC uses horizontal, snow-free modules, a simplified cell temperature, fixed losses, a protected energy reserve and 95% efficiency each way. The battery serves local load and surplus generation is curtailed. <span><a href="https://research-hub.nlr.gov/en/publications/pvwatts-version-5-manual/">PVWatts manual</a> · <a href="https://samrepo.nlr.gov/help/pvwatts_system_design.html">SAM PV design</a> · <a href="https://samrepo.nlr.gov/help/battery_dispatch_btm.html">SAM battery dispatch</a> · <a href="{{TECH_URL}}?study=solar">PV and battery study</a></span></dd>
+        <dt>Solar timing in six files</dt>
+        <dd>Checking interval times against NOAA solar-position equations identifies some radiation outside local daylight in Aktau, Atyrau, Kostanay, Oral, Turkistan and Zhezkazgan. The model preserves the source timing and flags these six locations in the PV results and CSV. A local irradiance series is especially important for interpreting battery dispatch and peak import there. <span><a href="https://gml.noaa.gov/grad/solcalc/solareqns.PDF">NOAA solar-position equations</a></span></dd>
+      </dl>
+    </section>
+
+    <section id="reproduce" class="ref-section ref-reproduce"><h2>Reproduce a result</h2>
+      <p>For Astana at 18 °C supply, use the weather and plant inputs to calculate each one-hour interval. Add the hourly cooling-plant electricity and count the rows labelled <code>dry_only</code> to check the annual chiller-off hours.</p>
+      <ul class="ref-files">
+        <li><strong>Inputs</strong><span><a href="case.json" download>Plant assumptions (JSON)</a> · <a href="data/astana_hourly.csv" download>Astana weather (CSV)</a></span></li>
+        <li><strong>Calculation</strong><span><a href="{{METHODS_URL}}#reproduce">Equations, worked examples and rebuild commands</a></span></li>
+        <li><strong>Reference outputs</strong><span><a href="reference/hourly.csv" download>Hourly CSV</a> · <a href="reference/monthly.csv" download>Monthly CSV</a> · <a href="reference/annual.csv" download>Annual CSV</a></span></li>
+      </ul>
+      <p class="ref-date">Sources and calculations reviewed 14 November 2026.</p>
+    </section>
+  </div>
+</div>

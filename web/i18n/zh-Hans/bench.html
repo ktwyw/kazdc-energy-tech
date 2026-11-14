@@ -1,0 +1,21 @@
+<section class="page-intro"><p class="kicker">实验台 · 水量热法</p><h1>测试冷却回路<span>。</span></h1><p class="deck">水流带走的热量能否解释电表记录的加热器输入电量？可先用示例练习热量平衡，再输入稳态实验的实测读数。</p></section>
+<section class="workspace">
+<div class="heading"><h2>预测与实测</h2><div class="tools"><button id="sample" class="quiet">载入示例</button><button id="new-run" class="action">输入实测数据</button></div></div>
+<div class="compare-grid"><form id="bench-form" class="controls"><h3 id="run-kind">示例读数</h3>
+<label for="run-name">实验编号</label><input id="run-name" required maxlength="64" value="课堂示例">
+<label for="predicted">预测换热功率（kW）</label><input id="predicted" required type="number" value="2" min="0" max="500" step="any">
+<label for="flow">水的质量流量（kg/s）</label><input id="flow" required type="number" value="0.1" min="0" max="20" step="any">
+<div class="field-pair"><div><label for="tin">进口温度（°C）</label><input id="tin" required type="number" value="20" min="1" max="95" step="any"></div><div><label for="tout">出口温度（°C）</label><input id="tout" required type="number" value="25" min="1" max="95" step="any"></div></div>
+<div class="field-pair"><div><label for="duration">测量时长（min）</label><input id="duration" required type="number" min="0.01" max="10080" step="any" value="30"></div><div><label for="meter">加热器耗电量（kWh）</label><input id="meter" required type="number" min="0" max="100000" step="any" value="1.10"></div></div>
+</form>
+<div class="result-panel"><div class="result-title"><h3>水侧热量平衡</h3><span id="evidence">演示示例</span></div>
+<div class="metrics"><div><span>水侧换热功率</span><strong id="duty">—</strong><small>kW 热功率</small></div><div><span>水流带走的热量</span><strong id="absorbed">—</strong><small>kWh 热量</small></div><div><span>加热器输入减去水侧热量</span><strong id="gap">—</strong><small>kWh 差值</small></div></div>
+<p class="interpretation" id="bench-note" role="status"></p><div class="table-wrap"><table id="bench-table"></table></div>{{COPY_CASE}}<button id="download-run" class="action">导出实验记录</button><p class="fine">读数仅保存在当前浏览器标签页。导出 CSV 可保留输入值、数据类型（示例或实测）及计算结果。</p></div></div><p class="error" id="bench-error" role="status" hidden></p></section>
+<section class="reading"><div><p class="kicker">教学与实验</p><h2>从预测到验证</h2></div><div>
+ <h3>实验前</h3><p>将加热器和两个水温探头划入同一测试段。测量前记录预测值，并记下流量计和温度探头的不确定度。把两个探头并排置于同一温度环境中，估算它们之间的读数偏差。</p>
+ <h3>将读数对齐到同一时段</h3><p>在同一时段记录流量、进出口水温和加热器电表读数。等流量和温度稳定后，输入该时段的平均流量和温度。若波动明显，将实验划分为若干较短的稳态时段，再将各时段的能量相加。如果水泵的散热进入测试段，应单独记录水泵电表的读数。</p>
+ <p class="equation">水侧换热功率 = 质量流量 × 4.18 kJ/(kg·K) ×（出口温度 − 进口温度）</p>
+ <p>示例中，水的质量流量为 0.100 kg/s，升温 5.0 K，对应的换热功率为 2.09 kW。半小时内水流带走 1.045 kWh 的热量。4.18 是液态水比热容的近似值。若使用乙二醇溶液，应采用其在实测浓度和温度下的比热容。</p>
+ <h3>解释能量差值</h3><p>带符号的差值可能来自测试段与环境的换热、装置升温时的蓄热和仪表测量的不确定度。仅凭一个正值无法区分这些因素。保持加热器功率不变，改用另一流量重复实验，再比较两次热量平衡。水温升幅越小，两个探头之间的偏差对结果的影响就越大。</p>
+ <p class="sources"><a href="{{REFERENCES_URL}}#liquid">液冷回路测量参考资料</a> · <a href="https://www.nlr.gov/docs/fy15osti/62905.pdf#page=23">NREL 机架实验与计量示例</a> · <a href="https://handbook.ashrae.org/Handbooks/S24/IP/s24_ch12/s24_ch12_ip.aspx">ASHRAE 手册：热能计量</a></p>
+</div></section>

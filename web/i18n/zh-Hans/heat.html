@@ -1,0 +1,34 @@
+<section class="page-intro"><p class="kicker">技术研究 · 余热回收</p>
+<h1>机架余热能供给谁？</h1><p class="deck">液冷机架全年都在放热。附近的建筑只在特定时段需要一定温度的热水。看看机架余热何时能满足供暖需求，以及能满足多少。</p></section>
+<section class="workspace">
+<div class="heading"><h2>将机架余热与用热需求匹配</h2><button class="quiet" id="reset">恢复默认设置</button></div>
+<div class="compare-grid">
+ <form id="heat-form" class="controls"><h3>余热回收工况</h3>
+  <label for="city">气象地点</label><select id="city" aria-describedby="weather-origin"></select>
+  <p class="fine" id="weather-origin"></p>
+  <label for="mode">供热方式</label><select id="mode"><option value="direct">通过换热器直接供热</option><option value="lift">直接供热，必要时启用热泵</option></select>
+  <div class="field-pair"><div><label for="warm">机架回水温度（°C）</label><input required id="warm" type="number" value="40" min="15" max="65" step="0.5"></div><div><label for="target">用户供水温度（°C）</label><input required id="target" type="number" value="35" min="20" max="80" step="0.5"></div></div>
+  <label for="capture">液冷回路可回收的 IT 热量占比（%）</label><input required id="capture" type="number" value="70" min="0" max="100" step="0.1">
+  <p id="capture-context" class="fine" hidden>此工况将冷板的热量捕获比例应用于整个机架的 IT 功率。对于实际机架，应按各部件占机架功率的比例，对各部件的热量捕获比例进行加权。</p>
+  <label for="peak">建筑峰值供暖负荷（kW 热功率）</label><input required id="peak" type="number" value="750" min="0" max="5000" step="any">
+  <label for="cop">设定温度下的供热性能系数（COP）</label><input required id="cop" type="number" value="4" min="1.1" max="10" step="0.1">
+  <p class="fine">建筑和设备参数均为示例值。IT 负载固定为 {{IT_MW}} MW。</p>
+ </form>
+ <div class="result-panel"><div class="result-title"><h3 id="heat-title">全年热量平衡</h3><span>典型年</span></div>
+  <div class="metrics"><div><span>供热量</span><strong id="delivered">—</strong><small>MWh 热量</small></div><div><span>满足的需求</span><strong id="coverage">—</strong><small>占全年供暖需求</small></div><div><span>热泵耗电量</span><strong id="compressor">—</strong><small>MWh 电量</small></div></div>
+  {{COPY_CASE}}
+  <p id="heat-status" class="interpretation" role="status"></p><div class="chart-head"><h3>供热量与热需求</h3><span>MWh 热量</span></div>
+  <div id="heat-chart" class="graphic"></div><div class="legend"><span class="dot teal"></span>供热量 <span class="dot muted"></span>热需求</div>
+ </div></div>
+ <p class="error" id="heat-error" role="status" hidden></p>
+ <details class="details"><summary>逐月能量平衡与 CSV 数据</summary><div class="details-body"><div class="table-wrap"><table id="heat-table"></table></div><button class="action" id="download-heat">下载热量平衡表</button></div></details>
+</section>
+<section class="reading"><div><p class="kicker">计算方法</p><h2>温度、供热能力与用热时段</h2></div><div>
+ <h3>按小时匹配供需</h3><p>当室外温度从 15 °C 降至 −25 °C 时，建筑供暖负荷从零线性增至设定的峰值。在这两个温度以外，负荷分别维持在零或峰值。这是一条示例性建筑供暖曲线。各小时的室外温度取自当地气象数据。峰值负荷、液冷回路捕获的热量占比及固定水温由情景设定。</p>
+ <h3>直接换热与热泵提温</h3><p>直接供热要求机架回水至少比用户供水高 3 K。在这一初步估算中，用户回水比供水低 10 K，机架回路在充分回收热量时降温 6 K，两侧流量均可调节。达到上述门槛时，换热器冷端的温差至少为 7 K。假定换热器的容量足以传递可回收的热量。详细设计还需测量两侧的流量和温度，并查阅制造商的性能曲线。</p>
+ <p>满足直接换热条件时，供热量取建筑需求与机架可用热量中的较小值。否则，直接供热量为零。启用备用热泵后，压缩机做功，直至满足负荷或用尽可用热源。模型在选定工况下采用恒定的供热 COP。热泵运行时，调节热源侧流量，使取热过程中的水温降幅保持在 6 K。因此，最低热源侧出水温度等于机架回水温度减去 6 K。对于单一蒸发温度和单一冷凝温度，可用下式估算理想可逆供热 COP 的乐观上限：T<sub>用户供水，K</sub> / (T<sub>用户供水，K</sub> − T<sub>热源出水，K</sub>)。两处温度均采用绝对温度。例如，机架回水为 15 °C、用户供水为 70 °C 时，热源侧出水为 9 °C，上限为 343.15 / 61 ≈ 5.63。实际热泵的 COP 必须低于这个上限，具体可达值取决于设备性能曲线。</p>
+ <p class="equation">供热量 = 从机架提取的热量 + 压缩机消耗的电能</p>
+ <p>剩余供暖需求等于建筑需求减去机架与热泵的供热量。模型不计算建筑其他供暖设备的运行。此热量平衡也不包含循环泵耗电、管路损失、同时仍需排散的热负荷，以及替代的锅炉能耗。应将供热量与制冷系统用电量分别核算。</p>
+ <h3>如何用测量检验模型</h3><p>在同一时段内测量机架回路的回水温度和流量，以及建筑侧的供回水温度和流量。即使机架回水温度较高，也只有在用户确实需要热量时才有利用价值。 <a href="{{BENCH_URL}}">试做水回路实验</a></p>
+ <p class="sources"><a href="{{REFERENCES_URL}}#heat">余热回收的资料来源与假设</a> · <a href="https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf">美国能源部设计指南，第 5.6、7.1 节</a> · <a href="https://www.nlr.gov/docs/fy15osti/62905.pdf#page=23">NREL 机架实测研究</a> · <a href="https://openstax.org/books/university-physics-volume-2/pages/4-5-the-carnot-cycle">可逆 COP，OpenStax 第 4.5 节</a></p>
+</div></section>

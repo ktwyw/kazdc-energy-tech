@@ -1,0 +1,332 @@
+{
+  "ui": {
+    "readingSource": "Reading source",
+    "example": "Illustrative example",
+    "enterMeasured": "Enter measured readings",
+    "userMeasured": "User-entered readings",
+    "weatherFile": "Original station weather file",
+    "sources": "Sources and model assumptions",
+    "solarTiming": "Some radiation in this file falls in intervals outside local daylight. Battery dispatch and peak grid import are sensitive to hourly alignment.",
+    "testReadings": "Test readings",
+    "modelInputs": "Model inputs",
+    "chartDescription": "{title} ({unit}). The monthly table gives the exact values.",
+    "padWater": "The pad uses {used} m³ of the {budget} m³ summer allowance. Each cubic metre displaces {rate} kWh of plant electricity.",
+    "padDry": "The plant runs in dry mode for this case. More water, a different trigger or a different coolant temperature may change which hours qualify.",
+    "airLess": "The air-to-air system uses {change} MWh less electricity than the dry-cooler reference ({actual} versus {base} MWh). Both fan power and compressor operation count. The frost lockout keeps the exchanger off for {hours} hours.",
+    "airMore": "The air-to-air system uses {change} MWh more electricity than the dry-cooler reference ({actual} versus {base} MWh). Both fan power and compressor operation count. The frost lockout keeps the exchanger off for {hours} hours.",
+    "tankResult": "Reference peak {peak} kW. The tank accepts {charged} MWh of cooling, loses {loss} MWh and ends the year with {stock} MWh in storage.",
+    "solarResult": "The {capacity} kW DC array supplies {direct} MWh directly. The site needs {load} MWh for IT and cooling. Surplus generation curtailed totals {spill} MWh.",
+    "glycolLess": "At the design rise of {rise} K, water needs {water} kW of pump input and the selected fluid needs {fluid} kW for the same {duty} MW duty. With the selected fluid, the adjusted schedule uses {change} MWh less pump electricity per year than maintaining a {rise} K rise throughout the year.",
+    "glycolMore": "At the design rise of {rise} K, water needs {water} kW of pump input and the selected fluid needs {fluid} kW for the same {duty} MW duty. With the selected fluid, the adjusted schedule uses {change} MWh more pump electricity per year than maintaining a {rise} K rise throughout the year.",
+    "coldResult": "The signed heat balance (heater input minus heat carried by water) is {balance} W. The plate-to-inlet thermal resistance is {resistance} K/W.",
+    "probeWarning": "Check probe positions, input power and steady state before interpreting these readings.",
+    "invalidCold": "Enter all seven readings within the indicated limits to calculate the heat balance.",
+    "invalidInput": "Complete each input within its limits to calculate the result.",
+    "coldBalance": "Cold-plate heat balance",
+    "loopResult": "Loop performance",
+    "annualResult": "Annual results",
+    "duty": "{power} MW thermal duty",
+    "hours": "{count} hours",
+    "additionalUse": "Additional electricity used",
+    "period": "Period",
+    "year": "Year",
+    "quantity": "Quantity",
+    "result": "Result",
+    "run": "Run",
+    "modelled": "Modelled",
+    "study": "study",
+    "scenario": "scenario",
+    "city": "city",
+    "stationId": "station_id",
+    "epwSource": "epw_source",
+    "sourcePeriod": "source_period",
+    "sourceYears": "source_years",
+    "weatherArchive": "weather_archive",
+    "epwOffset": "epw_utc_offset",
+    "stationNote": "station_note",
+    "csvPeriod": "period"
+  },
+  "units": {
+    "°C": "°C",
+    "m³": "m³",
+    "%": "%",
+    "MWh electric": "MWh electric",
+    "h": "h",
+    "MWh e": "MWh e",
+    "W": "W",
+    "kg/s": "kg/s",
+    "kPa": "kPa",
+    "K": "K",
+    "K/W": "K/W",
+    "kW": "kW",
+    "m": "m",
+    "MWh electric/year": "MWh electric/year",
+    "L/s": "L/s",
+    "kg/m³": "kg/m³",
+    "kJ/(kg·K)": "kJ/(kg·K)",
+    "mPa·s": "mPa·s",
+    "–": "–",
+    "MWh e/year": "MWh e/year",
+    "kW thermal": "kW thermal",
+    "kW electric": "kW electric",
+    "MWh thermal": "MWh thermal",
+    "MWh th": "MWh th",
+    "kW e": "kW e",
+    "m²": "m²",
+    "kWh": "kWh",
+    "kW AC": "kW AC",
+    "MWh/year": "MWh/year"
+  },
+  "labels": {
+    "coolantSupply": "Coolant supply",
+    "budget": "Summer make-up water",
+    "padEffectiveness": "Pad effectiveness",
+    "trigger": "Enable pad at or above",
+    "padMetricSaved": "Cooling electricity saved",
+    "padMetricWater": "Make-up water",
+    "padMetricExtraoff": "Extra full chiller-off hours",
+    "padColumnReference": "Dry + chiller",
+    "padColumnPlant": "Study plant",
+    "padColumnSaved": "Electricity saved",
+    "padColumnWethours": "Spray-pump runtime",
+    "padColumnOff": "Chiller off",
+    "padColumnExtraoff": "Extra off",
+    "padChartTitle": "Monthly cooling electricity",
+    "heater": "Heater input",
+    "flow": "Water mass flow",
+    "inlet": "Inlet water",
+    "outlet": "Outlet water",
+    "plate": "Plate surface",
+    "drop": "Pressure drop across plate",
+    "efficiency": "Pump efficiency",
+    "coldMetricLiquid": "Heat carried by water",
+    "coldMetricCapture": "Heater input captured",
+    "coldMetricPump": "Pump input for plate drop",
+    "coldColumnCapture": "Heat capture",
+    "coldColumnBalance": "Heater input minus water heat",
+    "coldColumnDelta": "Water temperature rise",
+    "coldColumnPump": "Pump input for plate pressure drop",
+    "coldColumnResistance": "Plate-to-inlet resistance",
+    "referenceCoolantSupply": "Reference coolant supply",
+    "airSupply": "Server supply air",
+    "airRise": "Rack air temperature rise",
+    "exchangerEffectiveness": "Exchanger effectiveness",
+    "fan": "Extra fans at full flow",
+    "frost": "Frost lockout below",
+    "airMetricOff": "Chiller-off hours",
+    "airMetricFans": "Exchanger fans",
+    "airColumnCompressor": "Compressor",
+    "airColumnFrosthours": "Frost lockout",
+    "mix": "Propylene glycol by volume",
+    "fluid": "Bulk fluid temperature",
+    "diameter": "Pipe inside diameter",
+    "length": "Total pipe length",
+    "rise": "Adjusted loop rise",
+    "duration": "Time at adjusted rise",
+    "glycolMetricVariable": "Variable-speed pumping",
+    "glycolMetricIce": "First-ice temperature",
+    "glycolMetricExposure": "Outdoor hours below first ice",
+    "glycolColumnFlow": "Required flow at {{LOOP_RISE}} K",
+    "glycolColumnAdjustedflow": "Required flow at adjusted rise",
+    "glycolColumnDrop": "Loop pressure drop at {{LOOP_RISE}} K",
+    "glycolColumnRho": "Fluid density",
+    "glycolColumnCp": "Specific heat",
+    "glycolColumnMu": "Dynamic viscosity",
+    "glycolColumnReynolds": "Reynolds number at {{LOOP_RISE}} K",
+    "glycolColumnWaterpump": "Water pump input at {{LOOP_RISE}} K",
+    "glycolColumnPump": "Selected fluid pump input at {{LOOP_RISE}} K",
+    "glycolColumnAdjustedpump": "Selected fluid pump at adjusted rise",
+    "glycolColumnConstant": "Selected fluid, constant design flow",
+    "glycolColumnVariable": "Selected fluid, variable flow",
+    "glycolColumnSaved": "Variable-flow electricity saving",
+    "glycolColumnWaterenergy": "Water, same variable-flow schedule",
+    "volume": "Tank water volume",
+    "rate": "Charge / discharge limit",
+    "loss": "Daily standing loss",
+    "tankMetricSaved": "Plant electricity saved",
+    "tankMetricPeakafter": "Peak with tank",
+    "tankMetricReleased": "Cooling delivered by tank",
+    "tankColumnCharged": "Charged",
+    "tankColumnReleased": "Delivered",
+    "tankColumnLoss": "Standing loss",
+    "tankColumnStock": "Ending inventory",
+    "tankColumnPeakbefore": "Reference peak",
+    "tankChartTitle": "Monthly peak cooling demand",
+    "tankLegendPeakafter": "With tank",
+    "area": "PV module area",
+    "battery": "Battery energy capacity",
+    "inverter": "Battery charge / discharge limit",
+    "reserve": "Battery reserve",
+    "solarMetricGrid": "Grid electricity purchased",
+    "solarMetricPeakafter": "Peak grid import",
+    "solarMetricDischarge": "Battery supplied to load",
+    "solarColumnLoad": "Site load",
+    "solarColumnPv": "PV generation",
+    "solarColumnDirect": "PV used directly",
+    "solarColumnCharge": "Battery charge (AC)",
+    "solarColumnDischarge": "Battery output (AC)",
+    "solarColumnLoss": "Battery losses",
+    "solarColumnGrid": "Purchased",
+    "solarColumnSpill": "Curtailed",
+    "solarColumnPeakbefore": "Peak without PV",
+    "solarChartTitle": "Monthly site and grid electricity",
+    "solarLegendLoad": "Site demand",
+    "solarLegendGrid": "Grid purchases"
+  },
+  "studies": {
+    "pad": {
+      "nav": "Adiabatic cooling",
+      "category": "Heat rejection",
+      "title": "Adiabatic-assisted dry cooling",
+      "question": "How much water would you spend to displace a summer hour of chiller operation?",
+      "assumptions": "The pad wets the outdoor coil intake in June, July and August. Air entering the server hall is unchanged.",
+      "method": [
+        [
+          "Water and power",
+          "Hourly dry-bulb temperature, relative humidity and station pressure give the outdoor wet-bulb temperature. With pad effectiveness ε, the air reaching the dry coil is Tdry − ε × (Tdry − Twet). The dry-cooler capacity, fan cycling, chiller COP and {{IT_MW}} MW duty follow the regional reference."
+        ],
+        [
+          "Dispatch",
+          "The pad can run in summer at or above the selected trigger when the reference chiller is on. The controller takes eligible hours in time order only if the assisted plant, including its 2 kW spray pump at full fan duty, draws less electricity. Spray runtime counts the fraction of the hour when both fan and spray pump operate. The last water allocation can cover part of an hour. An extra chiller-off hour counts only if the chiller stays off for the entire hour."
+        ],
+        [
+          "Water balance",
+          "Full-speed air mass flow is assumed to be 100 kg/s. Evaporation equals the air’s sensible heat reduction divided by 2,450 kJ/kg, using air heat capacity 1.006 kJ/(kg·K). Fan duty scales both airflow and spray runtime. Make-up water includes a 10% allowance above evaporation. Pad pressure drop and idle water losses are excluded. Measure airflow, pad inlet/outlet conditions, water and electrical input to calibrate the case."
+        ]
+      ],
+      "sources": [
+        "EnergyPlus evaporative pad model",
+        "DOE data-centre design guide"
+      ]
+    },
+    "cold": {
+      "nav": "Cold plates",
+      "category": "Liquid cooling · Bench experiment",
+      "title": "Direct-to-chip cold-plate test",
+      "question": "How much of a heater’s electrical input reaches the liquid, and what pressure drop does that flow require?",
+      "assumptions": "Use readings taken after the plate temperature stabilises. A flow meter and two matched water-temperature probes give the liquid heat rate.",
+      "method": [
+        [
+          "A repeatable run",
+          "Use an electrically heated block in contact with a cold plate. At a steady heater setting record mass flow, inlet and outlet water temperatures, plate surface temperature, the pressure difference across the plate and heater power over the same interval. Repeat at a second flow with the heater power held constant."
+        ],
+        [
+          "Heat capture and resistance",
+          "Qwater = ṁ × 4,180 × (Tout − Tin) in watts. Heat capture is Qwater / Pheater. The signed residual is Pheater − Qwater. Plate-to-inlet thermal resistance is (Tplate − Tin) / Pheater, referenced to the heater input and the plate-surface probe. The Open Compute Project defines a component-case-to-inlet resistance, which needs a probe at the component case. Probe offsets, heat stored during warm-up and losses from the block all affect the result."
+        ],
+        [
+          "What the pump figure covers",
+          "Estimated pump input is Δp × volumetric flow / efficiency, using water density 1,000 kg/m³. This counts the measured plate pressure drop. Add the pressure drop through hoses, manifolds and the rest of the circuit to estimate whole-loop pumping. Scale component capture by its share of rack power. If cold-plated components use 60% of rack power and their plates capture 83.6%, they contribute 50.2% of rack heat to the liquid loop. Add any other liquid-cooled components separately. The link below the balance assumes that the tested component represents the whole rack."
+        ]
+      ],
+      "sources": [
+        "Open Compute Project cold-plate qualification",
+        "DOE direct liquid-cooling systems"
+      ]
+    },
+    "air": {
+      "nav": "Outdoor-air cooling",
+      "category": "Air-side heat rejection",
+      "title": "Indirect outdoor-air cooling",
+      "question": "When can an air-to-air heat exchanger cool the server hall while keeping outdoor and indoor air separate?",
+      "assumptions": "Both plants serve the same IT heat load. The reference uses the selected water supply, and this alternative uses the selected server supply air.",
+      "method": [
+        [
+          "Heat exchange",
+          "Indoor return air is the supply-air temperature plus the chosen rack rise. Both air streams have the same assumed heat-capacity rate C = IT duty / rack rise. Full-flow sensible duty is ε × C × max(0, Treturn − Toutdoor), capped at the IT heat load when delivered. The two air streams remain physically separate."
+        ],
+        [
+          "Fans, chiller and cold weather",
+          "The exchanger bypasses when a full-flow fan would cost at least as much as the displaced compressor power. It cycles at full speed when the available exchanger capacity exceeds the load. Below the chosen outdoor frost limit the exchanger locks out and the chiller carries the load. This simple control can be replaced with a measured frost or defrost map."
+        ],
+        [
+          "Comparison boundary",
+          "The reference dry cooler and alternative meet the same IT heat duty at their respective water and air setpoints. Both include the same fixed loop-pump allowance and chiller COP. Existing indoor circulation is common and excluded. The fan input here represents the additional fans and pressure drop of the exchanger. Humidity transfer, detailed frost formation and part-load COP are outside this screen."
+        ]
+      ],
+      "sources": [
+        "ASHRAE data-centre economizers",
+        "EnergyPlus heat-exchanger equations"
+      ]
+    },
+    "glycol": {
+      "nav": "Glycol & pumps",
+      "category": "Hydraulics · Freeze protection",
+      "title": "Glycol loops and variable-speed pumps",
+      "question": "What pumping penalty accompanies freeze protection, and how much can a wider loop temperature rise recover?",
+      "assumptions": "The {{IT_MW}} MW heat duty is fixed. The reference operates at a {{LOOP_RISE}} K rise. A variable-speed pump can reduce flow during the hours when the adjusted rise is allowed.",
+      "method": [
+        [
+          "Fluid properties",
+          "Choose water or a tabulated propylene-glycol volume fraction. Density and specific heat are linearly interpolated between 0, 10, 20 and 30 °C. Viscosity is interpolated logarithmically. Glycol properties and approximate first-ice temperatures come from the DOWFROST engineering guide, tables 3, 10, 14 and 22. The calculation holds bulk fluid temperature fixed. At the illustrative 20% concentration, the manufacturer warns that inhibitor levels may be too low for adequate corrosion protection."
+        ],
+        [
+          "Hydraulics and control",
+          "At each loop temperature rise, volumetric flow is Q / (ρ cp ΔT). Darcy–Weisbach pipe friction and an assumed minor-loss coefficient of 10 give the pressure drop. Pipe roughness is 0.045 mm. The Darcy factor uses 64/Re for laminar flow, Swamee–Jain for turbulent flow, and this worksheet’s linear interpolation between Re = 2,300 and 4,000. Pump electricity equals flow × pressure drop / pump efficiency. Each control meets {{IT_MW}} MW. For the selected fraction of the year, the variable-speed case allows the wider temperature rise and sets the flow accordingly."
+        ],
+        [
+          "Interpreting the winter count",
+          "The weather screen counts outdoor hours colder than the fluid’s first-ice temperature. The temperature of an exposed idle pipe depends on insulation, thermal mass and shutdown duration. The count is an exposure indicator. A freeze-protection design needs local extremes, system details and a specified margin. Coil performance and minimum equipment flow are separate design checks."
+        ]
+      ],
+      "sources": [
+        "DOWFROST engineering and operating guide",
+        "NIST water properties",
+        "EPA pipe head-loss methods"
+      ]
+    },
+    "tank": {
+      "nav": "Chilled-water storage",
+      "category": "Daily thermal storage",
+      "title": "Overnight chilled-water storage",
+      "question": "Can spare dry-cooler capacity at night cover the afternoon peak, and what does it do to annual electricity?",
+      "assumptions": "The tank starts empty. Charging runs from 22:00 to 06:00 and discharge from 12:00 to 20:00 on Kazakhstan’s current civil clock (UTC+5).",
+      "method": [
+        [
+          "Capacity and charging",
+          "An ideal stratified water tank operates across the reference loop temperature rise. Its capacity is volume × 1,000 kg/m³ × 4.18 kJ/(kg·K) × loop rise / 3,600 in kWh thermal. Each night the dry cooler serves the IT heat first. Only spare full-fan capacity can charge the tank, subject to tank volume and charge power."
+        ],
+        [
+          "A chronological balance",
+          "Standing loss is applied every hour to the current inventory. From noon until 20:00 the tank can displace residual chiller duty up to the selected discharge limit. Extra fan operation and transfer pumping (1% of thermal power moved) count as electricity. The tank starts empty and the table reports its final inventory. The controller converts each source hour to UTC+5. Weather order and monthly reporting retain the original EPW calendar. Source UTC+6 runs one hour ahead of the dispatch clock."
+        ],
+        [
+          "Reading the peaks",
+          "Peak demand is the largest hourly mean cooling-plant draw in the month or year. Moving energy into the afternoon can leave the annual peak unchanged if the highest draw occurs at a different hour. The model idealises stratification, heat-exchanger approaches and tank operation within the two setpoints."
+        ]
+      ],
+      "sources": [
+        "ASHRAE sensible thermal storage",
+        "Kazakhstan civil time"
+      ]
+    },
+    "solar": {
+      "nav": "Solar PV & batteries",
+      "category": "On-site electricity",
+      "title": "Solar PV and battery storage",
+      "question": "How much of the site’s hourly demand can a horizontal array supply while the battery keeps an outage reserve?",
+      "assumptions": "The hourly site load is IT plus the reference cooling plant. Surplus PV charges the battery. Remaining surplus is curtailed.",
+      "method": [
+        [
+          "A horizontal array",
+          "The publisher uses ERA5 reanalysis for solar radiation in every city. The EPW’s hourly global horizontal irradiation provides incident energy on an unobstructed horizontal array. Rated DC capacity is 0.20 kW per square metre. With G as hourly mean irradiance in W/m², cell temperature is estimated as Tout + (45 − 20) G / 800. Apply a −0.4%/K power coefficient relative to 25 °C, 10% other system losses and 96% inverter efficiency. Clip AC output at the rated array capacity."
+        ],
+        [
+          "Battery dispatch",
+          "Solar electricity serves the site first. Surplus charges the battery within its AC power and energy limits. During a deficit the battery supplies the load down to the reserve. Charging and discharging are each 95% efficient. The battery starts at the reserve and the model reports its ending charge. There is no grid charging, export payment or demand tariff."
+        ],
+        [
+          "Reading the result",
+          "Grid purchases include the {{IT_MW}} MW IT load and the dry-cooler/chiller plant. Direct solar use and battery output both displace grid electricity. An evening or winter peak can remain even with a large array. The hourly screen assumes snow-free modules and excludes shading, roof-area constraints, degradation and other facility loads. Tilted systems need plane-of-array solar data or a transposition model. In Aktau, Atyrau, Kostanay, Oral, Turkistan and Zhezkazgan, some hourly radiation falls outside local daylight. The model retains the source timing. Check it against local irradiance when assessing batteries or peak import."
+        ]
+      ],
+      "sources": [
+        "PVWatts v5 DC output, equation (8)",
+        "SAM PV system design",
+        "SAM behind-the-meter battery dispatch",
+        "TMYx solar data source",
+        "NOAA solar-position equations"
+      ]
+    }
+  }
+}
